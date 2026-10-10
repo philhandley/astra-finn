@@ -1,0 +1,176 @@
+{
+  "id": "mars-life",
+  "title": "Getting to Mars, and living there",
+  "tagline": "Rockets, radio hellos and a Mars backpack",
+  "accent": "red",
+  "hero": "assets/img/perseverance-selfie.jpg",
+  "minutes": 15,
+  "patch": {
+    "name": "Mars Pioneer",
+    "icon": "astronaut"
+  },
+  "dadNotes": [
+    "A trip to Mars takes about six to nine months in a rocket: roughly Easter to Christmas.",
+    "A radio message takes about 3 to 22 minutes to reach Mars, so a Mars crew must fix most problems themselves.",
+    "The Moon is about 384,400 km away, so a radio hello there takes about 1.3 seconds.",
+    "Mars air is very thin: under 1 per cent of Earth's pressure, and mostly carbon dioxide.",
+    "Space stations have carried mice, fish and spiders for science. No crew has been to Mars yet.",
+    "Astronauts have grown and eaten lettuce on the space station."
+  ],
+  "steps": [
+    {
+      "type": "story",
+      "title": "A car-sized robot",
+      "img": "assets/img/perseverance-selfie.jpg",
+      "credit": "NASA/JPL-Caltech/MSSS",
+      "text": "This robot is called Perseverance. It is about as big as a car, and it landed on Mars in 2021.",
+      "wow": "It even took a selfie on Mars!",
+      "dad": "Ask Finn: how do you think a car-sized robot lands on another planet?",
+      "source": "https://www.youtube.com/watch?v=4czjS9h4Fpg"
+    },
+    {
+      "type": "video",
+      "title": "Landing on Mars",
+      "youtubeId": "4czjS9h4Fpg",
+      "start": 0,
+      "channel": "NASA",
+      "why": "Real cameras filmed Perseverance landing on Mars. Watch the parachute open and the rover lowered on ropes!"
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "How long does a rocket take to get to Mars?",
+      "choices": [
+        {
+          "label": "One week"
+        },
+        {
+          "label": "Six to nine months"
+        },
+        {
+          "label": "Five years"
+        }
+      ],
+      "answer": 1,
+      "reveal": "Good guess! The trip takes about six to nine months. That is about as long as from Easter to Christmas.",
+      "source": "https://www.popsci.com/science/how-long-does-it-take-to-get-to-mars/"
+    },
+    {
+      "type": "guess",
+      "title": "Guess again!",
+      "prompt": "How long does a radio message take to reach Mars?",
+      "choices": [
+        {
+          "label": "Less than a second"
+        },
+        {
+          "label": "Three to twenty-two minutes"
+        },
+        {
+          "label": "About a whole day"
+        }
+      ],
+      "answer": 1,
+      "reveal": "Good guess! Radio messages travel at the speed of light, but Mars is so far away that it takes three to twenty-two minutes. Mars cannot reply in a flash!",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+    },
+    {
+      "type": "story",
+      "title": "Getting there by Starship",
+      "img": "assets/img/starship-liftoff.jpg",
+      "credit": "Steve Jurvetson, CC BY 2.0",
+      "text": "To fly to Mars, Starship would fill up with fuel in space, from tanker ships, like a petrol station in orbit. Then it waits for Earth and Mars to line up.",
+      "wow": "Mars and Earth line up about every 2 years!",
+      "dad": "In 2026 SpaceX decided to aim for the Moon first. Ask: why practise on the Moon before Mars?",
+      "source": "https://payloadspace.com/spacex-delays-mars-plans-in-favor-of-the-moon/"
+    },
+    {
+      "type": "play",
+      "module": "delay",
+      "title": "Say Hello to Mars",
+      "intro": "Press the big button to send a hello to Mars, then wait for the reply to come back.",
+      "data": {}
+    },
+    {
+      "type": "story",
+      "title": "Air you cannot breathe",
+      "img": "assets/img/moxie.jpg",
+      "credit": "NASA",
+      "text": "The air on Mars is very thin, and most of it is a gas we cannot breathe. A machine called MOXIE showed that it can make oxygen from that air.",
+      "wow": "Astronauts might make some of their own air!",
+      "dad": "Ask Finn: what would you bring if you had to carry all your own air and water?"
+    },
+    {
+      "type": "story",
+      "title": "A home on Mars",
+      "img": "assets/img/mars-sunset.jpg",
+      "credit": "NASA/JPL-Caltech/Texas A&M/Cornell",
+      "text": "The first crews would probably live inside their Starship. To stay safe from the Sun's harmful rays, they might cover their homes with Mars soil, or live in caves made by old lava.",
+      "wow": "Some cave holes on Mars are wider than a football pitch!",
+      "dad": "Ask: would you rather live in a dome with a view, or a cosy cave?",
+      "source": "https://en.wikipedia.org/wiki/Mars"
+    },
+    {
+      "type": "video",
+      "title": "How people could live on Mars",
+      "youtubeId": "cf-JUz3gqdk",
+      "start": 0,
+      "channel": "SciShow Kids",
+      "why": "A kids' video that asks how people could live on Mars."
+    },
+    {
+      "type": "question",
+      "title": "Big Question: The Pet Problem",
+      "scenario": "Imagine the first crew to Mars can take just ONE animal. Every kilogram costs lots of money to launch, and animals need food, water and clean-up. What would you choose?",
+      "options": [
+        {
+          "label": "A dog",
+          "detail": "Company and cuddles, but it needs lots of food and walks."
+        },
+        {
+          "label": "A goldfish",
+          "detail": "Easy to look after, but its water is heavy."
+        },
+        {
+          "label": "A chicken",
+          "detail": "Fresh eggs, but it is noisy and needs space."
+        },
+        {
+          "label": "No animal",
+          "detail": "Take extra water and food instead."
+        }
+      ],
+      "reveal": "Space stations have carried mice, fish and spiders for science. Astronauts have grown lettuce on the space station and eaten it. No crew has been to Mars yet, so nobody knows which plan will be best.",
+      "followUp": "What would you pick, and what would change your mind?"
+    },
+    {
+      "type": "play",
+      "module": "pack",
+      "title": "Pack the Ship",
+      "intro": "Load the ship with what the crew needs, but keep it under the weight limit.",
+      "data": {}
+    },
+    {
+      "type": "athome",
+      "title": "Try it at home: The Mars backpack",
+      "need": [
+        "a small backpack or bag",
+        "five things from around the house"
+      ],
+      "steps": [
+        "Ask Finn to pick five things from around the house that he would take to Mars.",
+        "Pack them in the backpack. Keep them light, because everything has to fly on a rocket.",
+        "For each thing, Finn tells Dad why it would help on Mars.",
+        "Take one thing out. What would you miss most, and what could you make instead?"
+      ],
+      "why": "Everything you take to Mars has to be launched into space, so every item needs a good reason."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What would you miss most from Earth?"
+      ]
+    }
+  ]
+}

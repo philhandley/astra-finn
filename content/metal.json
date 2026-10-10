@@ -1,0 +1,119 @@
+{
+  "id": "metal",
+  "title": "How long does metal last?",
+  "tagline": "Rust, dust and a million years",
+  "accent": "gold",
+  "hero": "assets/img/apollo11-lro.jpg",
+  "minutes": 12,
+  "patch": {
+    "name": "Time Keeper",
+    "icon": "bolt"
+  },
+  "dadNotes": [
+    "Apollo 11's lander base is still on the Moon, more than 50 years on, with no rust.",
+    "Rust needs water and air. The Moon has neither, so its metal stays shiny.",
+    "Venus is about 465 degrees Celsius. The Venera 13 probe lasted 127 minutes, about as long as a film.",
+    "Opportunity was built for 90 Mars days and worked for nearly 15 years.",
+    "Voyager 1 has been flying since 1977 and still sends messages home.",
+    "Starship is made of stainless steel: cheap, tough in the cold, and better at handling heat than carbon fibre (Elon Musk's reasons)."
+  ],
+  "steps": [
+    {
+      "type": "story",
+      "title": "Still there after 50 years",
+      "img": "assets/img/apollo11-lro.jpg",
+      "credit": "LROC/NASA GSFC/ASU",
+      "text": "This photo was taken from space, of the place where Apollo 11 landed on the Moon. The lander's base is still there, more than fifty years later.",
+      "wow": "No rust on the Moon!",
+      "dad": "Ask Finn: why do you think it has not rusted?",
+      "source": "https://space.com/12846-apollo-moon-landing-sites-flags-footprints.html"
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "Where would a steel bike last the longest?",
+      "choices": [
+        {
+          "label": "On a beach on Earth"
+        },
+        {
+          "label": "On the Moon"
+        },
+        {
+          "label": "On Venus"
+        }
+      ],
+      "answer": 1,
+      "reveal": "Good guess! On the Moon there is no air and no water, so there is no rust. A beach has both air and water, so rust grows there. Venus is very hot and has acid in its clouds, so it is the hardest place of all.",
+      "source": "https://space.com/12846-apollo-moon-landing-sites-flags-footprints.html"
+    },
+    {
+      "type": "play",
+      "module": "timemachine",
+      "title": "The Metal Time Machine",
+      "intro": "Pick a place and an object, then drag the time slider to see what happens to it.",
+      "data": {}
+    },
+    {
+      "type": "story",
+      "title": "Rust by the sea",
+      "text": "On Earth, rust needs water and air to grow. A beach has both, so iron and steel go brown and crumbly.",
+      "wow": "Rust can slowly eat through steel!",
+      "dad": "Ask Finn: have you ever seen something go rusty?"
+    },
+    {
+      "type": "story",
+      "title": "Hot Venus",
+      "img": "assets/img/venera13.jpg",
+      "credit": "USSR/NASA (NSSDC archive)",
+      "text": "Venus is about 465 degrees Celsius, much hotter than any oven at home. In 1982 a Soviet probe landed there, and it sent back this picture of the ground.",
+      "wow": "It lasted 127 minutes, about as long as a film!",
+      "source": "https://scienceblog.com/t-in-1982-soviet-venera-13-survived-127-minutes-on-venus/"
+    },
+    {
+      "type": "story",
+      "title": "Built for three months",
+      "img": "assets/img/opportunity.jpg",
+      "credit": "NASA/JPL",
+      "text": "A rover called Opportunity was built to work on Mars for just 90 Mars days, about three months. It kept going for much longer.",
+      "wow": "It worked for nearly 15 years!",
+      "source": "https://astrobiology.nasa.gov/news/opportunity-rover-mission-comes-to-an-end/"
+    },
+    {
+      "type": "story",
+      "title": "Still flying",
+      "img": "assets/img/voyager.jpg",
+      "credit": "NASA",
+      "text": "Voyager 1 is a spacecraft that has been flying since 1977. It is now the furthest spacecraft from Earth, and it still sends messages home.",
+      "wow": "Flying since 1977!",
+      "dad": "Ask Finn: what would you want to tell someone who finds Voyager?",
+      "source": "https://science.nasa.gov/mission/voyager/"
+    },
+    {
+      "type": "athome",
+      "title": "Try it at home: The three rusty nails",
+      "need": [
+        "three clean jam jars with lids",
+        "three new nails",
+        "salt",
+        "cooking oil",
+        "water"
+      ],
+      "steps": [
+        "Jar 1: put a nail in, add water and a spoon of salt, then put the lid on.",
+        "Jar 2: put a nail in with nothing else, then put the lid on. This one stays dry.",
+        "Jar 3: put a nail in, add water, then pour a thin layer of oil on top. Put the lid on.",
+        "Check the nails tomorrow, and again in a week. Which one went rusty first?",
+        "Ask Finn: what do you think would happen to all three nails on the Moon?"
+      ],
+      "why": "Rust needs water and air. The oil keeps air away from jar 3, and on the Moon all three nails would stay shiny."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "Why do you think SpaceX chose steel for Starship?"
+      ]
+    }
+  ]
+}

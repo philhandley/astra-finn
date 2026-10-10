@@ -1,0 +1,156 @@
+{
+  "id": "asteroids",
+  "title": "How big is an asteroid?",
+  "tagline": "Space rocks come in all sizes",
+  "accent": "cyan",
+  "hero": "assets/img/bennu.jpg",
+  "minutes": 14,
+  "patch": {
+    "name": "Space Rock Spotter",
+    "icon": "asteroid"
+  },
+  "dadNotes": [
+    "Bennu is about 490 metres across: more than four football pitches end to end.",
+    "Chelyabinsk, 2013: a rock about 18 metres wide, about one and a half London buses long. It broke lots of windows.",
+    "2024 YR4: about 60 metres wide, as long as six houses in a row. In 2025 it had about a 1 in 25 chance of hitting the Moon in 2032. Webb measured it in 2026: it will miss the Moon by about 21,000 km.",
+    "DART (2022): a spacecraft crashed into Dimorphos on purpose. Its orbit got 33 minutes shorter.",
+    "Apophis: about 375 metres, nearly four football pitches long. On 13 April 2029 it flies past Earth, closer than some satellites.",
+    "Hera, an ESA spacecraft, is due at Didymos, the pair of rocks that includes Dimorphos, in November 2026.",
+    "About 39,000 near-Earth asteroids are known (NASA, December 2025). Rocks about 1 metre wide hit our air a few times a year and burn up."
+  ],
+  "steps": [
+    {
+      "type": "story",
+      "title": "Meet Bennu",
+      "img": "assets/img/bennu.jpg",
+      "credit": "NASA/Goddard/University of Arizona",
+      "text": "This lumpy dark rock is an asteroid called Bennu. It flies round the Sun and comes close to Earth.",
+      "wow": "About 490 metres across!",
+      "dad": "Ask Finn: do you think it is bigger than our house?",
+      "source": "https://arcnav.psi.edu/urn:nasa:pds:context:target:asteroid.101955_bennu"
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "Is Bennu bigger than the Eiffel Tower?",
+      "choices": [
+        {
+          "label": "Smaller"
+        },
+        {
+          "label": "About the same"
+        },
+        {
+          "label": "Bigger"
+        }
+      ],
+      "answer": 2,
+      "reveal": "Good guess! Bennu is bigger. If you laid the Eiffel Tower on its side, Bennu would be about one and a half Eiffel Towers long.",
+      "source": "https://arcnav.psi.edu/urn:nasa:pds:context:target:asteroid.101955_bennu"
+    },
+    {
+      "type": "play",
+      "module": "scale",
+      "title": "Scale Explorer",
+      "intro": "Pick a space rock, then pick something to compare it with, and watch them grow side by side.",
+      "data": {
+        "mode": "asteroids"
+      }
+    },
+    {
+      "type": "story",
+      "title": "A bright rock over Russia",
+      "img": "assets/img/chelyabinsk-trail.jpg",
+      "credit": "Alex Alishevskikh, CC BY-SA 2.0",
+      "text": "In 2013, a space rock about 18 metres wide flew over Russia and burst in the sky. It flashed very brightly, and it broke lots of windows.",
+      "wow": "About as long as one and a half buses!",
+      "source": "https://www.jpl.nasa.gov/news/additional-details-on-the-large-feb-15-fireball-over-russia/"
+    },
+    {
+      "type": "question",
+      "title": "Big Question: The Moon Rock Problem",
+      "scenario": "In early 2025, scientists were worried about a space rock called 2024 YR4. It had about a 1 in 25 chance of hitting the Moon in 2032, when you will be 12. What would you do?",
+      "options": [
+        {
+          "label": "Build a spacecraft to push it away",
+          "detail": "It costs billions and might miss, but we would learn a lot."
+        },
+        {
+          "label": "Watch it with a super telescope",
+          "detail": "It is cheap, but if it is coming, we might lose a whole year."
+        },
+        {
+          "label": "Do nothing",
+          "detail": "A brand new crater on the Moon would be amazing to study."
+        }
+      ],
+      "reveal": "The world chose to watch it with the Webb telescope. In 2026, Webb measured it again, and it will miss the Moon by about 21,000 kilometres. Was waiting clever, or just lucky? Grown-ups still argue about it.",
+      "followUp": "Would you choose differently if a Moon base was already built there?"
+    },
+    {
+      "type": "story",
+      "title": "A crash on purpose",
+      "img": "assets/img/dart-art.jpg",
+      "credit": "NASA/Johns Hopkins APL (illustration)",
+      "text": "In 2022, a spacecraft called DART crashed into a small space rock called Dimorphos, on purpose. It was a test to see if we could push a rock off its path.",
+      "wow": "Its orbit got 33 minutes shorter!",
+      "dad": "Ask Finn: how would you push a rock out of the way?",
+      "source": "https://carnegiescience.edu/orbital-period-change-dimorphos-due-dart-kinetic-impact"
+    },
+    {
+      "type": "video",
+      "title": "Watch the crash",
+      "youtubeId": "N-OvnVdZP_8",
+      "start": 0,
+      "channel": "Johns Hopkins APL",
+      "why": "Watch the spacecraft fly in and hit the little rock."
+    },
+    {
+      "type": "story",
+      "title": "A visitor on its way",
+      "img": "assets/img/dimorphos.jpg",
+      "credit": "NASA/Johns Hopkins APL",
+      "text": "A new spacecraft called Hera is flying to the same pair of rocks. It is due to arrive in November 2026, to look at the crash site.",
+      "wow": "A spacecraft visit to a crash site!",
+      "dad": "Ask Finn: what would you want Hera to find?",
+      "source": "https://www.esa.int/Space_Safety/Hera/ESA_s_Hera_targets_early_arrival_at_Didymos_asteroids"
+    },
+    {
+      "type": "story",
+      "title": "A visitor in 2029",
+      "img": "assets/img/earth-from-orion.jpg",
+      "credit": "NASA",
+      "text": "A big space rock called Apophis is nearly four football pitches long. On 13 April 2029, it will fly past Earth, closer than some satellites.",
+      "wow": "Some people in Europe may see it with their own eyes!",
+      "dad": "Ask Finn: how old will you be on that day? About nine!",
+      "source": "https://www.esa.int/Space_Safety/Planetary_Defence/Apophis"
+    },
+    {
+      "type": "athome",
+      "title": "Try it at home: Crater tray",
+      "need": [
+        "a baking tray or big box",
+        "flour",
+        "cocoa powder and a sieve",
+        "two or three marbles or small stones",
+        "some paper to put underneath"
+      ],
+      "steps": [
+        "Put paper down first, because this is messy!",
+        "Spread a layer of flour in the tray and smooth it flat.",
+        "Sieve a thin layer of cocoa over the top. When something lands, the white flour underneath shows through.",
+        "Hold a marble at knee height and drop it gently. Look at the crater it makes.",
+        "Now drop a marble from shoulder height. Which crater is bigger?",
+        "Try a small stone. Which one makes the biggest crater?"
+      ],
+      "why": "A bigger, faster rock hits harder and makes a bigger crater, which is how the Moon got so many dents."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How would you push a rock as big as a stadium?"
+      ]
+    }
+  ]
+}

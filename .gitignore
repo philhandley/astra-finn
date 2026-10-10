@@ -1,0 +1,6 @@
+# Local-only files
+.claude/
+*.log
+Thumbs.db
+desktop.ini
+artifact.html

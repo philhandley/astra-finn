@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module harness</title>
+<link rel="stylesheet" href="../css/app.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<style>
+  body { display: flex; flex-direction: column; height: 100vh; }
+  #bar { padding: 8px 14px; font-size: 15px; color: var(--ink-2); border-bottom: 1px solid var(--line); display: flex; gap: 16px; }
+  #stage { position: relative; flex: 1; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="bar">harness: <b id="name"></b> <span id="status"></span></div>
+<div id="stage"></div>
+<script type="module">
+  // Usage: dev/harness.html?module=catch[&data=<urlencoded JSON>][&mission=starship][&sound][&destroyAfter=5000]
+  const p = new URLSearchParams(location.search);
+  const mod = p.get('module');
+  document.getElementById('name').textContent = mod;
+  const status = document.getElementById('status');
+  window.addEventListener('error', e => console.error('HARNESS ERROR:', e.message, e.filename, e.lineno));
+  window.addEventListener('unhandledrejection', e => console.error('HARNESS REJECTION:', e.reason && (e.reason.stack || e.reason)));
+  let data = {};
+  if (p.get('data')) data = JSON.parse(p.get('data'));
+  if (p.get('mission')) {
+    try {
+      const m = await (await fetch(`../content/${p.get('mission')}.json`)).json();
+      const step = m.steps.find(s => s.type === 'play' && s.module === mod);
+      if (step && step.data) data = step.data;
+    } catch (e) { console.warn('mission load failed', e); }
+  }
+  const ctx = {
+    data,
+    speak: t => console.log('SPEAK:', t),
+    stopSpeaking() {},
+    log: t => console.log('LOG:', t),
+    complete: () => { console.log('COMPLETE'); status.textContent = 'complete ✓'; },
+    crew: { commander: 'Finn', engineer: 'Dad' },
+    sound: p.has('sound'),
+    save: (k, v) => localStorage.setItem(`h.${mod}.${k}`, JSON.stringify(v)),
+    load: k => { try { return JSON.parse(localStorage.getItem(`h.${mod}.${k}`)); } catch { return null; } },
+  };
+  const m = await import(`../js/games/${mod}.js`);
+  const inst = await m.mount(document.getElementById('stage'), ctx);
+  window.__inst = inst;
+  console.log('MOUNTED', mod);
+  if (p.has('destroyAfter')) setTimeout(() => { inst.destroy(); console.log('DESTROYED'); }, +p.get('destroyAfter'));
+</script>
+</body>
+</html>

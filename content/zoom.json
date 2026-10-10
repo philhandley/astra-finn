@@ -1,0 +1,103 @@
+{
+  "id": "zoom",
+  "title": "The Big Zoom",
+  "tagline": "From Finn all the way to the Sun",
+  "accent": "gold",
+  "hero": "assets/img/earth-from-orion.jpg",
+  "minutes": 9,
+  "patch": {
+    "name": "Big Zoom Explorer",
+    "icon": "zoom"
+  },
+  "dadNotes": [
+    "Earth is about 12,756 km across. The Moon is about 3,475 km, so about four Moons fit across Earth.",
+    "Mars is about 6,792 km across: about half as wide as Earth.",
+    "Ceres is about 950 km across. Lay about a hundred Mount Everests (8.8 km) end to end and they nearly stretch across it.",
+    "Starship is about 124 metres tall, more than a quarter taller than Big Ben (96 metres).",
+    "Jupiter is the biggest planet, and lots and lots of Earths could fit inside it.",
+    "The Sun is so big that Earth could fit inside it many times over. Let Finn guess what comes next before you slide."
+  ],
+  "steps": [
+    {
+      "type": "story",
+      "title": "Our home",
+      "img": "assets/img/earth.jpg",
+      "credit": "NASA",
+      "text": "This is Earth, our home. Today we start small, with you, and zoom out all the way to the Sun.",
+      "wow": "Ready for the Big Zoom?",
+      "dad": "Ask Finn: what do you think we will find at the very end?"
+    },
+    {
+      "type": "play",
+      "module": "scale",
+      "title": "The Big Zoom",
+      "intro": "Slide to the right to zoom out one step at a time, and watch each new thing appear.",
+      "data": {
+        "mode": "zoom"
+      }
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "How many Moons would fit across Earth?",
+      "choices": [
+        {
+          "label": "One"
+        },
+        {
+          "label": "About four"
+        },
+        {
+          "label": "About twenty"
+        }
+      ],
+      "answer": 1,
+      "reveal": "Good guess! About four Moons would fit across Earth. Earth is about 12,756 kilometres wide, and the Moon is about 3,475 kilometres wide.",
+      "source": "https://starchild.gsfc.nasa.gov/docs/StarChild/solar_system_level1/earth_facts.html"
+    },
+    {
+      "type": "story",
+      "title": "A dwarf planet",
+      "img": "assets/img/ceres.jpg",
+      "credit": "NASA/JPL (Dawn, Occator)",
+      "text": "Ceres is a round rock in space, about 950 kilometres across. It is the biggest object in the asteroid belt, between Mars and Jupiter.",
+      "wow": "Lay about a hundred Mount Everests end to end, and they nearly stretch across it!",
+      "source": "https://science.nasa.gov/dwarf-planets/ceres/facts/"
+    },
+    {
+      "type": "story",
+      "title": "Taller than Big Ben",
+      "img": "assets/img/starship-liftoff.jpg",
+      "credit": "Steve Jurvetson, CC BY 2.0",
+      "text": "Starship is about 124 metres tall. That is more than a quarter taller than Big Ben!",
+      "wow": "The biggest rocket ever flown.",
+      "source": "https://en.wikipedia.org/wiki/Starship_(rocket)"
+    },
+    {
+      "type": "story",
+      "title": "The giant planet",
+      "img": "assets/img/jupiter.jpg",
+      "credit": "NASA/JPL-Caltech",
+      "text": "Jupiter is the biggest planet in our Solar System. Lots and lots of Earths could fit inside it.",
+      "wow": "About 11 Earths would fit across it!",
+      "source": "https://science.nasa.gov/jupiter/jupiter-facts/"
+    },
+    {
+      "type": "story",
+      "title": "The Sun",
+      "img": "assets/img/sun.jpg",
+      "credit": "NASA/SDO",
+      "text": "This is the Sun, the star in the middle of our Solar System. Every planet goes round it, and it is the biggest thing we have zoomed to.",
+      "wow": "About 109 Earths would fit across it!",
+      "dad": "Ask Finn: what do you think is even bigger than the Sun?",
+      "source": "https://science.nasa.gov/sun/facts/"
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What do you think is even bigger than the Sun?"
+      ]
+    }
+  ]
+}

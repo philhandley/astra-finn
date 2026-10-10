@@ -1,0 +1,112 @@
+{
+  "id": "moon",
+  "title": "The Moon base",
+  "tagline": "Building a home where it is dark",
+  "accent": "cyan",
+  "hero": "assets/img/moon-basecamp.jpg",
+  "minutes": 13,
+  "patch": { "name": "Moon Base Builder", "icon": "moon" },
+  "dadNotes": [
+    "The Moon is about 384,400 km away. Its day (sunshine) lasts about two Earth weeks, then two weeks of night.",
+    "Moon gravity is about one sixth of Earth's: Finn would weigh about a sixth as much, and could jump about six times higher.",
+    "Artemis II: four astronauts flew round the Moon and home in about 9 days, in April 2026.",
+    "Shackleton crater: its rim gets sunshine most of the year, but its floor stays in shadow and may hold ice.",
+    "Temperatures at the Moon's equator run from about minus 178 degrees to plus 117 degrees Celsius.",
+    "Artemis IV, planned for 2028, would be the first crewed landing near the south pole."
+  ],
+  "steps": [
+    {
+      "type": "story",
+      "title": "A base on the Moon",
+      "img": "assets/img/moon-basecamp.jpg",
+      "credit": "NASA",
+      "text": "NASA wants to go back to the Moon, and this time to stay. This picture shows an idea for a Moon base near the south pole.",
+      "wow": "A home on the Moon!",
+      "dad": "Ask Finn: why would you build a house where it is dark?",
+      "source": "https://www.nasa.gov/moonbase/"
+    },
+    {
+      "type": "video",
+      "title": "Watch the Artemis II launch",
+      "youtubeId": "_eeZQw9PBc0",
+      "start": 0,
+      "channel": "NASA",
+      "why": "Watch the giant rocket that carried four astronauts round the Moon in April 2026.",
+      "warning": "It is very loud! Turn the sound down a little before you press play."
+    },
+    {
+      "type": "story",
+      "title": "Round the Moon and home",
+      "img": "assets/img/artemis2-crew.jpg",
+      "credit": "NASA",
+      "text": "In April 2026, four astronauts flew round the Moon and safely back to Earth. The whole trip took about nine days.",
+      "wow": "Nine days, there and back!",
+      "dad": "Ask Finn: what would you bring for nine days in space?",
+      "source": "https://www.nasa.gov/mission/artemis-ii/"
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "How long does one day on the Moon last?",
+      "choices": [ { "label": "About 24 hours, like ours" }, { "label": "About two weeks" }, { "label": "About six months" } ],
+      "answer": 1,
+      "reveal": "Good guess! A Moon day is about two weeks of sunshine, then about two weeks of night. The Moon turns very slowly, so the Sun stays up for ages.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html"
+    },
+    {
+      "type": "story",
+      "title": "A crater in the dark",
+      "img": "assets/img/shackleton.jpg",
+      "credit": "NASA/GSFC/ASU/JHUAPL/MIT/SwRI",
+      "text": "This is Shackleton crater, near the Moon's south pole. Its rim gets sunshine most of the year, but its floor is always in shadow.",
+      "wow": "Could there be ice in the dark?",
+      "dad": "Ask Finn: why do you think scientists want to look inside?",
+      "source": "https://science.nasa.gov/resource/shackleton-craters-illuminated-rim-shadowed-interior/"
+    },
+    {
+      "type": "play",
+      "module": "moonbase",
+      "title": "Build the Moon Base",
+      "intro": "Drag each part of the base onto the map, and look for the right spot for it.",
+      "data": {}
+    },
+    {
+      "type": "story",
+      "title": "The next landing",
+      "img": "assets/img/moon-full.jpg",
+      "credit": "NASA",
+      "text": "NASA plans a mission called Artemis IV for 2028. It would be the first time astronauts land near the Moon's south pole.",
+      "wow": "A first for people at the south pole!",
+      "dad": "Ask Finn: what would you look for first?",
+      "source": "https://www.nasa.gov/news-release/nasa-marches-toward-artemis-iii-mission-in-2027-names-crew-members/"
+    },
+    {
+      "type": "question",
+      "title": "Big Question: The Ice Decision",
+      "scenario": "Scientists think there may be ice in a dark crater on the Moon. The ice could be drinking water, or it could be split up to make rocket fuel. What would you do with it?",
+      "options": [
+        { "label": "Drink it and grow food", "detail": "Water for people, and plants to grow in a greenhouse." },
+        { "label": "Make rocket fuel", "detail": "Fuel so rockets can fly home from the Moon." },
+        { "label": "Leave it alone", "detail": "Scientists want to study it before anyone touches it." }
+      ],
+      "reveal": "Grown-ups still argue about this. Some people want to use the ice to help crews live and travel there. Others say digging it up could ruin the science. Nobody has the final answer yet.",
+      "followUp": "What would you do with the ice, and what would change your mind?"
+    },
+    {
+      "type": "athome",
+      "title": "Try it at home: Torch-and-ball Moon day",
+      "need": ["a dark room", "a torch", "a ball", "a sticky note", "a small bowl"],
+      "steps": [
+        "Dim the lights. Stick a sticky note on the ball to mark your home on the Moon.",
+        "Hold the torch level with the ball and shine it on the ball, like the Sun.",
+        "Turn the ball very slowly, the way the Moon turns. Watch your sticky note move from light into dark.",
+        "Put the bowl on the table, like a crater. Shine the torch low and flat across it. The inside of the bowl stays dark!"
+      ],
+      "why": "The Moon turns so slowly that one day lasts about two weeks, and at the poles the Sun stays low, so crater bottoms stay dark."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "Should the Moon belong to anyone?"]
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "id": "mars",
+  "title": "How big is Mars?",
+  "tagline": "The red planet, to scale",
+  "accent": "red",
+  "hero": "assets/img/mars-globe.jpg",
+  "minutes": 12,
+  "patch": { "name": "Red Planet Explorer", "icon": "planet" },
+  "dadNotes": [
+    "Mars is about 6,800 km across, about half of Earth's 12,756 km. About two Marses fit across Earth.",
+    "Mars gravity is 38 per cent of Earth's, so a jump is about 2.6 times higher there.",
+    "The Moon's gravity is about one sixth of Earth's: a 30 cm jump becomes about 1.8 m there, as tall as Dad.",
+    "A Mars day is about 40 minutes longer than ours. A Mars year is almost two of ours.",
+    "Olympus Mons is about 22 km tall: about two and a half Mount Everests (8.8 km) stacked up.",
+    "Mars air is very thin: under 1 per cent of Earth's air pressure."
+  ],
+  "steps": [
+    {
+      "type": "story",
+      "title": "The red planet",
+      "img": "assets/img/mars-globe.jpg",
+      "credit": "NASA/USGS",
+      "text": "This is Mars, our next-door neighbour in space. It is a cold, dusty planet that looks rusty red.",
+      "wow": "About half as wide as Earth!",
+      "dad": "Ask Finn: could you walk all the way round it in a day?",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "How many Marses would fit across Earth?",
+      "choices": [ { "label": "One" }, { "label": "About two" }, { "label": "About five" } ],
+      "answer": 1,
+      "reveal": "Good guess! About two Marses fit across Earth. Think of Earth as a football, and Mars would be a grapefruit.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+    },
+    {
+      "type": "play",
+      "module": "planets",
+      "title": "Planet Lineup and Mars Jump",
+      "intro": "Tap each planet to see how big it is, then press JUMP to see how high Finn could jump on Mars.",
+      "data": {}
+    },
+    {
+      "type": "story",
+      "title": "A giant volcano",
+      "img": "assets/img/olympus-mons.jpg",
+      "credit": "NASA/JPL-Caltech/ASU",
+      "text": "On Mars there is a volcano called Olympus Mons. It is about 22 kilometres tall, one of the tallest mountains we know of.",
+      "wow": "About two and a half Mount Everests stacked up!",
+      "source": "https://science.nasa.gov/photojournal/pj-olympus-mons-26/"
+    },
+    {
+      "type": "guess",
+      "title": "Guess!",
+      "prompt": "How long is one year on Mars?",
+      "choices": [ { "label": "About the same as ours" }, { "label": "Almost two of our years" }, { "label": "Half of our year" } ],
+      "answer": 1,
+      "reveal": "Good guess! Mars is further from the Sun, so it takes longer to go round. One year on Mars is almost two of our years.",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+    },
+    {
+      "type": "story",
+      "title": "A longer day",
+      "img": "assets/img/mars-sunset.jpg",
+      "credit": "NASA/JPL-Caltech/Texas A&M/Cornell",
+      "text": "This is a sunset on Mars, seen by a rover. A day on Mars is a little longer than a day on Earth.",
+      "wow": "About 40 minutes longer, nearly as long as a football half!",
+      "dad": "Ask Finn: what would you do with 40 extra minutes every day?",
+      "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"
+    },
+    {
+      "type": "video",
+      "title": "A helicopter on Mars",
+      "youtubeId": "wMnOo2zcjXA",
+      "start": 0,
+      "channel": "NASA JPL",
+      "why": "Watch a tiny helicopter take off and land on Mars, in air that is very thin."
+    },
+    {
+      "type": "athome",
+      "title": "Try it at home: The Mars jump test",
+      "need": ["a plain wall", "two sticky notes", "a pen", "a ruler or tape measure"],
+      "steps": [
+        "Finn stands next to the wall and reaches up as high as he can. Dad puts a sticky note where his fingertips reach.",
+        "Now Finn jumps as high as he can, touching the wall at the top of his jump.",
+        "Dad puts a second sticky note at that top mark. Measure the gap between the two notes. That is Finn's jump on Earth.",
+        "Multiply the jump by 2.6. That is how high Finn would jump on Mars.",
+        "Multiply the jump by 6. That is how high Finn would jump on the Moon. Is it as tall as Dad?"
+      ],
+      "why": "Mars pulls more gently than Earth, and the Moon pulls even less, so you float higher before you come back down."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "Who would fix the toilet on Mars?"]
+    }
+  ]
+}
