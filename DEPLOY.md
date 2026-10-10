@@ -22,6 +22,10 @@ git push -u origin main
 4. On GitHub, open the repository, then **Settings**, then **Pages**. Under "Build and deployment", set **Source** to "Deploy from a branch", **Branch** to `main` and folder `/ (root)`. Click **Save**.
 5. Wait about a minute. The address is `https://YOUR-USERNAME.github.io/astra-finn/`.
 
+### Testing offline
+
+Open the app once on Wi-Fi and step through a mission. Then switch Wi-Fi off and open the app again from its home-screen icon: it should start normally, including the 3D Starship. Only the YouTube videos need the internet.
+
 ### Updating later
 
 After any change, regenerate the offline file list, commit and push:
@@ -36,7 +40,9 @@ git add -A && git commit -m "Update Astra Finn" && git push
 
 ## Option B: the Claude Artifact link (instant, already done)
 
-The Artifact link opens straight away in any browser where you are signed in to claude.ai. Inside an Artifact:
+Link: https://claude.ai/artifact/KZ4zVXGZa4bmor6wnmYnaF
+
+It opens straight away in any browser where you are signed in to claude.ai. It is private to your account until you share it from the page's Share menu. Inside an Artifact:
 - Videos open in the YouTube app instead of playing inside the page.
 - It doesn't work offline, and "Add to Home screen" makes a shortcut rather than a full app.
 - Progress (patches, Crew Log) is stored separately from the GitHub Pages version.

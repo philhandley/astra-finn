@@ -7,3 +7,4 @@ artifact.html
 
 # Throwaway module test pages written by the build agents
 dev/test-*.html
+test-artifact-inner.html
