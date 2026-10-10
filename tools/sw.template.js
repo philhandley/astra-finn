@@ -4,12 +4,29 @@ const LOCAL = __LOCAL__;
 const CDN = __CDN__;
 const RUNTIME_HOSTS = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com', 'i.ytimg.com'];
 
+async function precache(cache, urls, init) {
+  // Fetch then put, a few at a time: parallel cache.add() calls can fail in Chrome.
+  const queue = [...urls];
+  const worker = async () => {
+    while (queue.length) {
+      const u = queue.shift();
+      try {
+        const res = await fetch(new Request(u, init));
+        if (res.ok || res.type === 'opaque') await cache.put(u, res);
+        else console.warn('precache skipped', u, res.status);
+      } catch (err) {
+        console.warn('precache failed', u, String(err));
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: 4 }, worker));
+}
+
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(VERSION);
-    // Add one by one so a single missing file can't break the install.
-    await Promise.all(LOCAL.map(u => cache.add(new Request(u, { cache: 'reload' })).catch(() => {})));
-    await Promise.all(CDN.map(u => cache.add(new Request(u, { mode: 'cors' })).catch(() => {})));
+    await precache(cache, LOCAL, { cache: 'reload' });
+    await precache(cache, CDN, { mode: 'cors' });
     await self.skipWaiting();
   })());
 });

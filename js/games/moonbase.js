@@ -104,6 +104,7 @@ const DEFAULTS = {
 /* ------------------------------------------------------------------ */
 
 const CSS = `
+.g-moonbase [hidden]{display:none!important}
 .g-moonbase{position:absolute;inset:0;display:grid;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--font-body);user-select:none;-webkit-user-select:none}
 .g-moonbase.land{grid-template-columns:minmax(0,1fr) var(--mb-tray-w,310px);grid-template-rows:minmax(0,1fr)}
 .g-moonbase.port{grid-template-rows:minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr)}
@@ -136,6 +137,9 @@ const CSS = `
 .g-moonbase.lit .mb-marker.ok{border-color:var(--gold-2);box-shadow:0 0 30px rgba(255,210,122,.55),14px 5px 14px rgba(0,0,0,.62)}
 .g-moonbase .win{transition:fill .8s,opacity .8s}
 .g-moonbase.lit .mb-layer .win{fill:var(--gold-2);opacity:1}
+.g-moonbase .win-g,.g-moonbase .win-r{transition:opacity .8s}
+.g-moonbase.lit .mb-layer .win-g{opacity:.42}
+.g-moonbase.lit .mb-layer .win-r{opacity:1}
 .g-moonbase .mb-ghost{position:absolute;left:0;top:0;z-index:30;pointer-events:none;transform:scale(1.14);box-shadow:24px 12px 24px rgba(0,0,0,.55);transition:none;animation:none}
 .g-moonbase .mb-caption{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:min(720px,calc(100% - 24px));display:flex;gap:14px;align-items:center;padding:10px 12px 10px 14px;z-index:8;border-radius:20px;pointer-events:auto;transition:border-color .4s}
 .g-moonbase .mb-caption.ok{border-color:rgba(111,227,165,.55)}
@@ -193,6 +197,18 @@ const CSS = `
 .g-moonbase .mb-twist-foot[hidden]{display:none}
 .g-moonbase .mb-twist-foot p{flex:1;min-width:240px;margin:0;font-size:20px}
 .g-moonbase .mb-twist-foot p b{color:var(--gold-2);font-weight:600;display:block}
+.g-moonbase.compact .mb-tray{gap:8px;padding:8px 10px}
+.g-moonbase.compact .mb-tray-head{min-height:48px}
+.g-moonbase.compact .mb-prog{flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}
+.g-moonbase.compact .mb-tiles{gap:8px}
+.g-moonbase.compact .mb-tile{flex-direction:row;justify-content:flex-start;gap:6px;padding:4px 8px 4px 4px;min-height:56px;text-align:left;border-radius:14px}
+.g-moonbase.compact .mb-tile > svg{width:46px;height:46px}
+.g-moonbase.compact .mb-tile .mb-pip{width:24px;height:24px;right:-5px;top:-7px}
+.g-moonbase.compact.xnarrow .mb-tile{flex-direction:column;justify-content:center;text-align:center;gap:2px;padding:4px 4px 6px;line-height:1.05}
+.g-moonbase.compact.xnarrow .mb-tile > svg{width:40px;height:40px}
+.g-moonbase.narrow .mb-cap-ic,.g-moonbase.narrow .mb-cap-sub{display:none}
+.g-moonbase.narrow .mb-caption{padding:6px 6px 6px 14px;gap:8px;top:8px;width:calc(100% - 16px)}
+.g-moonbase.narrow .mb-cap-txt{font-size:19px;line-height:1.25}
 @media (prefers-reduced-motion: reduce){.g-moonbase .mb-marker.sel{animation:none}.g-moonbase .mb-banner.show{animation:mb-banner 3.4s steps(1) forwards}}
 `;
 
@@ -247,23 +263,23 @@ const ICONS = {
     </g>
     <path d="M68 84l4-5 4 5-4 3z" style="fill:var(--oxygen)" opacity=".8"/>`,
   home: `
-    <ellipse cx="52" cy="85" rx="40" ry="5" fill="rgba(0,0,0,.35)"/>
-    <path d="M9 82a36 32 0 0 1 70 0z" fill="#8a857c"/>
-    <path d="M9 82a36 32 0 0 1 70 0" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.6"/>
-    <path d="M17 82a28 24 0 0 1 54 0M27 82a18 16 0 0 1 34 0" fill="none" stroke="rgba(0,0,0,.22)" stroke-width="1.4"/>
-    <g fill="rgba(0,0,0,.18)"><circle cx="24" cy="70" r="1.6"/><circle cx="36" cy="59" r="1.4"/><circle cx="56" cy="57" r="1.8"/><circle cx="65" cy="68" r="1.5"/><circle cx="45" cy="66" r="1.2"/></g>
-    <path d="M26 58a28 24 0 0 1 22-11" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2.4" stroke-linecap="round"/>
-    <path d="M70 82V69h17v13z" style="fill:${ST}" stroke="#7d869a" stroke-width="1.4"/>
-    <rect x="76" y="72" width="7" height="10" rx="1.5" fill="#2b313d"/>
-    <rect class="win" x="31" y="66" width="9" height="7" rx="2" style="fill:var(--gold-2)" opacity=".45"/>
-    <rect class="win" x="45" y="62" width="9" height="7" rx="2" style="fill:var(--gold-2)" opacity=".45"/>
-    <path d="M5 82h86" style="stroke:${ST}" stroke-width="2" stroke-linecap="round" opacity=".6"/>`,
+    <ellipse cx="52" cy="86" rx="40" ry="4.5" fill="rgba(0,0,0,.35)"/>
+    <path d="M10 82V58a31 33 0 0 1 62 0v24z" fill="#a8a296"/>
+    <path d="M10 58a31 33 0 0 1 62 0" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.6"/>
+    <path d="M10 68h62M10 75h62M41 25v57" stroke="rgba(0,0,0,.16)" stroke-width="1.6"/>
+    <g fill="rgba(0,0,0,.16)"><circle cx="20" cy="70" r="1.4"/><circle cx="60" cy="44" r="1.6"/><circle cx="26" cy="40" r="1.2"/><circle cx="64" cy="72" r="1.3"/></g>
+    <path d="M18 52a25 27 0 0 1 16-21" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2.8" stroke-linecap="round"/>
+    <circle class="win" cx="28" cy="56" r="5.2" style="fill:var(--gold-2)" opacity=".45" stroke="#6d675e" stroke-width="1.6"/>
+    <circle class="win" cx="49" cy="52" r="5.2" style="fill:var(--gold-2)" opacity=".45" stroke="#6d675e" stroke-width="1.6"/>
+    <path d="M66 82V67a6 6 0 0 1 6-6h12a6 6 0 0 1 6 6v15z" style="fill:${ST}" stroke="#7d869a" stroke-width="1.4"/>
+    <rect x="75" y="67" width="9" height="15" rx="3" fill="#2b313d"/>
+    <path d="M4 82h88" style="stroke:${ST}" stroke-width="2" stroke-linecap="round" opacity=".6"/>`,
   pad: `
     <ellipse cx="50" cy="70" rx="43" ry="17" fill="rgba(0,0,0,.3)"/>
     <ellipse cx="48" cy="67" rx="42" ry="16" fill="#555a64" style="stroke:${ST}" stroke-width="2"/>
     <ellipse cx="48" cy="67" rx="31" ry="11" fill="none" style="stroke:var(--gold)" stroke-width="2.2" stroke-dasharray="6 5"/>
     <path d="M40 63v8M56 63v8M40 67h16" stroke="rgba(243,239,230,.8)" stroke-width="2.6" stroke-linecap="round"/>
-    <g class="win" style="fill:var(--red)" opacity=".7"><circle cx="8" cy="67" r="2.6"/><circle cx="88" cy="67" r="2.6"/><circle cx="48" cy="51.5" r="2.6"/><circle cx="48" cy="82.5" r="2.6"/><circle cx="20" cy="56" r="2.2"/><circle cx="76" cy="56" r="2.2"/><circle cx="20" cy="78" r="2.2"/><circle cx="76" cy="78" r="2.2"/></g>
+    <g class="win-r" style="fill:var(--red)" opacity=".7"><circle cx="8" cy="67" r="2.6"/><circle cx="88" cy="67" r="2.6"/><circle cx="48" cy="51.5" r="2.6"/><circle cx="48" cy="82.5" r="2.6"/><circle cx="20" cy="56" r="2.2"/><circle cx="76" cy="56" r="2.2"/><circle cx="20" cy="78" r="2.2"/><circle cx="76" cy="78" r="2.2"/></g>
     <path d="M43 58V22c0-6 2-11 5-15 3 4 5 9 5 15v36z" fill="#d9dde4" stroke="#8d96a6" stroke-width="1.4"/>
     <path d="M43 58l-6 6M53 58l6 6" style="stroke:${ST}" stroke-width="2.2" stroke-linecap="round"/>
     <path d="M45 24c0-5 1.3-9 3-12" stroke="rgba(255,255,255,.7)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
@@ -283,7 +299,7 @@ const ICONS = {
     <path d="M6 82h84" style="stroke:${ST}" stroke-width="2" stroke-linecap="round" opacity=".6"/>`,
   green: `
     <ellipse cx="52" cy="85" rx="40" ry="5" fill="rgba(0,0,0,.35)"/>
-    <path class="win" d="M12 82a36 34 0 0 1 72 0z" style="fill:var(--green)" opacity=".14"/>
+    <path class="win-g" d="M12 82a36 34 0 0 1 72 0z" style="fill:var(--green)" opacity=".14"/>
     <g fill="none" stroke="rgba(201,206,214,.55)" stroke-width="1.3">
       <path d="M30 82a18 34 0 0 1 36 0"/><path d="M48 48v34"/><path d="M15 69h66"/><path d="M22 57h52"/>
     </g>
@@ -396,26 +412,29 @@ function makeTerrain() {
   const N = makeNoise(7), N2 = makeNoise(13);
   const rnd = mulberry32(424242);
   const ph = [rnd() * 6.283, rnd() * 6.283, rnd() * 6.283, rnd() * 6.283];
-  const rimR = (th) => 1 + 0.03 * Math.sin(3 * th + ph[0]) + 0.022 * Math.sin(5 * th + ph[1]) + 0.012 * Math.sin(9 * th + ph[2]) + 0.006 * Math.sin(17 * th + ph[3]);
+  const rimF = (th) => 1 + 0.03 * Math.sin(3 * th + ph[0]) + 0.022 * Math.sin(5 * th + ph[1]) + 0.012 * Math.sin(9 * th + ph[2]) + 0.006 * Math.sin(17 * th + ph[3]);
+  const LUTN = 2048, LUT = new Float32Array(LUTN + 1);
+  for (let i = 0; i <= LUTN; i++) LUT[i] = rimF(-Math.PI + (i / LUTN) * 2 * Math.PI);
+  const rimR = (th) => { const f = ((th + Math.PI) / (2 * Math.PI)) * LUTN; const i = f | 0; const t = f - i; return LUT[i] + (LUT[i < LUTN ? i + 1 : i] - LUT[i]) * t; };
   const feats = [];
   let tries = 0;
-  while (feats.length < 120 && tries < 4000) {
+  while (feats.length < 200 && tries < 6000) {
     tries++;
     const x = (rnd() * 2 - 1) * 7, y = (rnd() * 2 - 1) * 6;
     const u = rnd();
-    const r = 0.04 + 0.4 * u * u * u * u;
+    const r = 0.028 + 0.42 * u * u * u * u;
     if (Math.hypot(x, y) < 1.6 + r * 1.6) continue;
-    feats.push({ k: 0, x, y, r, dep: r * (0.36 + 0.14 * rnd()), rim: r * (0.07 + 0.05 * rnd()) });
+    feats.push({ k: 0, x, y, r, dep: r * (0.26 + 0.12 * rnd()), rim: r * (0.06 + 0.05 * rnd()) });
   }
   for (let i = 0; i < 8; i++) {
     const a = rnd() * 6.283, d = rnd() * 0.6, r = 0.05 + 0.1 * rnd();
     feats.push({ k: 0, x: Math.cos(a) * d, y: Math.sin(a) * d, r, dep: r * 0.32, rim: r * 0.07 });
   }
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 150; i++) {
     const x = (rnd() * 2 - 1) * 7, y = (rnd() * 2 - 1) * 6;
     if (Math.hypot(x, y) < 1.0) continue;
     const r = 0.016 + 0.05 * rnd() * rnd();
-    feats.push({ k: 1, x, y, r, h: r * (0.45 + 0.7 * rnd()) });
+    feats.push({ k: 1, x, y, r, h: r * (0.22 + 0.4 * rnd()) });
   }
   // a few "peaks of light" on the rim
   for (const a of [2.55, 3.05, 3.55, 4.0, 2.1]) {
@@ -433,11 +452,11 @@ function makeTerrain() {
   function big(q) {
     const D = 0.5, H = 0.11;
     if (q < 1) return -D + (D + H) * Math.pow(q, 2.3);
-    const t = (q - 1) / 0.42;
+    const t = (q - 1) / 0.34;
     return H * Math.exp(-t * t);
   }
   function height(x, y) {
-    let h = 0.02 * N.fbm(x * 0.6 + 3.1, y * 0.6 + 1.7, 4) + 0.007 * N2.fbm(x * 2.7 + 9.2, y * 2.7 + 4.4, 3);
+    let h = 0.02 * N.fbm(x * 0.6 + 3.1, y * 0.6 + 1.7, 4) + 0.009 * N2.fbm(x * 2.7 + 9.2, y * 2.7 + 4.4, 4);
     const r = Math.hypot(x, y);
     if (r < 2.8) h += big(r / rimR(Math.atan2(y, x)));
     const ci = Math.floor((x - GX0) / CELL), cj = Math.floor((y - GY0) / CELL);
@@ -471,7 +490,7 @@ function makeTerrain() {
     const o = 0.13;
     return (2 * litAt(x, y) + litAt(x - o, y) + litAt(x + o, y) + litAt(x, y - o) + litAt(x, y + o)) / 6;
   }
-  return { height, qAt, litAt, litFrac, albedo: (x, y) => 0.9 + 0.2 * N2.fbm(x * 1.1 + 20, y * 1.1 + 5, 2), frost: (x, y) => N.n2(x * 5 + 40, y * 5 + 11) };
+  return { height, qAt, litAt, litFrac, albedo: (x, y) => 0.9 + 0.22 * N2.n2(x * 1.3 + 20, y * 1.3 + 5), frost: (x, y) => N.n2(x * 16 + 40, y * 16 + 11) };
 }
 
 let TERRAIN = null; // shared, deterministic
@@ -732,20 +751,24 @@ export async function mount(el, ctx) {
       icon = Math.min(icon, Math.floor((maxTray - 24 - 56 - 10 - (rows - 1) * 10) / rows - 66));
       icon = clamp(icon, 52, 112);
     }
+    const compact = !land && (H < 820 || W < 620 || icon < 80);
+    root.classList.toggle('compact', compact);
+    if (compact) cols = 3;
     root.style.setProperty('--mb-icon', icon + 'px');
     root.style.setProperty('--mb-cols', String(cols));
     root.classList.toggle('narrow', W < 700);
+    root.classList.toggle('xnarrow', W < 560);
 
     const mw = mapEl.clientWidth, mh = mapEl.clientHeight;
-    if (!mw || !mh) return;
-    const reserve = mw < 560 ? 132 : 100;
+    if (mw < 220 || mh < 180) return;
+    const reserve = Math.min(140, Math.max(70, capEl.offsetHeight + 16));
     const avH = Math.max(120, mh - reserve);
     const s = Math.min(mw, avH);
-    const R = Math.max(40, (land ? 0.27 : 0.23) * s);
+    const R = Math.max(36, (land ? 0.27 : mw < 560 ? 0.27 : 0.23) * s);
     const sizeChanged = Math.abs(mw - G.w) > 0.5 || Math.abs(mh - G.h) > 0.5;
     G.w = mw; G.h = mh; G.R = R; G.land = land;
     G.cx = mw * 0.56; G.cy = Math.min(mh - 1.2 * R, reserve + avH * 0.5);
-    G.mark = Math.round(clamp(R * 0.58, 64, 108));
+    G.mark = Math.round(clamp(R * 0.58, mh < 420 ? 52 : 64, 108));
     G.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     root.style.setProperty('--mb-mark', G.mark + 'px');
 
@@ -754,17 +777,20 @@ export async function mount(el, ctx) {
     positionLabels();
     buildGlints();
 
-    // keep placed parts on the map
-    for (const id of IDS) if (state.placed[id]) state.placed[id] = clampWorld(state.placed[id].x, state.placed[id].y);
+    // keep placed parts on the map (orientation changes)
+    if (G.valid) for (const id of IDS) if (state.placed[id]) state.placed[id] = clampWorld(state.placed[id].x, state.placed[id].y);
 
     if (sizeChanged || !G.ready) {
-      if (!G.ready) { renderTerrain(); }
-      else { clearTimeout(terrainTimer); terrainTimer = setTimeout(() => { if (!dead) renderTerrain(); }, 160); }
+      if (!G.ready) { renderTerrain(true); }
+      else { clearTimeout(terrainTimer); clearTimeout(refineTimer); terrainTimer = setTimeout(() => { if (!dead) renderTerrain(false); }, 160); }
     }
     evaluate();
     syncAll();
     buildRover();
+    if (!G.valid) { G.valid = true; const q = readyQueue.splice(0); q.forEach((fn) => { try { fn(); } catch (e) { console.warn('[moonbase]', e); } }); }
   }
+  const readyQueue = [];
+  const whenReady = (fn) => { if (G.valid) fn(); else readyQueue.push(fn); };
   function scheduleLayout() { if (!layoutRaf && !dead) layoutRaf = requestAnimationFrame(layout); }
 
   function positionLabels() {
@@ -801,12 +827,14 @@ export async function mount(el, ctx) {
   }
 
   /* ---------- terrain rendering ---------- */
-  function renderTerrain() {
+  let refineTimer = 0;
+  function renderTerrain(quick) {
     const t0 = performance.now();
+    clearTimeout(refineTimer);
     const { w, h, cx, cy, R } = G;
     const dpr = G.dpr;
     terrainCv.width = Math.round(w * dpr); terrainCv.height = Math.round(h * dpr);
-    const maxPix = 200000;
+    const maxPix = quick ? 36000 : 330000;
     const k = Math.max(1, Math.sqrt((w * h) / maxPix));
     const gw = Math.ceil(w / k), gh = Math.ceil(h / k);
     const step = k / R;
@@ -815,6 +843,7 @@ export async function mount(el, ctx) {
       const wy = ((j + 0.5) * k - cy) / R;
       for (let i = 0; i < gw; i++) Hf[j * gw + i] = T.height(((i + 0.5) * k - cx) / R, wy);
     }
+    const tH = performance.now();
     // shadows: the Sun is low on the left, so sweep each row left to right
     const L = new Float32Array(gw * gh);
     const drop = step * TAN_E;
@@ -828,20 +857,22 @@ export async function mount(el, ctx) {
         const idx = j * gw + i;
         hor -= drop;
         const diff = Hf[idx] - hor;
-        L[idx] = clamp(0.5 + diff / 0.006, 0, 1);
+        L[idx] = clamp(0.5 + diff / 0.01, 0, 1);
         if (Hf[idx] > hor) hor = Hf[idx];
       }
     }
+    const tS = performance.now();
     const off = document.createElement('canvas');
     off.width = gw; off.height = gh;
-    const octx = off.getContext('2d');
+    const octx = off.getContext('2d', { willReadFrequently: true });
     const img = octx.createImageData(gw, gh);
     const D = img.data;
     const rimC = document.createElement('canvas'); rimC.width = gw; rimC.height = gh;
     const darkC = document.createElement('canvas'); darkC.width = gw; darkC.height = gh;
-    const rimImg = rimC.getContext('2d').createImageData(gw, gh), darkImg = darkC.getContext('2d').createImageData(gw, gh);
+    const rimX = rimC.getContext('2d', { willReadFrequently: true }), darkX = darkC.getContext('2d', { willReadFrequently: true });
+    const rimImg = rimX.createImageData(gw, gh), darkImg = darkX.createImageData(gw, gh);
     const rimMask = new Uint8Array(gw * gh), darkMask = new Uint8Array(gw * gh);
-    const E = 1.7, inv2 = 1 / (2 * step);
+    const E = 1.25, inv2 = 1 / (2 * step);
     const rnd = mulberry32(99);
     for (let j = 0; j < gh; j++) {
       const wy = ((j + 0.5) * k - cy) / R;
@@ -859,17 +890,17 @@ export async function mount(el, ctx) {
         const alb = T.albedo(wx, wy);
         const hh = Hf[idx];
         const lit = L[idx];
-        const b = (0.16 + 1.42 * dif) * alb * (1 + 1.1 * Math.max(0, hh));
+        const rr0 = wx * wx + wy * wy;
+        const q = rr0 > 6 ? 3 : T.qAt(wx, wy);
+        const b = (0.09 + 1.18 * dif) * alb * (1 + 1.3 * Math.max(0, hh));
         let lr = 238 * b, lg = 233 * b, lb = 223 * b;
-        const am = (0.04 + 0.075 * sky) * alb;
-        let sr = 150 * am, sg = 168 * am, sb = 208 * am;
-        const q = T.qAt(wx, wy);
-        if (q < 0.97 && lit < 0.6) {
-          const fr = T.frost(wx, wy);
-          const fv = fr > 0.15 ? (fr - 0.15) * 1.0 : 0;
-          sr += 18 * fv; sg += 30 * fv; sb += 44 * fv;
-          const rr = rnd();
-          if (rr < 0.018) { const v = rnd(); sr += 40 * v; sg += 58 * v; sb += 78 * v; }
+        const inPsr = q < 0.97;
+        const am = (inPsr ? 0.05 + 0.09 * sky : 0.17 + 0.14 * sky) * alb;
+        let sr = 150 * am, sg = 162 * am, sb = 192 * am;
+        if (inPsr && lit < 0.6) {
+          const fv = clamp(1 - q, 0, 1);
+          sr += 4 * fv; sg += 9 * fv; sb += 16 * fv;
+          if (rnd() < 0.012) { const v = rnd(); sr += 30 * v; sg += 44 * v; sb += 58 * v; }
         }
         let r = sr + (lr - sr) * lit, g = sg + (lg - sg) * lit, bb = sb + (lb - sb) * lit;
         // gentle tone curve
@@ -880,6 +911,7 @@ export async function mount(el, ctx) {
         if (q < 0.9 && lit < 0.35) darkMask[idx] = 1;
       }
     }
+    const tC = performance.now();
     octx.putImageData(img, 0, 0);
     // zone hint images: soft fill plus a bright edge
     const fillZone = (mask, imgd, c) => {
@@ -890,8 +922,8 @@ export async function mount(el, ctx) {
         const o = idx * 4; d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = edge ? 235 : 70;
       }
     };
-    fillZone(rimMask, rimImg, [255, 210, 122]); rimC.getContext('2d').putImageData(rimImg, 0, 0);
-    fillZone(darkMask, darkImg, [95, 212, 255]); darkC.getContext('2d').putImageData(darkImg, 0, 0);
+    fillZone(rimMask, rimImg, [255, 210, 122]); rimX.putImageData(rimImg, 0, 0);
+    fillZone(darkMask, darkImg, [95, 212, 255]); darkX.putImageData(darkImg, 0, 0);
     zones = { rim: rimC, dark: darkC };
 
     const c = tctx;
@@ -900,9 +932,9 @@ export async function mount(el, ctx) {
     c.drawImage(off, 0, 0, w, h);
     // fine regolith grain
     const grain = document.createElement('canvas'); grain.width = grain.height = 128;
-    const gc = grain.getContext('2d'); const gi = gc.createImageData(128, 128);
+    const gc = grain.getContext('2d', { willReadFrequently: true }); const gi = gc.createImageData(128, 128);
     const gr = mulberry32(5);
-    for (let i = 0; i < 128 * 128; i++) { const v = gr(); const o = i * 4; const c2 = v > 0.5 ? 255 : 0; gi.data[o] = gi.data[o + 1] = gi.data[o + 2] = c2; gi.data[o + 3] = Math.abs(v - 0.5) * 34; }
+    for (let i = 0; i < 128 * 128; i++) { const v = gr(); const o = i * 4; const c2 = v > 0.5 ? 255 : 0; gi.data[o] = gi.data[o + 1] = gi.data[o + 2] = c2; gi.data[o + 3] = Math.abs(v - 0.5) * 44; }
     gc.putImageData(gi, 0, 0);
     c.save(); c.globalAlpha = 0.9; c.fillStyle = c.createPattern(grain, 'repeat'); c.fillRect(0, 0, w, h); c.restore();
     // low Sun glow on the left edge, and a vignette
@@ -913,7 +945,8 @@ export async function mount(el, ctx) {
     g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.42)');
     c.fillStyle = g; c.fillRect(0, 0, w, h);
     G.ready = true;
-    if (qs.has('debugTiming')) console.log('[moonbase] terrain ' + Math.round(performance.now() - t0) + ' ms ' + gw + 'x' + gh);
+    if (qs.has('debugTiming')) console.log('[moonbase] terrain ' + (quick ? 'quick ' : '') + Math.round(performance.now() - t0) + ' ms ' + gw + 'x' + gh + ' h=' + Math.round(tH - t0) + ' s=' + Math.round(tS - tH) + ' c=' + Math.round(tC - tS) + ' rest=' + Math.round(performance.now() - tC));
+    if (quick) refineTimer = setTimeout(() => { if (!dead) renderTerrain(false); }, 50);
     // statuses depend on terrain only through T, so they are stable; refresh visuals anyway
     evaluate(); syncAll();
   }
@@ -921,7 +954,7 @@ export async function mount(el, ctx) {
   function buildGlints() {
     const r = mulberry32(31);
     glints = [];
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 48; i++) {
       const a = r() * 6.283, d = Math.sqrt(r()) * 0.8;
       glints.push({ x: Math.cos(a) * d, y: Math.sin(a) * d, sp: 0.6 + r() * 1.8, ph: r() * 6.283, s: 0.6 + r() * 0.9 });
     }
@@ -1007,8 +1040,7 @@ export async function mount(el, ctx) {
       say(line, true);
       audio.place();
       later(() => (st.ok ? audio.good() : audio.hint()), 140);
-      const px = toPx(p);
-      puffs.push({ x: px.x, y: px.y, t0: performance.now() / 1000 });
+      puffs.push({ p, t0: performance.now() / 1000 });
       hint = st.ok ? null : { id, key: st.key, t0: performance.now() / 1000, until: performance.now() / 1000 + 3.6 };
       save();
     }
@@ -1040,18 +1072,18 @@ export async function mount(el, ctx) {
       state.lit = false;
     }
     root.classList.toggle('lit', state.lit && state.everLit);
-    nightTarget = state.twistOpen ? 0.55 : (state.lit && state.everLit ? 0.16 : 0);
+    nightTarget = state.twistOpen ? 0.55 : (state.lit && state.everLit ? 0.28 : 0);
   }
   function lightsOnQuiet() {
     state.everLit = true;
     root.classList.add('lit');
-    nightTarget = 0.16;
+    nightTarget = 0.28;
     call(ctx.complete);
   }
   function firstLights() {
     state.everLit = true;
     root.classList.add('lit');
-    nightTarget = 0.16;
+    nightTarget = 0.28;
     bannerEl.textContent = 'Lights on!';
     bannerEl.classList.remove('show'); void bannerEl.offsetWidth; bannerEl.classList.add('show');
     setCaption(cfg.lightsOn, { tone: 'ok' });
@@ -1083,7 +1115,7 @@ export async function mount(el, ctx) {
     twistEl.classList.remove('show');
     root.classList.remove('night');
     later(() => { if (!state.twistOpen) twistEl.hidden = true; }, 600);
-    nightTarget = state.lit ? 0.16 : 0;
+    nightTarget = state.lit ? 0.28 : 0;
     setCaption(state.lit ? cfg.lightsOn : cfg.intro, { tone: state.lit ? 'ok' : undefined });
   }
   function reveal(i) {
@@ -1183,9 +1215,9 @@ export async function mount(el, ctx) {
       let v = Math.sin(t * g.sp + g.ph);
       if (reduced) v = g.ph > 5 ? 0.8 : 0;
       if (v < 0.55) continue;
-      const a = Math.pow((v - 0.55) / 0.45, 2) * 0.9;
+      const a = Math.pow((v - 0.55) / 0.45, 2) * 0.8;
       const x = G.cx + g.x * R, y = G.cy + g.y * R;
-      const s = (2.2 + 3.2 * a) * g.s;
+      const s = (1.4 + 2.6 * a) * g.s;
       c.strokeStyle = `rgba(205,236,255,${a.toFixed(3)})`;
       c.lineWidth = 1;
       c.beginPath(); c.moveTo(x - s, y); c.lineTo(x + s, y); c.moveTo(x, y - s); c.lineTo(x, y + s); c.stroke();
@@ -1200,7 +1232,8 @@ export async function mount(el, ctx) {
       if (k > 1 || k < 0) { if (k > 1) puffs.splice(i, 1); continue; }
       c.strokeStyle = `rgba(220,215,205,${(0.5 * (1 - k)).toFixed(3)})`;
       c.lineWidth = 3 * (1 - k) + 1;
-      c.beginPath(); c.ellipse(p.x, p.y, G.mark * (0.5 + 0.55 * k), G.mark * (0.42 + 0.45 * k), 0, 0, 6.283); c.stroke();
+      const pp = toPx(p.p);
+      c.beginPath(); c.ellipse(pp.x, pp.y, G.mark * (0.5 + 0.55 * k), G.mark * (0.42 + 0.45 * k), 0, 0, 6.283); c.stroke();
     }
 
     // base lights, cables and the rover
@@ -1223,7 +1256,7 @@ export async function mount(el, ctx) {
   function drawLights(t, dt) {
     const c = fx, P = state.placed;
     const pulse = 0.85 + 0.15 * Math.sin(t * 2.2);
-    const glowA = litA * (0.55 + nightA * 0.9);
+    const glowA = litA * (0.8 + nightA * 0.9);
     c.save();
     // cables from the solar tower
     const links = [['solar', 'home'], ['home', 'green'], ['home', 'garage'], ['solar', 'ice'], ['home', 'pad']];
@@ -1254,7 +1287,7 @@ export async function mount(el, ctx) {
     for (const id of IDS) {
       if (!P[id]) continue;
       const p = toPx(P[id]);
-      const r = G.mark * 1.25;
+      const r = G.mark * 1.45;
       const col = id === 'green' ? '111,227,165' : id === 'ice' ? '124,196,255' : '255,206,128';
       const g = c.createRadialGradient(p.x, p.y, G.mark * 0.3, p.x, p.y, r);
       g.addColorStop(0, `rgba(${col},${(0.42 * glowA * pulse).toFixed(3)})`);
@@ -1281,7 +1314,7 @@ export async function mount(el, ctx) {
 
   function drawRover(t, dt) {
     const c = fx;
-    const sc = clamp(G.R / 150, 0.7, 1.6);
+    const sc = clamp(G.R / 115, 0.85, 1.9);
     const speed = 46 * sc;
     if (rover.pause > 0) rover.pause -= dt;
     else {
@@ -1500,8 +1533,9 @@ export async function mount(el, ctx) {
   const ro = new ResizeObserver(() => scheduleLayout());
   ro.observe(el);
   setCaption(cfg.intro, { sub: cfg.introTip });
-  const restored = restore();
   layout();
+  whenReady(() => {
+  const restored = restore();
   if (restored) {
     evaluate(); syncAll(); buildRover();
     if (IDS.every((id) => state.placed[id] && state.status[id] && state.status[id].ok)) {
@@ -1534,7 +1568,6 @@ export async function mount(el, ctx) {
   if (qs.has('debugPlaceAll') || qs.has('debugNight')) {
     for (const id of ['solar', 'ice', 'home', 'green', 'garage', 'pad']) { const p = goodSpot(id); placeAt(id, p.x, p.y, { quiet: id !== 'pad' }); }
     if (qs.has('debugNight')) {
-      if (!state.everLit && state.lit) { later(() => {}, 0); }
       openTwistNow();
     }
   } else if (qs.has('debugBad')) {
@@ -1549,6 +1582,7 @@ export async function mount(el, ctx) {
     if (r !== null) reveal(clamp(+r || 0, 0, 2));
   }
   if (qs.get('debugSelect') && IDS.includes(qs.get('debugSelect'))) selectId(qs.get('debugSelect'), true);
+  });
 
   startLoop();
 
@@ -1561,6 +1595,7 @@ export async function mount(el, ctx) {
       if (raf) cancelAnimationFrame(raf);
       if (layoutRaf) cancelAnimationFrame(layoutRaf);
       clearTimeout(terrainTimer);
+      clearTimeout(refineTimer);
       timers.forEach((id) => clearTimeout(id));
       timers.clear();
       audio.close();

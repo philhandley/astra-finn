@@ -89,7 +89,9 @@
       "module": "delay",
       "title": "Say Hello to Mars",
       "intro": "Press the big button to send a hello to Mars, then wait for the reply to come back.",
-      "data": {}
+      "data": {
+        "secondsPerMinute": 0.7
+      }
     },
     {
       "type": "story",

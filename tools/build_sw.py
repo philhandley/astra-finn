@@ -30,6 +30,7 @@ def main():
     for p in files:
         h.update(p.relative_to(ROOT).as_posix().encode())
         h.update(p.read_bytes())
+    h.update((ROOT / 'tools' / 'sw.template.js').read_bytes())
     version = h.hexdigest()[:10]
     local = ['./'] + [p.relative_to(ROOT).as_posix() for p in files]
     addons = set()

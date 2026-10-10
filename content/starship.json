@@ -5,7 +5,10 @@
   "accent": "gold",
   "hero": "assets/img/starship-liftoff.jpg",
   "minutes": 20,
-  "patch": { "name": "Booster Catchers", "icon": "rocket" },
+  "patch": {
+    "name": "Booster Catchers",
+    "icon": "rocket"
+  },
   "dadNotes": [
     "Height: about 124 m for the version flying now. Big Ben's tower is 96 m, so Starship is about a quarter taller.",
     "Booster (Super Heavy) is about 72 m tall with 33 Raptor engines. The Ship on top is about 52 m with 6 engines: 3 for air, 3 big-belled ones for space.",
@@ -13,7 +16,7 @@
     "It's made of stainless steel: cheap, strong when super cold, and copes with heat better than carbon fibre.",
     "About 18,000 black heat-shield tiles protect the Ship at about 1,400 °C when it comes back from space.",
     "First booster catch: Flight 5, 13 October 2024. Boosters have been caught three times (Flights 5, 7 and 8).",
-    "First time in orbit: Flight 14, 28 September 2026, with 26 Starlink satellites. Nobody has caught the Ship yet; SpaceX may try on Flight 15, possibly later this month.",
+    "First time in orbit: Flight 14, 28 September 2026, with 26 Starlink satellites. Nobody has caught the Ship yet. Flight 15 might try, but no date is confirmed: reports in early October 2026 pointed to November.",
     "Plans: an uncrewed Moon landing as early as 2027. Mars has been put on the back burner for now."
   ],
   "steps": [
@@ -34,29 +37,116 @@
       "intro": "Spin it with your finger. Tap the glowing dots. Try Cutaway to see inside, then press LAUNCH!",
       "data": {
         "hotspots": [
-          { "id": "booster-engines", "title": "33 engines", "text": "The booster has 33 Raptor engines. They all light up at once with a giant roar.", "wow": "More engines than any rocket ever!" },
-          { "id": "ship-engines", "title": "Ship engines", "text": "The ship has 6 engines. 3 small ones work best in air. 3 big ones work best in space.", "wow": "Big bells for space!" },
-          { "id": "grid-fins", "title": "Grid fins", "text": "These metal waffles steer the booster as it falls back home. The tower catches it just below them.", "wow": "4 fins, like giant waffles!" },
-          { "id": "hot-stage", "title": "Hot-staging ring", "text": "The ship lights its engines while it's still sitting on the booster. The fire escapes through these holes.", "wow": "It lights up before it lets go!" },
-          { "id": "lox-tank", "title": "Oxygen tank", "text": "The biggest tank holds liquid oxygen. Fire needs oxygen, and there's none in space, so the rocket brings its own.", "wow": "Colder than the coldest place on Earth!" },
-          { "id": "methane-tank", "title": "Methane tank", "text": "This tank holds liquid methane, the fuel. Methane and oxygen burn together to make the fire.", "wow": "One day we might make methane on Mars!" },
-          { "id": "ship-tanks", "title": "Ship's tanks", "text": "The ship has its own fuel tanks, so it can keep flying after the booster lets go.", "wow": "About 1,600 tonnes of fuel: as heavy as 1,000 cars!" },
-          { "id": "header-tanks", "title": "Header tanks", "text": "Little tanks in the nose keep some fuel safe and ready for landing.", "wow": "Saved for the very end!" },
-          { "id": "payload", "title": "Cargo bay", "text": "This is the space for cargo. Today it carries satellites. One day it could carry astronauts.", "wow": "100 tonnes: as heavy as a blue whale!" },
-          { "id": "flaps", "title": "Flaps", "text": "Four flaps steer the ship as it falls back from space, like a skydiver using arms and legs.", "wow": "Belly flop, then flip!" },
-          { "id": "tiles", "title": "Heat shield", "text": "About 18,000 black tiles stop the ship getting too hot when it comes back from space.", "wow": "1,400 °C: hotter than lava!" },
-          { "id": "tower", "title": "The catching tower", "text": "The launch tower has two giant arms called chopsticks. They catch the booster in mid-air!", "wow": "One and a half Big Bens tall!" }
+          {
+            "id": "booster-engines",
+            "title": "33 engines",
+            "text": "The booster has 33 Raptor engines. They all light up at once with a giant roar.",
+            "wow": "More engines than any rocket ever!"
+          },
+          {
+            "id": "ship-engines",
+            "title": "Ship engines",
+            "text": "The ship has 6 engines. 3 small ones work best in air. 3 big ones work best in space.",
+            "wow": "Big bells for space!"
+          },
+          {
+            "id": "grid-fins",
+            "title": "Grid fins",
+            "text": "These metal waffles steer the booster as it falls back home. The tower catches it just below them.",
+            "wow": "4 fins, like giant waffles!"
+          },
+          {
+            "id": "hot-stage",
+            "title": "Hot-staging ring",
+            "text": "The ship lights its engines while it's still sitting on the booster. The fire escapes through these holes.",
+            "wow": "It lights up before it lets go!"
+          },
+          {
+            "id": "lox-tank",
+            "title": "Oxygen tank",
+            "text": "The biggest tank holds liquid oxygen. Fire needs oxygen, and there's none in space, so the rocket brings its own.",
+            "wow": "Colder than the coldest place on Earth!"
+          },
+          {
+            "id": "methane-tank",
+            "title": "Methane tank",
+            "text": "This tank holds liquid methane, the fuel. Methane and oxygen burn together to make the fire.",
+            "wow": "One day we might make methane on Mars!"
+          },
+          {
+            "id": "ship-tanks",
+            "title": "Ship's tanks",
+            "text": "The ship has its own fuel tanks, so it can keep flying after the booster lets go.",
+            "wow": "About 1,600 tonnes of fuel: as heavy as 1,000 cars!"
+          },
+          {
+            "id": "header-tanks",
+            "title": "Header tanks",
+            "text": "Little tanks in the nose keep some fuel safe and ready for landing.",
+            "wow": "Saved for the very end!"
+          },
+          {
+            "id": "payload",
+            "title": "Cargo bay",
+            "text": "This is the space for cargo. Today it carries satellites. One day it could carry astronauts.",
+            "wow": "100 tonnes: as heavy as a blue whale!"
+          },
+          {
+            "id": "flaps",
+            "title": "Flaps",
+            "text": "Four flaps steer the ship as it falls back from space, like a skydiver using arms and legs.",
+            "wow": "Belly flop, then flip!"
+          },
+          {
+            "id": "tiles",
+            "title": "Heat shield",
+            "text": "About 18,000 black tiles stop the ship getting too hot when it comes back from space.",
+            "wow": "1,400 °C: hotter than lava!"
+          },
+          {
+            "id": "tower",
+            "title": "The catching tower",
+            "text": "The launch tower has two giant arms called chopsticks. They catch the booster in mid-air!",
+            "wow": "One and a half Big Bens tall!"
+          }
         ],
         "launchBeats": [
-          { "id": "ignition", "caption": "Ignition! All 33 engines light up." },
-          { "id": "liftoff", "caption": "Liftoff! Starship climbs past the tower." },
-          { "id": "maxq", "caption": "Max-Q: the air is pushing hardest now. Hold on!" },
-          { "id": "hotstage", "caption": "Hot staging! The ship lights its engines and lets go." },
-          { "id": "boostback", "caption": "The booster flips round and heads back home." },
-          { "id": "catch", "caption": "The chopsticks close... CAUGHT!" },
-          { "id": "space", "caption": "The ship is in space. Look at the curve of the Earth!" },
-          { "id": "reentry", "caption": "Coming home belly first, glowing like a shooting star." },
-          { "id": "flip", "caption": "Flip, engines on... and a soft landing!" }
+          {
+            "id": "ignition",
+            "caption": "Ignition! All 33 engines light up."
+          },
+          {
+            "id": "liftoff",
+            "caption": "Liftoff! Starship climbs past the tower."
+          },
+          {
+            "id": "maxq",
+            "caption": "Max-Q: the air is pushing hardest now. Hold on!"
+          },
+          {
+            "id": "hotstage",
+            "caption": "Hot staging! The ship lights its engines and lets go."
+          },
+          {
+            "id": "boostback",
+            "caption": "The booster flips round and heads back home."
+          },
+          {
+            "id": "catch",
+            "caption": "The chopsticks close... CAUGHT!"
+          },
+          {
+            "id": "space",
+            "caption": "The ship is in space. Look at the curve of the Earth!"
+          },
+          {
+            "id": "reentry",
+            "caption": "Coming home belly first, glowing like a shooting star."
+          },
+          {
+            "id": "flip",
+            "caption": "Flip, engines on... and a soft landing!"
+          }
         ]
       }
     },
@@ -64,7 +154,17 @@
       "type": "guess",
       "title": "Guess!",
       "prompt": "How many engines does the booster have?",
-      "choices": [ { "label": "3 engines" }, { "label": "10 engines" }, { "label": "33 engines" } ],
+      "choices": [
+        {
+          "label": "3 engines"
+        },
+        {
+          "label": "10 engines"
+        },
+        {
+          "label": "33 engines"
+        }
+      ],
       "answer": 2,
       "reveal": "33 engines! More than any rocket ever. They all light up together at liftoff.",
       "source": "https://en.wikipedia.org/wiki/Starship_(rocket)"
@@ -81,7 +181,17 @@
       "type": "guess",
       "title": "Guess!",
       "prompt": "Which is taller: Starship or Big Ben?",
-      "choices": [ { "label": "Big Ben" }, { "label": "They're the same" }, { "label": "Starship" } ],
+      "choices": [
+        {
+          "label": "Big Ben"
+        },
+        {
+          "label": "They're the same"
+        },
+        {
+          "label": "Starship"
+        }
+      ],
       "answer": 2,
       "reveal": "Starship! It's about 124 metres tall. Big Ben's tower is 96 metres. Starship would peek over the top.",
       "source": "https://webtest.parliament.uk/about/living-heritage/building/palace/architecture/palacestructure/towers-of-parliament"
@@ -119,9 +229,18 @@
       "credit": "Steve Jurvetson, CC BY 2.0",
       "scenario": "It's October 2024. The giant booster is falling back towards your only tower. If the catch goes wrong, the tower could break, and you couldn't launch for a long time.",
       "options": [
-        { "label": "Try to catch it!", "detail": "Exciting, and we'd learn how to reuse rockets." },
-        { "label": "Land it in the sea", "detail": "The tower stays safe, but the booster is lost." },
-        { "label": "Only catch it if everything is perfect", "detail": "Check every engine first. If anything's wrong, go to the sea." }
+        {
+          "label": "Try to catch it!",
+          "detail": "Exciting, and we'd learn how to reuse rockets."
+        },
+        {
+          "label": "Land it in the sea",
+          "detail": "The tower stays safe, but the booster is lost."
+        },
+        {
+          "label": "Only catch it if everything is perfect",
+          "detail": "Check every engine first. If anything's wrong, go to the sea."
+        }
       ],
       "reveal": "SpaceX chose something like the last one. The booster checked itself all the way down. Everything looked good, and the tower caught it on the very first try! On another flight, something wasn't quite right, so they sent it to the sea instead.",
       "followUp": "Is checking first brave, or careful? Can it be both?"
@@ -139,13 +258,19 @@
       "title": "Starship news",
       "text": "Just last month, on 28 September 2026, Starship flew all the way around the Earth for the first time. Next, SpaceX wants to try catching the ship too. Nobody has ever done that!",
       "wow": "Next stop: the Moon, maybe in 2027",
-      "dad": "Flight 15 might try the first ship catch soon. Check the news together!",
-      "source": "https://www.wunc.org/national/2026-09-28/spacexs-starship-launches-on-first-orbital-mission-from-texas"
+      "dad": "Flight 15 could try the first ship catch, maybe in November. Look out for it together!",
+      "source": "https://www.nasaspaceflight.com/2026/09/starship-14-orbit-flight-15/"
     },
     {
       "type": "athome",
       "title": "Try it at home: Balloon rocket",
-      "need": ["A balloon", "A long piece of string (about 4 metres)", "A drinking straw", "Sticky tape", "Two chairs"],
+      "need": [
+        "A balloon",
+        "A long piece of string (about 4 metres)",
+        "A drinking straw",
+        "Sticky tape",
+        "Two chairs"
+      ],
       "steps": [
         "Thread the string through the straw.",
         "Tie the string tight between two chairs.",

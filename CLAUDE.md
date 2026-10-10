@@ -8,7 +8,7 @@ A six-year-old (Finn, the Commander) and his dad (the Flight Engineer) using a S
 ## Hard constraints of this machine
 - No Node.js and no npm. Do not add a build step, a bundler or a framework that needs one.
 - Python 3.12 with Pillow is installed. Use it for image resizing, PWA icon generation and `python -m http.server 8000` for local testing.
-- git is installed with Git Credential Manager. `gh` is not. git has no `user.name` or `user.email` set yet.
+- git is installed with Git Credential Manager. `gh` is not. The repo is initialised on `main` with a local user name and email.
 - Chrome and Edge are installed. Use the built-in browser pane to test at 1280 by 800.
 
 ## Technical rules
@@ -19,9 +19,10 @@ A six-year-old (Finn, the Commander) and his dad (the Flight Engineer) using a S
 - Images: public domain or Creative Commons only, credited in `assets/img/CREDITS.md`, resized to 1600 px and 300 KB max. Leave out anything with an unclear licence.
 - Keep the Three.js scene under about 60k triangles, cap `devicePixelRatio` at 1.5, pause the render loop when hidden.
 
-## Content rules (Astra Nova style)
-- Every mission follows the four beats: Wonder, Commander's Guess, Conundrum, Build or Fly then Debrief.
-- Conundrums have three or four options, no right answer, and a reveal that never says which option was correct. Write them so a crew could split either way.
+## Content rules (age first, Astra Nova flavour)
+- Finn is six. Most steps are informative and playful: big pictures, read-aloud story cards, guesses, hands-on play and a try-it-at-home experiment. See `PLAN.md` section 2a.
+- Only some missions have a Big Question (the Astra Nova Conundrum). Each has three or four picture-sized options, no right answer, and a reveal that never says which option was correct. Write them so a crew could split either way.
+- Every mission ends with a debrief ("What was your favourite part?" plus one question) and a patch.
 - No violence or suffering in scenarios. Empty test rockets blowing up is fine. People in danger is not.
 - One to three sentences per card. One number per card, always with a comparison a six-year-old can picture. Every number has a `source` URL from `research/`.
 - Every text card has a Read aloud button.
@@ -29,6 +30,11 @@ A six-year-old (Finn, the Commander) and his dad (the Flight Engineer) using a S
 
 ## Delegation
 Use Haiku 5.5 subagents in parallel for the seven tasks listed in `PLAN.md` section 9. Each prompt must be self-contained and each agent writes only its own files. Build the engine, the Three.js Starship, the catch game and the PWA plumbing yourself.
+
+## Testing
+- `tools/shot.sh <name> "<path-and-hash>" [WxH] [ms]` takes a headless Chrome screenshot of the local server (port 8100) and prints console lines. Add `?devcrew` to skip crew setup. Each module has `debug...` URL params listed at the top of its file.
+- `dev/harness.html?module=<name>` mounts one module on its own.
+- Run `python tools/build_sw.py` after any change, before committing. Headless Chrome on this PC fails service-worker cache writes ("Entry already exists"); headless Edge works, so test offline caching with Edge and `dev/test-sw.html`.
 
 ## Done means
 Installed from the public link on the tablet, Mission 5 finished end to end with no console errors, and the app still opens with Wi-Fi off after one online visit.
