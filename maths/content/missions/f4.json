@@ -1,0 +1,217 @@
+{
+ "id": "f4",
+ "sector": "fractions",
+ "title": "Fractions of Amounts",
+ "tagline": "Half of 6, a quarter of 12",
+ "covers": [
+  "Y2-F-2"
+ ],
+ "patch": {
+  "name": "Fractions of Amounts",
+  "icon": "fraction"
+ },
+ "dadNotes": [
+  "Finding 1/4 of 12 is the same as sharing 12 into 4 equal groups.",
+  "Write it the school way: 1/2 of 6 = 3."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "6 apples for the space station.",
+    "Half go to the kitchen."
+   ],
+   "question": "How many apples is that?",
+   "widget": "objects",
+   "props": {
+    "n": 6,
+    "icon": "apple",
+    "arrange": "row"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you found half of a number at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "What is 1/4 of 12?",
+   "options": [
+    "About 2",
+    "About 3",
+    "About 6"
+   ],
+   "answer": 1,
+   "reveal": [
+    "3.",
+    "12 shared into 4 equal groups is 3 each."
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "groups",
+   "props": {
+    "total": 6,
+    "mode": "share",
+    "bowls": 2,
+    "icon": "apple"
+   },
+   "script": [
+    {
+     "say": [
+      "Share 6 apples into 2 equal groups."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "{groupSize} in each group.",
+      "Half of 6 is {groupSize}."
+     ]
+    },
+    {
+     "caption": "1/2 of 6 = 3",
+     "say": [
+      "We write it like this.",
+      "1/2 of 6 = 3."
+     ]
+    },
+    {
+     "set": {
+      "total": 12,
+      "bowls": 4,
+      "icon": "crystal"
+     },
+     "say": [
+      "Now find 1/4 of 12 crystals.",
+      "Share them into 4 groups."
+     ],
+     "goal": {
+      "done": true
+     },
+     "caption": "1/4 of 12 = ?",
+     "then": [
+      "{groupSize} in each group.",
+      "1/4 of 12 = 3."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "tiers": [
+    2,
+    3
+   ],
+   "widget": "groups",
+   "props": {
+    "total": 8,
+    "mode": "share",
+    "bowls": 4,
+    "icon": "fuel"
+   },
+   "script": [
+    {
+     "say": [
+      "Find 3/4 of 8 fuel cans.",
+      "First share them into 4 groups."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "1/4 of 8 is {groupSize}."
+     ]
+    },
+    {
+     "caption": "3/4 of 8 = ?",
+     "say": [
+      "So what is 3/4 of 8?",
+      "Count 3 of the groups."
+     ],
+     "input": "numpad",
+     "answer": "6",
+     "then": [
+      "3 groups of 2 is 6.",
+      "3/4 of 8 = 6."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "fractions.fractionOfAmount",
+    "fractions.fractionOfLength"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Your turn.",
+    "Share to find the fraction."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wyr",
+   "title": "Would you rather?",
+   "prompt": "Half of a small pizza, or a quarter of a giant pizza?",
+   "options": [
+    {
+     "label": "1/2 of a small pizza",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "circle",
+      "parts": 2,
+      "shaded": 1
+     }
+    },
+    {
+     "label": "1/4 of a giant pizza",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "circle",
+      "parts": 4,
+      "shaded": 1
+     }
+    }
+   ],
+   "reveal": [
+    "It depends how giant the giant pizza is!",
+    "A half is not always bigger than a quarter.",
+    "It depends on the size of the whole."
+   ],
+   "followUp": "What would change your mind?"
+  },
+  {
+   "type": "athome",
+   "title": "Half the shopping",
+   "need": [
+    "A bag of fruit or a box of eggs"
+   ],
+   "steps": [
+    "Count them all.",
+    "Find half by sharing into 2 groups.",
+    "Find a quarter by sharing into 4 groups."
+   ],
+   "why": "1/2 of 6 = 3 means share 6 into 2 equal groups."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How does sharing help you find 1/4 of 12?"
+   ]
+  }
+ ]
+}

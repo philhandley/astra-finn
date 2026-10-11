@@ -1,0 +1,258 @@
+{
+ "id": "a6",
+ "sector": "blaster",
+ "title": "Sharing and Grouping",
+ "tagline": "Two kinds of division",
+ "covers": [
+  "Y2-MD-2",
+  "2MD–2"
+ ],
+ "patch": {
+  "name": "Sharing and Grouping",
+  "icon": "blaster"
+ },
+ "dadNotes": [
+  "Sharing: we know how many groups. Grouping: we know how many in each group.",
+  "School words: '15 divided into groups of 5 is equal to 3.'"
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "12 space biscuits for 3 robots.",
+    "Each robot wants a fair share."
+   ],
+   "question": "How could they share them?",
+   "widget": "objects",
+   "props": {
+    "n": 12,
+    "icon": "cookie",
+    "arrange": "scatter"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you shared things into equal groups at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "12 biscuits, 3 robots. How many each?",
+   "options": [
+    "About 2",
+    "About 4",
+    "About 9"
+   ],
+   "answer": 1,
+   "reveal": [
+    "4 each.",
+    "12 shared between 3 is 4."
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "groups",
+   "props": {
+    "total": 12,
+    "mode": "share",
+    "bowls": 3,
+    "icon": "cookie"
+   },
+   "script": [
+    {
+     "say": [
+      "Tap Deal one each.",
+      "Every robot gets one."
+     ],
+     "goal": {
+      "bowls": [
+       1,
+       1,
+       1
+      ]
+     },
+     "then": [
+      "One each. Keep going!"
+     ]
+    },
+    {
+     "say": [
+      "Keep dealing until they are all gone."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "Each robot gets {groupSize}.",
+      "That is sharing."
+     ]
+    },
+    {
+     "caption": "12 ÷ 3 = 4",
+     "say": [
+      "We write it with a divide sign.",
+      "12 divided by 3 is 4."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "groups",
+   "props": {
+    "total": 12,
+    "mode": "group",
+    "groupSize": 4,
+    "icon": "cookie"
+   },
+   "script": [
+    {
+     "say": [
+      "Now pack the biscuits in bags of 4.",
+      "Tap Make a group of 4."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "You made {groups} bags of 4.",
+      "That is grouping."
+     ]
+    },
+    {
+     "caption": "12 ÷ 4 = 3",
+     "say": [
+      "The 12 is the number of biscuits.",
+      "The 4 is how many in each bag.",
+      "The 3 is the number of bags."
+     ]
+    },
+    {
+     "set": {
+      "total": 15,
+      "groupSize": 5
+     },
+     "say": [
+      "15 biscuits. Bags of 5.",
+      "How many bags will you need?"
+     ],
+     "input": "numpad",
+     "answer": "3",
+     "then": [
+      "15 divided into groups of 5 is equal to 3."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "groups",
+   "props": {
+    "total": 7,
+    "mode": "share",
+    "bowls": 2,
+    "icon": "cookie"
+   },
+   "script": [
+    {
+     "say": [
+      "7 biscuits. 2 astronauts.",
+      "Deal them out fairly."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "Each gets {groupSize}.",
+      "There is {left} left over."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wyr",
+   "title": "Would you rather?",
+   "prompt": "7 biscuits, 2 astronauts. What would you do with the extra one?",
+   "options": [
+    {
+     "label": "Break it in half"
+    },
+    {
+     "label": "Save it for later"
+    },
+    {
+     "label": "Give it to a friend"
+    }
+   ],
+   "reveal": [
+    "Some crews break it: 3 and a half each.",
+    "Some save it for tomorrow.",
+    "Some give it away. Every idea keeps it fair."
+   ],
+   "followUp": "What would change your mind?"
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "muldiv.sharing",
+    "muldiv.grouping"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Your turn.",
+    "Share or group?"
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "muldiv.divisionFacts",
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Division facts for the 2s, 5s and 10s."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Share the snack",
+   "need": [
+    "A small bowl of raisins or grapes",
+    "2 or 3 plates"
+   ],
+   "steps": [
+    "Deal the snack onto the plates, one at a time.",
+    "Is it fair? Is any left over?",
+    "Now make piles of 5. How many piles?"
+   ],
+   "why": "Sharing and grouping are the two kinds of dividing."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "What is different about sharing and grouping?"
+   ]
+  }
+ ]
+}

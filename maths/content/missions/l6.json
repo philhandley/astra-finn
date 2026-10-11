@@ -1,0 +1,263 @@
+{
+  "id": "l6",
+  "sector": "launchpad",
+  "title": "Add and Take Away",
+  "tagline": "Add and subtract within 20",
+  "covers": [
+    "Y1-AS-1",
+    "Y1-AS-3",
+    "1AS–2"
+  ],
+  "patch": {
+    "name": "Add and Take Away",
+    "icon": "numberline"
+  },
+  "dadNotes": [
+    "'Take away' is for stories where things leave. Otherwise say 'subtract' or 'minus'.",
+    "When counting on, say the start number, then count the hops: 'six... seven, eight, nine'.",
+    "Ask Finn to tell the story first, then write the number sentence."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "5 rockets on the pad.",
+        "2 more rockets land."
+      ],
+      "question": "How many rockets now?",
+      "widget": "objects",
+      "props": {
+        "n": 7,
+        "icon": "rocket",
+        "colours": [
+          5,
+          2
+        ],
+        "arrange": "row"
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you added and subtracted at school?"
+    },
+    {
+      "type": "try",
+      "widget": "numberline",
+      "props": {
+        "min": 0,
+        "max": 20,
+        "mode": "hop",
+        "start": 5,
+        "hopSize": 1,
+        "labels": "all"
+      },
+      "script": [
+        {
+          "say": [
+            "The rocket is on 5.",
+            "Add 2. Make 2 hops."
+          ],
+          "goal": {
+            "hops": 2
+          },
+          "hint": [
+            "Tap the Hop button.",
+            "Or tap the line just ahead of the rocket."
+          ],
+          "then": [
+            "5 + 2 = {value}.",
+            "We counted on from 5."
+          ]
+        },
+        {
+          "say": [
+            "There were 5. 2 more came.",
+            "We can write this as 5 plus 2 is equal to 7."
+          ],
+          "caption": "5 + 2 = 7"
+        },
+        {
+          "set": {
+            "start": 8,
+            "hopSize": 1
+          },
+          "caption": "8 + 3 = ?",
+          "say": [
+            "Now start at 8.",
+            "Add 3. Make 3 hops."
+          ],
+          "goal": {
+            "hops": 3
+          },
+          "then": [
+            "8 + 3 = {value}."
+          ]
+        },
+        {
+          "set": {
+            "start": 9,
+            "hopSize": -1
+          },
+          "caption": "9 − 4 = ?",
+          "say": [
+            "Hops can go back too.",
+            "Start at 9. Hop back 4."
+          ],
+          "goal": {
+            "hops": 4
+          },
+          "then": [
+            "9 − 4 = {value}.",
+            "We counted back."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "guess",
+      "prompt": "Which is bigger: 9 − 0 or 9 + 0?",
+      "options": [
+        "9 − 0",
+        "9 + 0",
+        "The same"
+      ],
+      "answer": 2,
+      "reveal": [
+        "They are both 9!",
+        "Adding or subtracting 0 changes nothing."
+      ],
+      "art": "astronaut"
+    },
+    {
+      "type": "try",
+      "widget": "objects",
+      "props": {
+        "n": 6,
+        "icon": "astronaut",
+        "arrange": "row"
+      },
+      "script": [
+        {
+          "say": [
+            "First there were 6 astronauts in the rover."
+          ]
+        },
+        {
+          "set": {
+            "crossed": 2
+          },
+          "say": [
+            "Then 2 astronauts got out.",
+            "How many are in the rover now?"
+          ],
+          "input": "numpad",
+          "answer": 4,
+          "then": [
+            "Now there are 4 astronauts in the rover.",
+            "We can write this as 6 minus 2 is equal to 4."
+          ]
+        },
+        {
+          "set": {
+            "n": 5,
+            "crossed": 0,
+            "icon": "alien"
+          },
+          "caption": "5 − 0 = ?",
+          "say": [
+            "5 aliens.",
+            "Take away 0. How many now?"
+          ],
+          "input": "numpad",
+          "answer": 5,
+          "then": [
+            "Subtracting 0 changes nothing.",
+            "5 − 0 = 5."
+          ]
+        },
+        {
+          "set": {
+            "crossed": 5
+          },
+          "caption": "5 − 5 = ?",
+          "say": [
+            "Now take away all 5."
+          ],
+          "input": "numpad",
+          "answer": 0,
+          "then": [
+            "5 − 5 = 0.",
+            "None are left."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.countOn",
+        "addsub.wordProblem"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Count on, count back, and solve stories."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.factsWithin20",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        6,
+        6
+      ],
+      "intro": [
+        "Facts within 20."
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} counted on for 6 + 3.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "6 + 3",
+        "Start at 6. Count on 3.",
+        "6, 7, 8",
+        "So 6 + 3 = 8"
+      ],
+      "wrong": 2,
+      "fix": [
+        "Count on from 6: 7, 8, 9.",
+        "Do not count the 6 itself.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What happens when you add 0?"
+      ]
+    }
+  ]
+}

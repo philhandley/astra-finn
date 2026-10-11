@@ -1,0 +1,90 @@
+{
+  "id": "l3",
+  "sector": "launchpad",
+  "title": "Skip-count Rockets",
+  "tagline": "Count in 2s, 5s and 10s",
+  "covers": ["Y1-NPV-2", "1NF–2"],
+  "patch": { "name": "Skip-count Rockets", "icon": "rocket" },
+  "dadNotes": [
+    "DfE sentence: 'The cans are in groups of 10, so we will count in tens.'",
+    "Count in 2s, 5s and 10s out loud with no pictures, forwards and backwards.",
+    "Odd numbers: 1, 3, 5, 7, 9. Count them forwards and back too."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["4 packs of fuel cans.", "Each pack has 10 cans.", "The cans are in groups of 10, so we count in tens."],
+      "question": "How many cans altogether?",
+      "widget": "objects",
+      "props": { "n": 40, "icon": "fuel", "arrange": "groups", "groups": [10, 10, 10, 10] }
+    },
+    { "type": "ask", "text": "Have you counted in 2s, 5s and 10s at school?" },
+    {
+      "type": "guess",
+      "prompt": "How many hops of 5 get from 0 to 20?",
+      "options": ["2 hops", "4 hops", "10 hops"],
+      "answer": 1,
+      "reveal": ["4 hops of 5.", "5, 10, 15, 20."],
+      "widget": "numberline",
+      "props": { "min": 0, "max": 20, "step": 5, "minor": 1, "labels": "all" },
+      "revealProps": { "hops": [{ "from": 0, "to": 5 }, { "from": 5, "to": 10 }, { "from": 10, "to": 15 }, { "from": 15, "to": 20 }] }
+    },
+    {
+      "type": "try",
+      "widget": "numberline",
+      "props": { "min": 0, "max": 20, "mode": "hop", "hopSize": 2, "start": 0 },
+      "script": [
+        { "say": ["Let's count in 2s.", "Tap Hop."], "goal": { "hops": 1 }, "then": ["Hop! You landed on {value}."] },
+        { "say": ["Keep hopping to 10."], "goal": { "value": 10 }, "then": ["2, 4, 6, 8, 10.", "That's {hops} hops of 2."], "hint": ["Back undoes a hop."] },
+        { "say": ["Keep going to 20."], "goal": { "value": 20 }, "then": ["{hops} hops of 2 make 20."] },
+        { "set": { "min": 0, "max": 50, "step": 5, "hopSize": 5, "start": 0 }, "say": ["Now hop in 5s.", "Land on 30."], "goal": { "value": 30 }, "then": ["5, 10, 15, 20, 25, 30.", "{hops} hops of 5."] },
+        { "set": { "min": 0, "max": 100, "step": 10, "hopSize": 10, "start": 0 }, "say": ["Now 10s!", "Hop to 70."], "goal": { "value": 70 }, "then": ["{hops} tens is 70."] }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "hundred",
+      "props": { "mode": "tap" },
+      "script": [
+        { "say": ["Count in 10s on the 100 square.", "Tap each number up to 50."], "goal": { "taps": [10, 20, 30, 40, 50] }, "then": ["10, 20, 30, 40, 50.", "They make a column!"], "hint": ["Start with 10.", "Tap a gold square again to undo it."] },
+        { "set": { "pattern": { "every": 5, "from": 5 } }, "say": ["These are the 5s.", "What pattern can you see?"], "then": ["They all end in 5 or 0.", "Two stripes down the square!"] },
+        { "set": { "pattern": { "every": 2, "from": 2 } }, "say": ["These are the 2s.", "Count them: 2, 4, 6..."], "then": ["They end in 2, 4, 6, 8 or 0.", "These are even numbers."] }
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [2, 3],
+      "widget": "numberline",
+      "props": { "min": 0, "max": 20, "mode": "hop", "hopSize": 2, "start": 1 },
+      "script": [
+        { "say": ["Start at 1.", "Hop in 2s to 11."], "goal": { "value": 11 }, "then": ["1, 3, 5, 7, 9, 11.", "These are odd numbers."] },
+        { "set": { "start": 19, "hopSize": -2 }, "say": ["Now hop back in 2s from 19.", "Stop on 9."], "goal": { "value": 9 }, "then": ["19, 17, 15, 13, 11, 9.", "Odd numbers, going back."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": ["number.skipCount", "number.countObjects"],
+      "levels": [1, 2, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn, {commander}.", "Skip count and find the missing numbers."]
+    },
+    {
+      "type": "error",
+      "intro": ["{engineer} counted in 5s.", "Can you spot the slip?"],
+      "lines": ["Count in 5s from 0:", "0, 5, 10, 15", "20, 25, 30, 35", "40, 45, 55, 60"],
+      "wrong": 3,
+      "fix": ["After 45 comes 50, then 55.", "What would you tell {engineer}?"]
+    },
+    {
+      "type": "athome",
+      "title": "Shoe pairs",
+      "need": ["The shoes by the door"],
+      "steps": ["Put the shoes in pairs.", "Count the shoes in 2s.", "Now count toes in 5s!"],
+      "why": "Pairs are groups of 2. Counting groups is faster than counting in 1s."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "When is counting in 10s faster than counting in 1s?"]
+    }
+  ]
+}

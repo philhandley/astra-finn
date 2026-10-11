@@ -1,0 +1,319 @@
+{
+  "id": "m2",
+  "sector": "measure",
+  "title": "Mass",
+  "tagline": "Grams and kilograms on the scales",
+  "covers": [
+    "Y2-M-1",
+    "Y2-M-2"
+  ],
+  "patch": {
+    "name": "Mass",
+    "icon": "scales"
+  },
+  "dadNotes": [
+    "Grams (g) for light things, kilograms (kg) for heavy things. 1000 g is the same as 1 kg.",
+    "On any scale, first work out what each small mark is worth, then read.",
+    "On a balance, the heavier side always goes down."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "These are kitchen scales.",
+        "The needle shows how heavy things are."
+      ],
+      "question": "Can you find 0 on the dial?",
+      "widget": "measure",
+      "props": {
+        "tool": "scales",
+        "unit": "g",
+        "max": 1000,
+        "labels": 100,
+        "marks": 100,
+        "value": 300,
+        "object": "apple"
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you weighed things at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "About how heavy is a big apple?",
+      "art": "apple",
+      "options": [
+        "About 2 g",
+        "About 200 g",
+        "About 20 kg"
+      ],
+      "answer": 1,
+      "reveal": [
+        "About 200 g.",
+        "Grams are for light things like apples."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "measure",
+      "props": {
+        "tool": "scales",
+        "unit": "kg",
+        "max": 10,
+        "labels": 1,
+        "marks": 1,
+        "value": 0,
+        "object": "robot"
+      },
+      "script": [
+        {
+          "say": [
+            "The robot weighs 6 kg.",
+            "Drag the needle to 6."
+          ],
+          "goal": {
+            "value": 6
+          },
+          "hint": [
+            "Drag round the dial, or tap +."
+          ],
+          "then": [
+            "6 kg. kg means kilograms."
+          ]
+        },
+        {
+          "set": {
+            "unit": "g",
+            "max": 1000,
+            "labels": 100,
+            "marks": 100,
+            "value": 0,
+            "object": "apple"
+          },
+          "say": [
+            "Light things are weighed in grams.",
+            "Show 200 g."
+          ],
+          "goal": {
+            "value": 200
+          },
+          "then": [
+            "200 g. g means grams."
+          ]
+        },
+        {
+          "set": {
+            "marks": 50,
+            "value": 350,
+            "object": "cookie",
+            "interactive": false
+          },
+          "say": [
+            "The small marks are halfway.",
+            "How heavy are the cookies?"
+          ],
+          "input": "numpad",
+          "answer": 350,
+          "unit": "g",
+          "hint": [
+            "The needle is between 300 and 400."
+          ],
+          "then": [
+            "Halfway from 300 to 400 is 350.",
+            "The cookies weigh 350 g."
+          ]
+        },
+        {
+          "set": {
+            "value": 0,
+            "object": "crystal",
+            "interactive": true
+          },
+          "say": [
+            "Show 750 g."
+          ],
+          "goal": {
+            "value": 750
+          },
+          "then": [
+            "750 g. Halfway between 700 and 800."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "measure",
+      "props": {
+        "tool": "scales",
+        "unit": "kg",
+        "max": 20,
+        "labels": 10,
+        "marks": 2,
+        "value": 14,
+        "object": "robot",
+        "interactive": false
+      },
+      "script": [
+        {
+          "say": [
+            "This dial counts in 2s.",
+            "How heavy is the robot?"
+          ],
+          "input": "numpad",
+          "answer": 14,
+          "unit": "kg",
+          "hint": [
+            "Start at 10. Count on in 2s."
+          ],
+          "then": [
+            "10, 12, 14.",
+            "The robot weighs 14 kg."
+          ]
+        },
+        {
+          "set": {
+            "max": 50,
+            "labels": 10,
+            "marks": 5,
+            "value": 0,
+            "object": "asteroid",
+            "interactive": true
+          },
+          "say": [
+            "Now it counts in 5s.",
+            "Show 35 kg."
+          ],
+          "goal": {
+            "value": 35
+          },
+          "then": [
+            "30, then 35.",
+            "35 kg of moon rock!"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "look",
+      "lines": [
+        "The moon rock side went down.",
+        "The moon rock is heavier than the apple."
+      ],
+      "question": "How could we write that with a sign?",
+      "caption": "8 kg > 3 kg",
+      "widget": "measure",
+      "props": {
+        "tool": "compare",
+        "kind": "mass",
+        "a": 8,
+        "b": 3,
+        "icons": [
+          "asteroid",
+          "apple"
+        ]
+      }
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "measure.readScales",
+        "measure.setScale"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        6,
+        7
+      ],
+      "intro": [
+        "Your turn. Read the scales."
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "measure.compareMeasures",
+        "measure.orderMeasures",
+        "measure.chooseUnit"
+      ],
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        4,
+        5,
+        6
+      ],
+      "params": {
+        "units": [
+          "g",
+          "kg"
+        ],
+        "kind": "mass"
+      },
+      "intro": [
+        "Heavier or lighter? Compare and order."
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick the one that doesn't belong. Then say why.",
+      "options": [
+        {
+          "label": "1 kg"
+        },
+        {
+          "label": "1000 g"
+        },
+        {
+          "label": "100 g"
+        },
+        {
+          "label": "10 kg"
+        }
+      ],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "1 kg has just 1 digit. 1000 g has 4 digits.",
+        "100 g is the only light one.",
+        "10 kg is the only really heavy one."
+      ],
+      "followUp": "Did you notice 1 kg and 1000 g weigh the same?"
+    },
+    {
+      "type": "athome",
+      "title": "Kitchen scales",
+      "need": [
+        "Kitchen scales",
+        "An apple, a bag of pasta, a tin"
+      ],
+      "steps": [
+        "Guess which is heaviest.",
+        "Weigh each one and read the scales.",
+        "Put them in order, lightest first."
+      ],
+      "why": "Real scales count in 2s, 5s, 10s or more. Read the marks first."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "Would you weigh a dog in g or kg?"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,300 @@
+{
+  "id": "m5",
+  "sector": "measure",
+  "title": "The Space Shop",
+  "tagline": "Buy supplies and give change",
+  "covers": [
+    "Y2-M-5",
+    "Y2-AS-1"
+  ],
+  "patch": {
+    "name": "Space Shop",
+    "icon": "coin"
+  },
+  "dadNotes": [
+    "To find change, count on from the price up to the coin you paid with.",
+    "Only add or take away amounts in the same unit: pence with pence, pounds with pounds.",
+    "Play shop at home with real coins and a few toys with price labels."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "art": "astronaut",
+      "lines": [
+        "Welcome to the Space Shop!",
+        "Everything an astronaut needs."
+      ],
+      "question": "What would you buy for a trip to the Moon?"
+    },
+    {
+      "type": "ask",
+      "text": "Have you worked out change at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "A snack costs 30p. You pay with 50p. About how much change?",
+      "widget": "coins",
+      "props": {
+        "purse": [
+          "50p"
+        ],
+        "price": 30
+      },
+      "options": [
+        "About 2p",
+        "About 20p",
+        "About 80p"
+      ],
+      "answer": 1,
+      "reveal": [
+        "20p change.",
+        "30p and 20p makes 50p."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "coins",
+      "props": {
+        "tray": [
+          "1p",
+          "2p",
+          "5p",
+          "10p",
+          "20p",
+          "50p"
+        ],
+        "purse": [],
+        "showTotal": true,
+        "price": 35
+      },
+      "script": [
+        {
+          "say": [
+            "A fuel can costs 35p.",
+            "Put 35p in the purse."
+          ],
+          "goal": {
+            "total": 35
+          },
+          "hint": [
+            "20p, then 10p, then 5p."
+          ],
+          "then": [
+            "35p. That pays for the fuel."
+          ]
+        },
+        {
+          "set": {
+            "price": 20
+          },
+          "say": [
+            "A star map costs 20p.",
+            "Add 20p more to buy both."
+          ],
+          "goal": {
+            "total": 55
+          },
+          "then": [
+            "35p + 20p = 55p.",
+            "Both cost 55p."
+          ]
+        },
+        {
+          "say": [
+            "How much would 2 star maps cost?"
+          ],
+          "input": "numpad",
+          "answer": 40,
+          "unit": "p",
+          "then": [
+            "20p + 20p = 40p."
+          ]
+        },
+        {
+          "set": {
+            "purse": [],
+            "price": 30,
+            "tray": [
+              "1p",
+              "2p",
+              "5p",
+              "10p",
+              "20p"
+            ]
+          },
+          "say": [
+            "A snack is 30p. You pay with 50p.",
+            "Put the change in the purse."
+          ],
+          "goal": {
+            "total": 20
+          },
+          "hint": [
+            "Count on: 30p, 40p, 50p."
+          ],
+          "then": [
+            "Your change is 20p.",
+            "30p + 20p = 50p."
+          ]
+        },
+        {
+          "set": {
+            "purse": [],
+            "price": 65
+          },
+          "say": [
+            "A torch costs 65p. You pay with £1.",
+            "How much change?"
+          ],
+          "input": "numpad",
+          "answer": 35,
+          "unit": "p",
+          "hint": [
+            "Count on from 65 to 100.",
+            "65, 70, then 100."
+          ],
+          "then": [
+            "65 + 35 = 100.",
+            "The change is 35p."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "money.moneyProblem",
+        "money.changeFrom"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn in the shop."
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "coins",
+      "props": {
+        "tray": [
+          "5p",
+          "10p",
+          "20p",
+          "50p"
+        ],
+        "purse": [],
+        "showTotal": true,
+        "price": 100
+      },
+      "script": [
+        {
+          "say": [
+            "The pod costs £1.",
+            "Pay with exactly 4 coins."
+          ],
+          "goal": {
+            "total": 100,
+            "count": 4
+          },
+          "hint": [
+            "Start with 50p.",
+            "Then make 50p more with 3 coins."
+          ],
+          "then": [
+            "{items}. Exactly £1!"
+          ]
+        },
+        {
+          "set": {
+            "purse": []
+          },
+          "say": [
+            "Now pay £1 with 5 coins."
+          ],
+          "goal": {
+            "total": 100,
+            "count": 5
+          },
+          "then": [
+            "{items}. Another way!"
+          ]
+        },
+        {
+          "set": {
+            "purse": []
+          },
+          "say": [
+            "Can 3 of these coins make exactly £1?",
+            "Try it. Then tap Got it."
+          ],
+          "then": [
+            "No! 50p + 20p + 20p is only 90p.",
+            "And 50p + 50p is already £1 with 2 coins."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Pack the pod",
+      "prompt": "You have exactly £1. Which 3 things would you pack?",
+      "options": [
+        {
+          "label": "Snack, torch, map",
+          "art": "cookie",
+          "detail": "50p + 30p + 20p"
+        },
+        {
+          "label": "Water, badge, rope",
+          "art": "fuel",
+          "detail": "60p + 25p + 15p"
+        },
+        {
+          "label": "Oxygen, robot, sticker",
+          "art": "robot",
+          "detail": "40p + 40p + 20p"
+        }
+      ],
+      "reveal": [
+        "Every pod costs exactly £1!",
+        "50p + 30p + 20p makes £1. So do the other two.",
+        "Different ways, same amount. So pick what you need most."
+      ],
+      "followUp": "Can you find another 3 things that make £1?"
+    },
+    {
+      "type": "athome",
+      "title": "Shop at home",
+      "need": [
+        "Coins",
+        "Toys with price labels"
+      ],
+      "steps": [
+        "Dad runs the shop. Finn buys.",
+        "Pay with one coin.",
+        "The shopkeeper counts on to give change."
+      ],
+      "why": "Counting on is how real shopkeepers give change."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "Something costs 70p. How much change from £1?"
+      ]
+    }
+  ]
+}

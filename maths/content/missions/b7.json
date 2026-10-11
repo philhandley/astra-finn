@@ -1,0 +1,277 @@
+{
+  "id": "b7",
+  "sector": "bonds",
+  "title": "How Many More?",
+  "tagline": "Find the difference with bar models",
+  "covers": [
+    "Y2-AS-1",
+    "2AS–2"
+  ],
+  "patch": {
+    "name": "How Many More?",
+    "icon": "numberline"
+  },
+  "dadNotes": [
+    "'How many more?' is a subtraction or a missing addend: 4 + ? = 7.",
+    "Keep the units the same: cm with cm, pounds with pounds."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "7 red rockets.",
+        "4 blue rockets."
+      ],
+      "question": "How many more red rockets?",
+      "widget": "bar",
+      "props": {
+        "kind": "compare",
+        "a": 7,
+        "b": 4,
+        "labelA": "Red",
+        "labelB": "Blue",
+        "icons": "rocket",
+        "unknown": "difference"
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you found the difference at school?"
+    },
+    {
+      "type": "try",
+      "widget": "bar",
+      "props": {
+        "kind": "compare",
+        "a": 7,
+        "b": 4,
+        "labelA": "Red",
+        "labelB": "Blue",
+        "icons": "rocket",
+        "unknown": "difference"
+      },
+      "script": [
+        {
+          "say": [
+            "Line them up.",
+            "How many more red rockets?"
+          ],
+          "input": "numpad",
+          "answer": 3,
+          "hint": [
+            "Count the empty boxes."
+          ],
+          "then": [
+            "4 + 3 = 7.",
+            "There are 3 more red rockets."
+          ]
+        },
+        {
+          "say": [
+            "How many fewer blue rockets?"
+          ],
+          "input": "numpad",
+          "answer": 3,
+          "then": [
+            "3 fewer. The difference is still 3.",
+            "More and fewer are the same gap."
+          ]
+        },
+        {
+          "set": {
+            "a": 12,
+            "b": 5,
+            "labelA": "Crew A",
+            "labelB": "Crew B",
+            "icons": null
+          },
+          "say": [
+            "Crew A found 12 crystals.",
+            "Crew B found 5.",
+            "What is the difference?"
+          ],
+          "input": "numpad",
+          "answer": 7,
+          "hint": [
+            "5 + ? = 12",
+            "Or work out 12 − 5."
+          ],
+          "then": [
+            "12 − 5 = 7.",
+            "The difference is 7."
+          ]
+        },
+        {
+          "set": {
+            "a": 25,
+            "b": 19,
+            "labelA": "Cost",
+            "labelB": "You have"
+          },
+          "say": [
+            "A rocket kit costs £25.",
+            "You have £19.",
+            "How much more do you need?"
+          ],
+          "input": "numpad",
+          "answer": 6,
+          "prefix": "£",
+          "hint": [
+            "Count on from 19 to 25."
+          ],
+          "then": [
+            "19 + 6 = 25.",
+            "You need £6 more."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "guess",
+      "prompt": "Rocket A is 64 cm. Rocket B is 38 cm. About how much taller is A?",
+      "options": [
+        "About 10 cm",
+        "About 25 cm",
+        "About 50 cm"
+      ],
+      "answer": 1,
+      "reveal": [
+        "26 cm taller.",
+        "64 − 38 = 26."
+      ],
+      "art": "rocket"
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "numberline",
+      "props": {
+        "min": 30,
+        "max": 70,
+        "labels": [
+          30,
+          38,
+          40,
+          50,
+          60,
+          64,
+          70
+        ],
+        "hops": [
+          {
+            "from": 38,
+            "to": 40
+          },
+          {
+            "from": 40,
+            "to": 60
+          },
+          {
+            "from": 60,
+            "to": 64
+          }
+        ],
+        "readonly": true
+      },
+      "script": [
+        {
+          "say": [
+            "Count on from 38 to 64.",
+            "2 to get to 40. Then 20. Then 4."
+          ],
+          "caption": "38 + ? = 64",
+          "input": "numpad",
+          "answer": 26,
+          "hint": [
+            "2 + 20 + 4"
+          ],
+          "then": [
+            "2 + 20 + 4 = 26.",
+            "The difference is 26 cm."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "addsub.difference",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Find the difference."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.wordProblem",
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Story problems. Add or subtract?"
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Would you rather?",
+      "prompt": "To find the difference, would you rather count on or subtract?",
+      "options": [
+        {
+          "label": "Count on: 38, 40, 60, 64"
+        },
+        {
+          "label": "Subtract: 64 − 38"
+        }
+      ],
+      "reveal": [
+        "Both give 26!",
+        "Counting on is great when the numbers are close.",
+        "Subtracting is quick when you know your facts."
+      ],
+      "followUp": "Which way would you pick for 52 and 49?"
+    },
+    {
+      "type": "athome",
+      "title": "Tall towers",
+      "need": [
+        "Building blocks or Lego"
+      ],
+      "steps": [
+        "Build a tower of 7 blocks and a tower of 4.",
+        "Stand them side by side.",
+        "How many more blocks has the tall one?"
+      ],
+      "why": "Lining things up shows the difference."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How can adding help you find a difference?"
+      ]
+    }
+  ]
+}

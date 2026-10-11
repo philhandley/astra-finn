@@ -1,0 +1,410 @@
+{
+ "id": "s5",
+ "sector": "shape",
+ "title": "Rover Drive",
+ "tagline": "Straight lines, quarter turns and right angles",
+ "covers": [
+  "Y2-PD-2",
+  "Y1-PD-1"
+ ],
+ "patch": {
+  "name": "Rover Driver",
+  "icon": "rover"
+ },
+ "dadNotes": [
+  "Clockwise is the way clock hands move. Anticlockwise is the other way.",
+  "A quarter turn is a right angle. 2 make a half turn, 4 make a whole turn.",
+  "Play \"robot\": Finn gives you forward and turn instructions to reach the sofa."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Our Moon rover needs to reach the flag.",
+    "Watch out for rocks."
+   ],
+   "question": "Which way is the rover facing?",
+   "widget": "rover",
+   "props": {
+    "cols": 6,
+    "rows": 5,
+    "start": {
+     "x": 0,
+     "y": 4,
+     "dir": "N"
+    },
+    "target": {
+     "x": 4,
+     "y": 1
+    },
+    "rocks": [
+     {
+      "x": 2,
+      "y": 2
+     }
+    ]
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you given turning instructions at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "The rover faces up. It makes a half turn. Which way does it face?",
+   "options": [
+    "Up",
+    "Down",
+    "Right"
+   ],
+   "answer": 1,
+   "reveal": [
+    "Down!",
+    "A half turn is 2 quarter turns."
+   ],
+   "widget": "rover",
+   "props": {
+    "cols": 3,
+    "rows": 3,
+    "start": {
+     "x": 1,
+     "y": 1,
+     "dir": "N"
+    },
+    "trail": false
+   },
+   "revealProps": {
+    "start": {
+     "x": 1,
+     "y": 1,
+     "dir": "S"
+    }
+   }
+  },
+  {
+   "type": "try",
+   "widget": "rover",
+   "props": {
+    "cols": 3,
+    "rows": 3,
+    "start": {
+     "x": 1,
+     "y": 1,
+     "dir": "N"
+    },
+    "controls": [
+     "left",
+     "right"
+    ],
+    "showTurnArc": true,
+    "trail": false
+   },
+   "script": [
+    {
+     "say": [
+      "Make a quarter turn clockwise.",
+      "Clockwise goes the way clock hands move."
+     ],
+     "goal": {
+      "dir": "E",
+      "turns": 1
+     },
+     "then": [
+      "A quarter turn is a right angle.",
+      "Now it faces right."
+     ]
+    },
+    {
+     "say": [
+      "Now a quarter turn anticlockwise."
+     ],
+     "goal": {
+      "turns": 0
+     },
+     "then": [
+      "Back to facing up."
+     ]
+    },
+    {
+     "say": [
+      "Make a half turn, clockwise."
+     ],
+     "goal": {
+      "turns": 2
+     },
+     "then": [
+      "2 right angles make a half turn."
+     ]
+    },
+    {
+     "set": {
+      "start": {
+       "x": 1,
+       "y": 1,
+       "dir": "N"
+      }
+     },
+     "say": [
+      "Now a three-quarter turn clockwise."
+     ],
+     "goal": {
+      "turns": 3
+     },
+     "then": [
+      "3 right angles! It faces left."
+     ]
+    },
+    {
+     "set": {
+      "start": {
+       "x": 1,
+       "y": 1,
+       "dir": "N"
+      }
+     },
+     "say": [
+      "Face left again, with just 1 turn."
+     ],
+     "goal": {
+      "dir": "W",
+      "turns": -1
+     },
+     "then": [
+      "A quarter turn anticlockwise.",
+      "Same way, fewer turns!"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "rover",
+   "props": {
+    "cols": 6,
+    "rows": 5,
+    "start": {
+     "x": 0,
+     "y": 4,
+     "dir": "N"
+    },
+    "target": {
+     "x": 0,
+     "y": 1
+    },
+    "controls": [
+     "forward",
+     "back",
+     "left",
+     "right"
+    ],
+    "showTurnArc": true
+   },
+   "script": [
+    {
+     "say": [
+      "Drive forward to the flag."
+     ],
+     "goal": {
+      "atTarget": true
+     },
+     "then": [
+      "{moves} moves in a straight line."
+     ]
+    },
+    {
+     "set": {
+      "start": {
+       "x": 0,
+       "y": 4,
+       "dir": "N"
+      },
+      "target": {
+       "x": 3,
+       "y": 1
+      }
+     },
+     "say": [
+      "The flag has moved.",
+      "You will need to turn."
+     ],
+     "goal": {
+      "atTarget": true
+     },
+     "then": [
+      "Brilliant driving!",
+      "You made {moves} moves."
+     ]
+    },
+    {
+     "set": {
+      "start": {
+       "x": 5,
+       "y": 4,
+       "dir": "W"
+      },
+      "target": {
+       "x": 1,
+       "y": 0
+      },
+      "rocks": [
+       {
+        "x": 3,
+        "y": 2
+       },
+       {
+        "x": 1,
+        "y": 2
+       }
+      ]
+     },
+     "say": [
+      "Now steer round the rocks."
+     ],
+     "goal": {
+      "atTarget": true
+     },
+     "then": [
+      "Safe at the flag!"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "geometry.turns",
+    "geometry.roverPath"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    5,
+    6,
+    6
+   ],
+   "intro": [
+    "Your turn, rover driver."
+   ]
+  },
+  {
+   "type": "try",
+   "tiers": [
+    2,
+    3
+   ],
+   "widget": "rover",
+   "props": {
+    "cols": 6,
+    "rows": 5,
+    "start": {
+     "x": 0,
+     "y": 4,
+     "dir": "E"
+    },
+    "target": {
+     "x": 4,
+     "y": 0
+    },
+    "rocks": [
+     {
+      "x": 2,
+      "y": 4
+     },
+     {
+      "x": 2,
+      "y": 3
+     }
+    ],
+    "controls": [
+     "forward",
+     "left",
+     "right"
+    ],
+    "program": true,
+    "showTurnArc": true
+   },
+   "script": [
+    {
+     "say": [
+      "Plan the whole route with arrow cards.",
+      "Then press Go!"
+     ],
+     "goal": {
+      "atTarget": true
+     },
+     "then": [
+      "Your program worked!",
+      "That is how engineers drive real Moon rovers."
+     ],
+     "hint": [
+      "Plan one step at a time.",
+      "Undo fixes the last card."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "geometry.rightAngles",
+   "levels": [
+    2,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    4,
+    5
+   ],
+   "intro": [
+    "Right angles in turns and shapes."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} turned the rover.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "Start facing up.",
+    "Quarter turn clockwise: facing right.",
+    "Quarter turn clockwise: facing left.",
+    "Half turn: facing right."
+   ],
+   "wrong": 2,
+   "fix": [
+    "From right, a quarter turn clockwise faces down.",
+    "What would you tell {engineer}?"
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Be the rover",
+   "need": [
+    "A grown-up",
+    "A toy to be the flag"
+   ],
+   "steps": [
+    "{engineer} gives forward and turn instructions.",
+    "Use quarter turns, clockwise and anticlockwise.",
+    "Swap: now {commander} gives the instructions."
+   ],
+   "why": "Robots need exact steps, just like this."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How many right angles make a whole turn?"
+   ]
+  }
+ ]
+}

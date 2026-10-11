@@ -1,0 +1,251 @@
+{
+ "id": "a4",
+ "sector": "blaster",
+ "title": "The 10s and the 5s",
+ "tagline": "The 10 and 5 times tables",
+ "covers": [
+  "Y2-MD-1"
+ ],
+ "patch": {
+  "name": "The 10s and 5s",
+  "icon": "blaster"
+ },
+ "dadNotes": [
+  "The 10 times table is place value: 7 × 10 is 7 tens.",
+  "The 5s are the minutes on a clock: the 6 means 30 minutes."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Crystals come in packs of 10.",
+    "Here are 4 packs."
+   ],
+   "question": "How many crystals?",
+   "widget": "objects",
+   "props": {
+    "n": 40,
+    "arrange": "groups",
+    "groups": [
+     10,
+     10,
+     10,
+     10
+    ],
+    "icon": "dot"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Do you know the 10 and 5 times tables?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Each hand has 5 fingers. How many fingers on 4 hands?",
+   "options": [
+    "About 10",
+    "About 20",
+    "About 40"
+   ],
+   "answer": 1,
+   "reveal": [
+    "20 fingers.",
+    "4 × 5 = 20."
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 10,
+    "rows": 0,
+    "lockSize": true,
+    "highlightRows": true,
+    "maxRows": 10
+   },
+   "script": [
+    {
+     "say": [
+      "Each blast makes a pack of 10.",
+      "Blast 4 times."
+     ],
+     "goal": {
+      "rows": 4
+     },
+     "then": [
+      "4 tens is {total}.",
+      "4 × 10 = 40."
+     ]
+    },
+    {
+     "say": [
+      "Blast up to 7 tens."
+     ],
+     "goal": {
+      "rows": 7
+     },
+     "then": [
+      "7 × 10 = {total}.",
+      "7 tens is 70."
+     ]
+    },
+    {
+     "say": [
+      "How many tens make 90?",
+      "Blast more if you like."
+     ],
+     "input": "numpad",
+     "answer": "9",
+     "then": [
+      "9 × 10 = 90."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 5,
+    "rows": 0,
+    "lockSize": true,
+    "highlightRows": true,
+    "maxRows": 10
+   },
+   "script": [
+    {
+     "say": [
+      "Now each blast is a hand of 5.",
+      "Blast 4 times."
+     ],
+     "goal": {
+      "rows": 4
+     },
+     "then": [
+      "Count in 5s: 5, 10, 15, 20."
+     ]
+    },
+    {
+     "say": [
+      "A clock counts in 5s too!",
+      "Blast to 6 rows."
+     ],
+     "goal": {
+      "rows": 6
+     },
+     "caption": "6 × 5 = 30",
+     "then": [
+      "6 × 5 = {total}.",
+      "On a clock, the 6 means 30 minutes."
+     ]
+    },
+    {
+     "say": [
+      "What is 8 × 5?",
+      "Blast more if you like."
+     ],
+     "input": "numpad",
+     "answer": "40",
+     "then": [
+      "8 × 5 = 40."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "10"
+    },
+    {
+     "label": "25"
+    },
+    {
+     "label": "30"
+    },
+    {
+     "label": "32"
+    }
+   ],
+   "reveal": [
+    "Every one can be the odd one out!",
+    "Only 25 is odd. Only 32 is not in the 5s.",
+    "Only 10 is under 20. Only 30 is in the 3s."
+   ],
+   "followUp": "Can you find a reason for every single one?"
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "muldiv.times10",
+    "muldiv.times5"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Your turn.",
+    "Count in 10s and 5s."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "muldiv.countInMultiples",
+   "params": {
+    "tables": [
+     5,
+     10
+    ]
+   },
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Count in 5s and 10s from any number."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Hands and coins",
+   "need": [
+    "Your hands",
+    "Some 10p coins if you have them"
+   ],
+   "steps": [
+    "Hold up both hands. Count fingers in 5s.",
+    "Count 10p coins in 10s.",
+    "How much is 6 × 10p?"
+   ],
+   "why": "You can find 5s on hands and clocks, and 10s on coins."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Where can you see 5s on a clock?"
+   ]
+  }
+ ]
+}

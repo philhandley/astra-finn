@@ -1,0 +1,289 @@
+{
+  "id": "b2",
+  "sector": "bonds",
+  "title": "Across the Ten",
+  "tagline": "Make 10 first, then add the rest",
+  "covers": [
+    "2AS–1"
+  ],
+  "patch": {
+    "name": "Across the Ten",
+    "icon": "tensframe"
+  },
+  "dadNotes": [
+    "Make 10 first: 8 + 5 = 8 + 2 + 3. Ask 'how many fill the frame?'",
+    "Two ways to subtract across 10: through 10 (15 − 5 − 4) or from 10 (10 − 9, then add 5).",
+    "Doubles of 6 to 9 should become instant: 6 + 6, 7 + 7, 8 + 8, 9 + 9."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "8 gold and 5 blue.",
+        "2 blue counters filled the first frame."
+      ],
+      "question": "How many altogether?",
+      "widget": "tensframe",
+      "props": {
+        "colours": [
+          8,
+          5
+        ],
+        "frames": 2
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you added across 10 at school?"
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": {
+        "colours": [
+          8,
+          0
+        ],
+        "frames": 2,
+        "twoColour": true
+      },
+      "script": [
+        {
+          "say": [
+            "8 + 5.",
+            "Tap blue. Fill the first frame."
+          ],
+          "goal": {
+            "count": 10,
+            "a": 8
+          },
+          "hint": [
+            "Tap the blue brush first.",
+            "Tap a counter to take it off."
+          ],
+          "then": [
+            "8 + 2 = 10."
+          ]
+        },
+        {
+          "say": [
+            "5 is 2 and 3.",
+            "Now add the other 3."
+          ],
+          "goal": {
+            "count": 13,
+            "a": 8
+          },
+          "then": [
+            "10 + 3 = 13.",
+            "So 8 + 5 = 13."
+          ]
+        },
+        {
+          "set": {
+            "colours": [
+              7,
+              0
+            ],
+            "frames": 2
+          },
+          "caption": "7 + 6 = ?",
+          "say": [
+            "Try 7 + 6.",
+            "Make 10 first."
+          ],
+          "goal": {
+            "count": 10,
+            "a": 7
+          },
+          "then": [
+            "7 + 3 = 10.",
+            "3 more to go."
+          ]
+        },
+        {
+          "say": [
+            "Add the rest of the 6."
+          ],
+          "goal": {
+            "count": 13,
+            "a": 7
+          },
+          "then": [
+            "10 + 3 = 13.",
+            "So 7 + 6 = 13."
+          ]
+        },
+        {
+          "caption": "9 + 4 = ?",
+          "say": [
+            "No counters this time.",
+            "What is 9 + 4?"
+          ],
+          "input": "numpad",
+          "answer": 13,
+          "hint": [
+            "9 + 1 = 10.",
+            "Then 3 more."
+          ],
+          "then": [
+            "9 + 1 = 10. 10 + 3 = 13."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "guess",
+      "prompt": "Is 15 − 9 more or less than 10?",
+      "options": [
+        "More than 10",
+        "Less than 10",
+        "Exactly 10"
+      ],
+      "answer": 1,
+      "reveal": [
+        "Less than 10. It is 6.",
+        "9 is nearly 10, so 15 − 9 is nearly 5."
+      ],
+      "art": "comet"
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": {
+        "count": 15,
+        "frames": 2
+      },
+      "script": [
+        {
+          "caption": "15 − 9 = ?",
+          "say": [
+            "15 − 9.",
+            "Subtract 5 first. Tap 5 counters."
+          ],
+          "goal": {
+            "count": 10
+          },
+          "hint": [
+            "Tap the counters in the second frame."
+          ],
+          "then": [
+            "15 − 5 = 10.",
+            "We went through 10."
+          ]
+        },
+        {
+          "say": [
+            "9 is 5 and 4.",
+            "Now subtract 4 more."
+          ],
+          "goal": {
+            "count": 6
+          },
+          "then": [
+            "10 − 4 = 6.",
+            "So 15 − 9 = 6."
+          ]
+        },
+        {
+          "set": {
+            "count": 15
+          },
+          "caption": "10 − 9 = 1",
+          "say": [
+            "Another way: subtract from 10.",
+            "10 − 9 = 1. Then 1 + 5 = ?"
+          ],
+          "input": "numpad",
+          "answer": 6,
+          "then": [
+            "Add the 5 ones that were left.",
+            "15 − 9 = 6 again!"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.makeTen",
+        "addsub.subtractAcross10"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Make 10, or go through 10."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.doubles",
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Doubles of 6, 7, 8 and 9."
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Would you rather?",
+      "prompt": "Would you rather work out 9 + 7 or 10 + 6?",
+      "options": [
+        {
+          "label": "9 + 7"
+        },
+        {
+          "label": "10 + 6"
+        }
+      ],
+      "reveal": [
+        "They are both 16!",
+        "10 + 6 is quick: 1 ten and 6 ones.",
+        "9 + 7 can become 10 + 6. Move 1 across."
+      ],
+      "followUp": "When is it useful to make a 10 first?"
+    },
+    {
+      "type": "athome",
+      "title": "Egg box tens",
+      "need": [
+        "An egg box or ice cube tray with 10 spaces",
+        "20 small things, like pasta"
+      ],
+      "steps": [
+        "Put 8 in the box.",
+        "Add 5 more. Fill the box first.",
+        "How many in the box? How many outside?"
+      ],
+      "why": "Filling the 10 first is how we add across 10."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How does making 10 help with 8 + 5?"
+      ]
+    }
+  ]
+}

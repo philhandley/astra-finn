@@ -44,6 +44,8 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
   if (!sameOrigin && !RUNTIME_HOSTS.includes(url.hostname)) return;
+  // Astra Maths lives in /maths/ with its own service worker and cache; leave it alone.
+  if (sameOrigin && new URL('maths/', self.registration.scope).pathname === url.pathname.slice(0, new URL('maths/', self.registration.scope).pathname.length)) return;
   event.respondWith((async () => {
     const cache = await caches.open(VERSION);
     const hit = await cache.match(req, { ignoreSearch: sameOrigin && req.mode === 'navigate' });

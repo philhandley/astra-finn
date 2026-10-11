@@ -1,0 +1,308 @@
+{
+ "id": "d1",
+ "sector": "data",
+ "title": "Tally and Table",
+ "tagline": "Count and record in tallies and tables",
+ "covers": [
+  "Y2-S-1",
+  "Y2-S-2"
+ ],
+ "patch": {
+  "name": "Tally Keeper",
+  "icon": "chart"
+ },
+ "dadNotes": [
+  "Tally marks go in gates of 5: four lines, then the fifth across. Count gates in 5s.",
+  "Ask \"how many more?\" and \"which has the fewest?\" questions about any table."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Our scanner spotted lots of asteroids.",
+    "Some have gold rings, some cyan, some green."
+   ],
+   "question": "Which colour do you think has the most?",
+   "widget": "objects",
+   "props": {
+    "n": 12,
+    "icon": "asteroid",
+    "arrange": "scatter",
+    "colours": [
+     5,
+     4,
+     3
+    ]
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you made a tally chart at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Which colour has the most asteroids?",
+   "options": [
+    "Gold",
+    "Cyan",
+    "Green"
+   ],
+   "answer": 0,
+   "reveal": [
+    "Gold has the most: 5.",
+    "Counting carefully beats guessing!"
+   ],
+   "widget": "objects",
+   "props": {
+    "n": 12,
+    "icon": "asteroid",
+    "arrange": "scatter",
+    "colours": [
+     5,
+     4,
+     3
+    ]
+   }
+  },
+  {
+   "type": "try",
+   "widget": "charts",
+   "props": {
+    "kind": "tally",
+    "interactive": true,
+    "title": "Asteroids by colour",
+    "given": [
+     5,
+     4,
+     3
+    ],
+    "givenAs": "number",
+    "cats": [
+     {
+      "label": "Gold",
+      "colour": "gold",
+      "icon": "asteroid",
+      "value": 0
+     },
+     {
+      "label": "Cyan",
+      "colour": "cyan",
+      "icon": "asteroid",
+      "value": 0
+     },
+     {
+      "label": "Green",
+      "colour": "green",
+      "icon": "asteroid",
+      "value": 0
+     }
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "A tally mark is a quick line for each one.",
+      "Tap + by Gold 5 times."
+     ],
+     "goal": {
+      "values": [
+       5,
+       0,
+       0
+      ]
+     },
+     "then": [
+      "4 lines, then the 5th goes across.",
+      "That makes a gate of 5."
+     ]
+    },
+    {
+     "say": [
+      "Now tally 4 cyan and 3 green."
+     ],
+     "goal": {
+      "values": [
+       5,
+       4,
+       3
+      ]
+     },
+     "then": [
+      "Our tally chart is finished!"
+     ]
+    },
+    {
+     "say": [
+      "How many asteroids altogether?"
+     ],
+     "input": "numpad",
+     "answer": 12,
+     "then": [
+      "5 + 4 + 3 = 12."
+     ]
+    },
+    {
+     "set": {
+      "kind": "table",
+      "interactive": false,
+      "given": null,
+      "heads": [
+       "Colour",
+       "Number"
+      ]
+     },
+     "say": [
+      "The same counts can go in a table."
+     ],
+     "then": [
+      "A table uses numbers instead of tally marks."
+     ]
+    },
+    {
+     "say": [
+      "Which colour has the fewest?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "Gold",
+       "label": "Gold"
+      },
+      {
+       "value": "Cyan",
+       "label": "Cyan"
+      },
+      {
+       "value": "Green",
+       "label": "Green"
+      }
+     ],
+     "answer": "Green",
+     "then": [
+      "Green has the fewest: 3."
+     ]
+    },
+    {
+     "say": [
+      "How many more gold than green?"
+     ],
+     "input": "numpad",
+     "answer": 2,
+     "then": [
+      "5 take away 3 is 2."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "stats.readTally",
+    "stats.readTable",
+    "stats.mostLeast"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    6,
+    8
+   ],
+   "intro": [
+    "Your turn. Read the tallies and tables."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": [
+    "stats.mostLeast",
+    "stats.buildChart"
+   ],
+   "levels": [
+    2,
+    3,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Now sort and build."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wyr",
+   "title": "Would you rather...?",
+   "prompt": "Would you rather count passing asteroids with tally marks or with numbers?",
+   "options": [
+    {
+     "label": "Tally marks",
+     "widget": "charts",
+     "props": {
+      "kind": "tally",
+      "cats": [
+       {
+        "label": "Gold",
+        "colour": "gold",
+        "icon": "asteroid",
+        "value": 7
+       }
+      ]
+     }
+    },
+    {
+     "label": "Numbers",
+     "widget": "charts",
+     "props": {
+      "kind": "table",
+      "cats": [
+       {
+        "label": "Gold",
+        "colour": "gold",
+        "icon": "asteroid",
+        "value": 7
+       }
+      ]
+     }
+    }
+   ],
+   "reveal": [
+    "Tally marks are quick when things zoom past.",
+    "Numbers are easier to read afterwards.",
+    "Lots of scientists use both!"
+   ],
+   "followUp": "When would tally marks be best? What would change your mind?"
+  },
+  {
+   "type": "athome",
+   "title": "Car colour tally",
+   "need": [
+    "A window onto a road",
+    "Paper and a pencil"
+   ],
+   "steps": [
+    "Watch the road for 5 minutes.",
+    "Make a tally mark for each car, by colour.",
+    "Which colour had the most?"
+   ],
+   "why": "Tallies are fast: one line each, and a gate for every 5."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Why is the 5th tally mark drawn across the others?"
+   ]
+  }
+ ]
+}

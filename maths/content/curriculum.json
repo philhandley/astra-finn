@@ -1,0 +1,506 @@
+[
+ {
+  "id": "Y1-NPV-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "count to and across 100, forwards and backwards, from any number"
+ },
+ {
+  "id": "Y1-NPV-2",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "count, read, write to 100 in numerals; count in 2s, 5s, 10s"
+ },
+ {
+  "id": "Y1-NPV-3",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "1 more and 1 less"
+ },
+ {
+  "id": "Y1-NPV-4",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "represent numbers with objects, pictures, number line; equal to, more than, less than, most, least"
+ },
+ {
+  "id": "Y1-NPV-5",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "read and write 1 to 20 in numerals and words"
+ },
+ {
+  "id": "Y1-AS-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "read, write, interpret statements with +, −, ="
+ },
+ {
+  "id": "Y1-AS-2",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "number bonds and related subtraction facts within 20"
+ },
+ {
+  "id": "Y1-AS-3",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "add and subtract one- and two-digit numbers to 20, including 0"
+ },
+ {
+  "id": "Y1-AS-4",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "one-step + and − problems; missing numbers such as 7 = ? − 9"
+ },
+ {
+  "id": "Y1-MD-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Multiplication and division",
+  "short": "one-step × and ÷ problems with objects, pictures and arrays"
+ },
+ {
+  "id": "Y1-F-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Fractions",
+  "short": "a half as 1 of 2 equal parts"
+ },
+ {
+  "id": "Y1-F-2",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Fractions",
+  "short": "a quarter as 1 of 4 equal parts"
+ },
+ {
+  "id": "Y1-M-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "compare, describe, solve practical problems: length, mass, capacity, time"
+ },
+ {
+  "id": "Y1-M-2",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "measure and begin to record length, mass, capacity, time"
+ },
+ {
+  "id": "Y1-M-3",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "value of coins and notes"
+ },
+ {
+  "id": "Y1-M-4",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "sequence events: before, after, next, first, today, yesterday, tomorrow, morning, afternoon, evening"
+ },
+ {
+  "id": "Y1-M-5",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "days of the week, weeks, months, years"
+ },
+ {
+  "id": "Y1-M-6",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "time to the hour and half past; draw the hands"
+ },
+ {
+  "id": "Y1-G-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Shape",
+  "short": "name common 2-D and 3-D shapes"
+ },
+ {
+  "id": "Y1-PD-1",
+  "year": 1,
+  "kind": "statutory",
+  "strand": "Position and direction",
+  "short": "position, direction, movement; whole, half, quarter, three-quarter turns"
+ },
+ {
+  "id": "1NPV–1",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Number and place value",
+  "short": "count within 100 forwards and backwards from any number"
+ },
+ {
+  "id": "1NPV–2",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Number and place value",
+  "short": "location of numbers to 20 on the line; compare with <, >, ="
+ },
+ {
+  "id": "1NF–1",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Number facts",
+  "short": "fluency in + and − facts within 10"
+ },
+ {
+  "id": "1NF–2",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Number facts",
+  "short": "count in 2s, 5s, 10s to 10 multiples from any multiple; count through odd numbers"
+ },
+ {
+  "id": "1AS–1",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Addition and subtraction",
+  "short": "compose and partition numbers to 10; odd and even"
+ },
+ {
+  "id": "1AS–2",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Addition and subtraction",
+  "short": "read, write, interpret equations with +, −, =; relate to real life"
+ },
+ {
+  "id": "1G–1",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Shape",
+  "short": "recognise 2-D and 3-D shapes in any orientation; not always similar"
+ },
+ {
+  "id": "1G–2",
+  "year": 1,
+  "kind": "rtp",
+  "strand": "Shape",
+  "short": "compose shapes from smaller shapes to match an example"
+ },
+ {
+  "id": "Y2-NPV-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "count in 2s, 3s, 5s from 0 and 10s from any number, forward and back"
+ },
+ {
+  "id": "Y2-NPV-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "place value of each digit in a two-digit number"
+ },
+ {
+  "id": "Y2-NPV-3",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "identify, represent, estimate with different representations incl. number line"
+ },
+ {
+  "id": "Y2-NPV-4",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "compare and order 0 to 100 with <, >, ="
+ },
+ {
+  "id": "Y2-NPV-5",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "read and write to at least 100 in numerals and words"
+ },
+ {
+  "id": "Y2-NPV-6",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Number and place value",
+  "short": "use place value and number facts to solve problems"
+ },
+ {
+  "id": "Y2-AS-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "solve + and − problems with objects, pictures, quantities, measures; mental and written methods"
+ },
+ {
+  "id": "Y2-AS-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "recall + and − facts to 20 fluently; derive related facts to 100"
+ },
+ {
+  "id": "Y2-AS-3",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "add and subtract: two-digit and 1s; two-digit and 10s; two two-digit; three one-digit"
+ },
+ {
+  "id": "Y2-AS-4",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "addition commutative, subtraction not"
+ },
+ {
+  "id": "Y2-AS-5",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Addition and subtraction",
+  "short": "inverse relationship; check calculations; missing numbers"
+ },
+ {
+  "id": "Y2-MD-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Multiplication and division",
+  "short": "recall × and ÷ facts for 2, 5, 10; odd and even"
+ },
+ {
+  "id": "Y2-MD-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Multiplication and division",
+  "short": "calculate × and ÷ statements within the tables; write with ×, ÷, ="
+ },
+ {
+  "id": "Y2-MD-3",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Multiplication and division",
+  "short": "multiplication commutative, division not"
+ },
+ {
+  "id": "Y2-MD-4",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Multiplication and division",
+  "short": "solve × and ÷ problems with materials, arrays, repeated addition, facts, in context"
+ },
+ {
+  "id": "Y2-F-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Fractions",
+  "short": "recognise, find, name, write 1/3, 1/4, 2/4, 3/4 of length, shape, set, quantity"
+ },
+ {
+  "id": "Y2-F-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Fractions",
+  "short": "simple fractions such as 1/2 of 6 = 3; 2/4 = 1/2"
+ },
+ {
+  "id": "Y2-M-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "choose and use standard units: m/cm, kg/g, °C, l/ml, with rulers, scales, thermometers, vessels"
+ },
+ {
+  "id": "Y2-M-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "compare and order length, mass, capacity with >, <, ="
+ },
+ {
+  "id": "Y2-M-3",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "£ and p symbols; combine amounts"
+ },
+ {
+  "id": "Y2-M-4",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "different coin combinations for the same amount"
+ },
+ {
+  "id": "Y2-M-5",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "add and subtract money in context, including change"
+ },
+ {
+  "id": "Y2-M-6",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "compare and sequence intervals of time"
+ },
+ {
+  "id": "Y2-M-7",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "tell and write time to five minutes incl. quarter past and to; draw hands"
+ },
+ {
+  "id": "Y2-M-8",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Measurement",
+  "short": "minutes in an hour, hours in a day"
+ },
+ {
+  "id": "Y2-G-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Shape",
+  "short": "properties of 2-D shapes: sides, vertical line symmetry"
+ },
+ {
+  "id": "Y2-G-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Shape",
+  "short": "properties of 3-D shapes: edges, vertices, faces"
+ },
+ {
+  "id": "Y2-G-3",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Shape",
+  "short": "2-D shapes on the surface of 3-D shapes"
+ },
+ {
+  "id": "Y2-G-4",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Shape",
+  "short": "compare and sort 2-D and 3-D shapes and everyday objects"
+ },
+ {
+  "id": "Y2-PD-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Position and direction",
+  "short": "order and arrange objects in patterns and sequences"
+ },
+ {
+  "id": "Y2-PD-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Position and direction",
+  "short": "position, direction, movement; straight line; rotation as turns and right angles; clockwise and anticlockwise"
+ },
+ {
+  "id": "Y2-S-1",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Statistics",
+  "short": "interpret and construct pictograms, tally charts, block diagrams, tables"
+ },
+ {
+  "id": "Y2-S-2",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Statistics",
+  "short": "count objects in each category; sort categories by quantity"
+ },
+ {
+  "id": "Y2-S-3",
+  "year": 2,
+  "kind": "statutory",
+  "strand": "Statistics",
+  "short": "totalling and comparing categorical data"
+ },
+ {
+  "id": "2NPV–1",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Number and place value",
+  "short": "place value in two-digit numbers; standard and non-standard partitioning"
+ },
+ {
+  "id": "2NPV–2",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Number and place value",
+  "short": "location of any two-digit number on the line; previous and next multiple of 10"
+ },
+ {
+  "id": "2NF–1",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Number facts",
+  "short": "secure fluency in + and − facts within 10"
+ },
+ {
+  "id": "2AS–1",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Addition and subtraction",
+  "short": "add and subtract across 10"
+ },
+ {
+  "id": "2AS–2",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Addition and subtraction",
+  "short": "the \"difference\" structure; \"How many more?\""
+ },
+ {
+  "id": "2AS–3",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Addition and subtraction",
+  "short": "within 100: add or subtract only ones or only tens to a two-digit number"
+ },
+ {
+  "id": "2AS–4",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Addition and subtraction",
+  "short": "within 100: add and subtract any two two-digit numbers"
+ },
+ {
+  "id": "2MD–1",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Multiplication and division",
+  "short": "repeated addition contexts as multiplication equations within 2, 5, 10 tables"
+ },
+ {
+  "id": "2MD–2",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Multiplication and division",
+  "short": "grouping problems with the number of groups unknown; missing factor; quotitive division"
+ },
+ {
+  "id": "2G–1",
+  "year": 2,
+  "kind": "rtp",
+  "strand": "Shape",
+  "short": "precise language for 2-D and 3-D properties; compare by reasoning"
+ }
+]

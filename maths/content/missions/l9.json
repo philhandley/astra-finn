@@ -1,0 +1,703 @@
+{
+ "id": "l9",
+ "sector": "launchpad",
+ "title": "Shape Spotter",
+ "tagline": "Name 2-D and 3-D shapes and make turns",
+ "covers": [
+  "Y1-G-1",
+  "Y1-PD-1",
+  "1G–1",
+  "1G–2"
+ ],
+ "patch": {
+  "name": "Shape Spotter",
+  "icon": "shapes"
+ },
+ "dadNotes": [
+  "Turn shapes round as you talk: a triangle upside down is still a triangle.",
+  "Use the school sentence: 'This is not a triangle because it has 4 sides.'",
+  "Quarter turn, half turn, whole turn: stand up and turn together."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Our rocket is built from 2-D shapes.",
+    "Can you spot the triangles?"
+   ],
+   "question": "How many different shapes can you see?",
+   "widget": "shapes2d",
+   "props": {
+    "shapes": [
+     {
+      "poly": [
+       [
+        -1,
+        -1.5
+       ],
+       [
+        1,
+        -1.5
+       ],
+       [
+        1,
+        2
+       ],
+       [
+        -1,
+        2
+       ]
+      ],
+      "x": 400,
+      "y": 262,
+      "colour": "white"
+     },
+     {
+      "poly": [
+       [
+        -1,
+        0
+       ],
+       [
+        1,
+        0
+       ],
+       [
+        0,
+        -1.4
+       ]
+      ],
+      "x": 400,
+      "y": 172,
+      "colour": "red"
+     },
+     {
+      "shape": "circle",
+      "scale": 0.45,
+      "x": 400,
+      "y": 230,
+      "colour": "cyan"
+     },
+     {
+      "poly": [
+       [
+        0,
+        0
+       ],
+       [
+        0,
+        1.5
+       ],
+       [
+        -1.1,
+        1.5
+       ]
+      ],
+      "x": 340,
+      "y": 292,
+      "colour": "gold"
+     },
+     {
+      "poly": [
+       [
+        0,
+        0
+       ],
+       [
+        0,
+        1.5
+       ],
+       [
+        1.1,
+        1.5
+       ]
+      ],
+      "x": 460,
+      "y": 292,
+      "colour": "gold"
+     },
+     {
+      "shape": "semicircle",
+      "rotate": 180,
+      "scale": 0.7,
+      "x": 400,
+      "y": 402,
+      "colour": "orange"
+     }
+    ],
+    "unit": 60
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you named shapes at school?"
+  },
+  {
+   "type": "try",
+   "widget": "shapes2d",
+   "props": {
+    "shape": "triangle",
+    "tap": "sides"
+   },
+   "script": [
+    {
+     "say": [
+      "This is a triangle.",
+      "Tap each side once."
+     ],
+     "goal": {
+      "sides": 3
+     },
+     "then": [
+      "{sides} straight sides.",
+      "This is a triangle because it has 3 straight sides."
+     ],
+     "hint": [
+      "Tap right on the gold line edges."
+     ]
+    },
+    {
+     "set": {
+      "shape": "triangle",
+      "rotate": 180,
+      "tap": null
+     },
+     "say": [
+      "Now it is upside down.",
+      "Is it still a triangle?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "yes",
+       "label": "Yes"
+      },
+      {
+       "value": "no",
+       "label": "No"
+      }
+     ],
+     "answer": "yes",
+     "then": [
+      "Yes! Turning a shape does not change its name."
+     ]
+    },
+    {
+     "set": {
+      "shape": "long-triangle",
+      "rotate": 70
+     },
+     "say": [
+      "Long and thin.",
+      "Is this a triangle?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "yes",
+       "label": "Yes"
+      },
+      {
+       "value": "no",
+       "label": "No"
+      }
+     ],
+     "answer": "yes",
+     "then": [
+      "Yes. It still has 3 straight sides."
+     ]
+    },
+    {
+     "set": {
+      "shape": "square",
+      "rotate": 0,
+      "tap": "sides"
+     },
+     "say": [
+      "Tap each side of this shape."
+     ],
+     "goal": {
+      "sides": 4
+     },
+     "then": [
+      "This is not a triangle because it has 4 sides.",
+      "It is a square."
+     ]
+    },
+    {
+     "set": {
+      "shape": "curvy-triangle",
+      "tap": null
+     },
+     "say": [
+      "What about this one?",
+      "Is it a triangle?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "yes",
+       "label": "Yes"
+      },
+      {
+       "value": "no",
+       "label": "No"
+      }
+     ],
+     "answer": "no",
+     "then": [
+      "This is not a triangle because some sides are curved."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cube",
+    "autoRotate": true
+   },
+   "script": [
+    {
+     "say": [
+      "3-D shapes are solid, like a dice or a ball.",
+      "Spin this one with your finger."
+     ]
+    },
+    {
+     "say": [
+      "What is this 3-D shape called?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "cube",
+       "label": "Cube"
+      },
+      {
+       "value": "sphere",
+       "label": "Sphere"
+      },
+      {
+       "value": "cone",
+       "label": "Cone"
+      }
+     ],
+     "answer": "cube",
+     "then": [
+      "A cube. Every face is a square."
+     ]
+    },
+    {
+     "set": {
+      "shape": "cylinder"
+     },
+     "say": [
+      "And this one?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "cuboid",
+       "label": "Cuboid"
+      },
+      {
+       "value": "cylinder",
+       "label": "Cylinder"
+      },
+      {
+       "value": "sphere",
+       "label": "Sphere"
+      }
+     ],
+     "answer": "cylinder",
+     "then": [
+      "A cylinder, like a tin of beans."
+     ]
+    },
+    {
+     "set": {
+      "shape": "pyramid"
+     },
+     "say": [
+      "One more."
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "cone",
+       "label": "Cone"
+      },
+      {
+       "value": "cube",
+       "label": "Cube"
+      },
+      {
+       "value": "pyramid",
+       "label": "Pyramid"
+      }
+     ],
+     "answer": "pyramid",
+     "then": [
+      "A pyramid. Its triangle faces meet at a point."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "shapes2d",
+   "props": {
+    "shapes": [
+     {
+      "shape": "half-square",
+      "x": 372,
+      "y": 267,
+      "colour": "cyan"
+     },
+     {
+      "shape": "half-square",
+      "rotate": 180,
+      "x": 428,
+      "y": 233,
+      "colour": "cyan"
+     }
+    ],
+    "unit": 98
+   },
+   "script": [
+    {
+     "say": [
+      "Push these 2 triangles together.",
+      "What shape do they make?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "square",
+       "label": "Square",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "square",
+        "readonly": true
+       }
+      },
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "rectangle",
+       "label": "Rectangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "rectangle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "square",
+     "then": [
+      "2 triangles make a square."
+     ]
+    },
+    {
+     "set": {
+      "shapes": [
+       {
+        "shape": "square",
+        "x": 291,
+        "y": 250,
+        "colour": "gold"
+       },
+       {
+        "shape": "square",
+        "x": 509,
+        "y": 250,
+        "colour": "gold"
+       }
+      ],
+      "unit": 98
+     },
+     "say": [
+      "Push these 2 squares together.",
+      "What shape do they make?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "triangle",
+       "label": "Triangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "triangle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "rectangle",
+       "label": "Rectangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "rectangle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "rectangle",
+     "then": [
+      "2 squares make a rectangle."
+     ]
+    },
+    {
+     "set": {
+      "shapes": [
+       {
+        "shape": "semicircle",
+        "x": 400,
+        "y": 197,
+        "colour": "pink"
+       },
+       {
+        "shape": "semicircle",
+        "rotate": 180,
+        "x": 400,
+        "y": 303,
+        "colour": "pink"
+       }
+      ],
+      "unit": 98
+     },
+     "say": [
+      "And these 2 halves?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "oval",
+       "label": "Oval",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "oval",
+        "readonly": true
+       }
+      },
+      {
+       "value": "square",
+       "label": "Square",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "square",
+        "readonly": true
+       }
+      },
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "circle",
+     "then": [
+      "2 semicircles make a circle."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "rover",
+   "props": {
+    "cols": 3,
+    "rows": 3,
+    "start": {
+     "x": 1,
+     "y": 1,
+     "dir": "N"
+    },
+    "controls": [
+     "right"
+    ],
+    "showTurnArc": true,
+    "trail": false
+   },
+   "script": [
+    {
+     "say": [
+      "Our rover faces up.",
+      "Make a quarter turn clockwise."
+     ],
+     "goal": {
+      "turns": 1
+     },
+     "then": [
+      "A quarter turn. Now it faces right."
+     ],
+     "hint": [
+      "Press the clockwise button once."
+     ]
+    },
+    {
+     "say": [
+      "Make another quarter turn."
+     ],
+     "goal": {
+      "turns": 2
+     },
+     "then": [
+      "2 quarter turns make a half turn.",
+      "Now it faces down."
+     ]
+    },
+    {
+     "say": [
+      "Keep turning until it faces up again."
+     ],
+     "goal": {
+      "dir": "N",
+      "turns": {
+       "gte": 4
+      }
+     },
+     "then": [
+      "4 quarter turns make a whole turn!",
+      "It is back where it started."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "geometry.notATriangle",
+    "geometry.name2d",
+    "geometry.name3d",
+    "geometry.turns"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    8,
+    8
+   ],
+   "intro": [
+    "Your turn, Shape Spotter."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": [
+    "geometry.composeShapes",
+    "geometry.everydayObject"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Now build shapes and spot them at home."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "Cube",
+     "widget": "shapes3d",
+     "props": {
+      "shape": "cube",
+      "svg": true
+     }
+    },
+    {
+     "label": "Cylinder",
+     "widget": "shapes3d",
+     "props": {
+      "shape": "cylinder",
+      "svg": true
+     }
+    },
+    {
+     "label": "Sphere",
+     "widget": "shapes3d",
+     "props": {
+      "shape": "sphere",
+      "svg": true
+     }
+    },
+    {
+     "label": "Cone",
+     "widget": "shapes3d",
+     "props": {
+      "shape": "cone",
+      "svg": true
+     }
+    }
+   ],
+   "reveal": [
+    "Cube: the only one with no curved faces.",
+    "Sphere: the only one with no flat faces.",
+    "Cone: the only one with a sharp point.",
+    "Cylinder: the only one with 2 circle faces."
+   ],
+   "followUp": "Every one can be the odd one out. Can you find another reason?"
+  },
+  {
+   "type": "athome",
+   "title": "Shape hunt",
+   "need": [
+    "The kitchen",
+    "A grown-up"
+   ],
+   "steps": [
+    "Find something shaped like a cylinder.",
+    "Find a cuboid and a sphere.",
+    "Turn a box round. Is it still a cuboid?"
+   ],
+   "why": "Shapes keep their names however they are turned."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How do you know a shape is a triangle?"
+   ]
+  }
+ ]
+}

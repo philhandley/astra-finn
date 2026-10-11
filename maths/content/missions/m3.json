@@ -1,0 +1,319 @@
+{
+  "id": "m3",
+  "sector": "measure",
+  "title": "Capacity and Temperature",
+  "tagline": "Millilitres, litres and degrees",
+  "covers": [
+    "Y2-M-1",
+    "Y2-M-2"
+  ],
+  "patch": {
+    "name": "Capacity and Temperature",
+    "icon": "star"
+  },
+  "dadNotes": [
+    "Read a jug at eye level, at the top of the liquid.",
+    "ml for a cup or a spoon, litres for a bucket or a bath.",
+    "Check what each small mark is worth before reading a thermometer: 1s, 2s, 5s or 10s."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "This is a measuring jug.",
+        "It measures liquid in millilitres. We write ml."
+      ],
+      "question": "Where is the top of the water?",
+      "widget": "measure",
+      "props": {
+        "tool": "jug",
+        "unit": "ml",
+        "max": 500,
+        "labels": 100,
+        "marks": 100,
+        "value": 300
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you used a measuring jug at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "About how much fuel is in the jug?",
+      "widget": "measure",
+      "props": {
+        "tool": "jug",
+        "unit": "ml",
+        "max": 1000,
+        "labels": 200,
+        "marks": 100,
+        "value": 700,
+        "liquid": "fuel"
+      },
+      "options": [
+        "About 100 ml",
+        "About 700 ml",
+        "About 1000 ml"
+      ],
+      "answer": 1,
+      "reveal": [
+        "700 ml.",
+        "It is halfway between 600 and 800."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "measure",
+      "props": {
+        "tool": "jug",
+        "unit": "ml",
+        "max": 500,
+        "labels": 100,
+        "marks": 100,
+        "value": 0,
+        "liquid": "water"
+      },
+      "script": [
+        {
+          "say": [
+            "Drag the water up.",
+            "Fill the jug to 200 ml."
+          ],
+          "goal": {
+            "value": 200
+          },
+          "hint": [
+            "Drag the gold button up."
+          ],
+          "then": [
+            "200 ml. ml means millilitres."
+          ]
+        },
+        {
+          "say": [
+            "Fill it to 400 ml."
+          ],
+          "goal": {
+            "value": 400
+          },
+          "then": [
+            "400 ml. That is 200 ml more."
+          ]
+        },
+        {
+          "set": {
+            "marks": 50,
+            "value": 0
+          },
+          "say": [
+            "Now there are small marks too.",
+            "Fill it to 250 ml."
+          ],
+          "goal": {
+            "value": 250
+          },
+          "hint": [
+            "250 is between 200 and 300."
+          ],
+          "then": [
+            "250 is halfway from 200 to 300."
+          ]
+        },
+        {
+          "set": {
+            "unit": "l",
+            "max": 5,
+            "labels": 1,
+            "marks": 1,
+            "value": 0,
+            "liquid": "fuel"
+          },
+          "say": [
+            "Big tanks use litres. We write l.",
+            "Fill it to 3 l."
+          ],
+          "goal": {
+            "value": 3
+          },
+          "then": [
+            "3 litres of rocket fuel!"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "look",
+      "lines": [
+        "A thermometer shows how hot or cold it is.",
+        "We measure in degrees Celsius."
+      ],
+      "question": "Is 22 °C warm or cold?",
+      "widget": "measure",
+      "props": {
+        "tool": "thermometer",
+        "min": 0,
+        "max": 40,
+        "labels": 10,
+        "marks": 2,
+        "value": 22,
+        "object": "sun"
+      }
+    },
+    {
+      "type": "try",
+      "widget": "measure",
+      "props": {
+        "tool": "thermometer",
+        "min": 0,
+        "max": 40,
+        "labels": 10,
+        "marks": 2,
+        "value": 10,
+        "object": "sun"
+      },
+      "script": [
+        {
+          "say": [
+            "A warm day on Earth.",
+            "Drag the red line to 24 °C."
+          ],
+          "goal": {
+            "value": 24
+          },
+          "hint": [
+            "Find 20. Then count on in 2s."
+          ],
+          "then": [
+            "24 °C. 20, 22, 24."
+          ]
+        },
+        {
+          "set": {
+            "object": "moon",
+            "value": 20
+          },
+          "say": [
+            "Night time. It is colder.",
+            "Show 6 °C."
+          ],
+          "goal": {
+            "value": 6
+          },
+          "then": [
+            "6 °C is cold. Time for a coat!"
+          ]
+        },
+        {
+          "say": [
+            "Which is warmer, 24 °C or 6 °C?"
+          ],
+          "input": "choice",
+          "options": [
+            "24 °C",
+            "6 °C"
+          ],
+          "answer": "24 °C",
+          "then": [
+            "24 °C > 6 °C.",
+            "Nights on the real Moon are colder than any freezer!"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "measure.readJug",
+        "measure.fillJug",
+        "measure.readThermometer",
+        "measure.setThermometer"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Jugs and thermometers."
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} read this jug.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "The jug has 300 and 400, with 1 small mark between.",
+        "The water is on the small mark after 300.",
+        "Each small mark is 10 ml.",
+        "So there is 310 ml."
+      ],
+      "wrong": 2,
+      "fix": [
+        "With 1 small mark, each one is 50 ml.",
+        "So there is 350 ml.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": [
+        "measure.compareMeasures",
+        "measure.orderMeasures",
+        "measure.chooseUnit"
+      ],
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        4,
+        4,
+        5
+      ],
+      "params": {
+        "units": [
+          "ml",
+          "l"
+        ],
+        "kind": "capacity"
+      },
+      "intro": [
+        "More or less? Compare and order."
+      ]
+    },
+    {
+      "type": "athome",
+      "title": "Bath-time maths",
+      "need": [
+        "A measuring jug",
+        "Cups, mugs and bottles"
+      ],
+      "steps": [
+        "Guess which cup holds the most.",
+        "Fill each one, then pour it into the jug.",
+        "Read the jug at eye level."
+      ],
+      "why": "Capacity is how much a container holds."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What would you measure in litres?"
+      ]
+    }
+  ]
+}

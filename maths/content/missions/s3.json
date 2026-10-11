@@ -1,0 +1,409 @@
+{
+ "id": "s3",
+ "sector": "shape",
+ "title": "Shapes on Shapes",
+ "tagline": "Find 2-D shapes on 3-D shapes, and sort them",
+ "covers": [
+  "Y2-G-3",
+  "Y2-G-4"
+ ],
+ "patch": {
+  "name": "Shapes on Shapes",
+  "icon": "cube"
+ },
+ "dadNotes": [
+  "Print faces with paint, or draw round them: the outline is the 2-D shape.",
+  "Sorting: ask \"Which ones can roll? Which have a point?\" and let Finn make up his own rules."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Look at the gold face of this cylinder.",
+    "It is flat."
+   ],
+   "question": "What 2-D shape is it?",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cylinder",
+    "highlight": "top"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you found 2-D shapes on 3-D shapes before?"
+  },
+  {
+   "type": "try",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cylinder",
+    "highlight": "top"
+   },
+   "script": [
+    {
+     "say": [
+      "Spin the cylinder with your finger.",
+      "Look at the gold face."
+     ]
+    },
+    {
+     "say": [
+      "Which 2-D shape is the gold face?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "square",
+       "label": "Square",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "square",
+        "readonly": true
+       }
+      },
+      {
+       "value": "triangle",
+       "label": "Triangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "triangle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "circle",
+     "then": [
+      "A circle! A cylinder has 2 circle faces."
+     ]
+    },
+    {
+     "set": {
+      "shape": "pyramid",
+      "highlight": "side"
+     },
+     "say": [
+      "Now look at this pyramid.",
+      "What shape is the gold face?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "square",
+       "label": "Square",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "square",
+        "readonly": true
+       }
+      },
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "triangle",
+       "label": "Triangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "triangle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "triangle",
+     "then": [
+      "A triangle on a pyramid."
+     ]
+    },
+    {
+     "set": {
+      "shape": "pyramid",
+      "highlight": "base"
+     },
+     "say": [
+      "Now the gold face is underneath.",
+      "What shape is it?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "triangle",
+       "label": "Triangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "triangle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "square",
+       "label": "Square",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "square",
+        "readonly": true
+       }
+      },
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "square",
+     "then": [
+      "The base is a square.",
+      "So it is a square-based pyramid."
+     ]
+    },
+    {
+     "set": {
+      "shape": "prism",
+      "highlight": "end"
+     },
+     "say": [
+      "What shape is on the end of this prism?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "rectangle",
+       "label": "Rectangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "rectangle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "triangle",
+       "label": "Triangle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "triangle",
+        "readonly": true
+       }
+      },
+      {
+       "value": "circle",
+       "label": "Circle",
+       "widget": "shapes2d",
+       "props": {
+        "shape": "circle",
+        "readonly": true
+       }
+      }
+     ],
+     "answer": "triangle",
+     "then": [
+      "Triangles on both ends."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cylinder",
+    "autoRotate": true
+   },
+   "script": [
+    {
+     "say": [
+      "Lots of things are shaped like a cylinder."
+     ],
+     "then": [
+      "A tin, a candle, a drum."
+     ]
+    },
+    {
+     "set": {
+      "shape": "sphere"
+     },
+     "say": [
+      "Which one is a sphere?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "A brick",
+       "label": "A brick"
+      },
+      {
+       "value": "An orange",
+       "label": "An orange"
+      },
+      {
+       "value": "A party hat",
+       "label": "A party hat"
+      }
+     ],
+     "answer": "An orange",
+     "then": [
+      "An orange. It is round all over."
+     ]
+    },
+    {
+     "set": {
+      "shape": "cube"
+     },
+     "say": [
+      "Which one is a cube?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "A candle",
+       "label": "A candle"
+      },
+      {
+       "value": "A tent",
+       "label": "A tent"
+      },
+      {
+       "value": "A dice",
+       "label": "A dice"
+      }
+     ],
+     "answer": "A dice",
+     "then": [
+      "A dice. Every face is a square."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "geometry.faceShape",
+    "geometry.everydayObject",
+    "geometry.sortShapes"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    6,
+    8
+   ],
+   "intro": [
+    "Your turn. Faces, objects and sorting."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "Square",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "square",
+      "colour": "cyan"
+     }
+    },
+    {
+     "label": "Cube",
+     "widget": "shapes3d",
+     "props": {
+      "shape": "cube",
+      "svg": true
+     }
+    },
+    {
+     "label": "Circle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "circle",
+      "colour": "gold"
+     }
+    },
+    {
+     "label": "Sphere",
+     "widget": "shapes3d",
+     "props": {
+      "shape": "sphere",
+      "svg": true
+     }
+    }
+   ],
+   "reveal": [
+    "Cube: the only one with edges.",
+    "Sphere: the only one that rolls any way.",
+    "Square: the only flat shape with corners.",
+    "Circle: the only flat shape with no corners."
+   ],
+   "followUp": "Every one can be the odd one out. Which reason do you like best?"
+  },
+  {
+   "type": "error",
+   "tiers": [
+    2,
+    3
+   ],
+   "intro": [
+    "{engineer} sorted some objects.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "Everyday objects and their shapes",
+    "A dice is a cube.",
+    "A tin is a cylinder.",
+    "A party hat is a pyramid.",
+    "A football is a sphere."
+   ],
+   "wrong": 3,
+   "fix": [
+    "A party hat is a cone.",
+    "It has a circle base, not a square one."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Shape stamps",
+   "need": [
+    "Paint or an ink pad",
+    "Paper",
+    "A tin, a box and a toy brick"
+   ],
+   "steps": [
+    "Dip one face of each object in paint.",
+    "Press it on the paper.",
+    "What 2-D shape did each one print?"
+   ],
+   "why": "Every flat face of a 3-D shape is a 2-D shape."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Which 3-D shapes have a circle on them?"
+   ]
+  }
+ ]
+}

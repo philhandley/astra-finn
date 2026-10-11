@@ -1,0 +1,260 @@
+{
+  "id": "b6",
+  "sector": "bonds",
+  "title": "Any Order?",
+  "tagline": "Adding in any order, and checking with the inverse",
+  "covers": [
+    "Y2-AS-4",
+    "Y2-AS-5"
+  ],
+  "patch": {
+    "name": "Any Order?",
+    "icon": "scales"
+  },
+  "dadNotes": [
+    "Swap the numbers in an addition: same answer. Try it with a subtraction: it breaks.",
+    "Check a subtraction by adding: 62 − 28 = 34, so 34 + 28 should be 62."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "A bar model.",
+        "4 and 9 make 13."
+      ],
+      "question": "Do 9 and 4 make 13 too?",
+      "widget": "bar",
+      "props": {
+        "kind": "partwhole",
+        "whole": 13,
+        "parts": [
+          4,
+          9
+        ]
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you learned that adding works in any order?"
+    },
+    {
+      "type": "guess",
+      "prompt": "Is 9 − 4 the same as 4 − 9?",
+      "options": [
+        "Yes",
+        "No",
+        "Not sure"
+      ],
+      "answer": 1,
+      "reveal": [
+        "No!",
+        "9 − 4 = 5.",
+        "4 − 9 does not make 5."
+      ],
+      "art": "satellite"
+    },
+    {
+      "type": "try",
+      "widget": "balance",
+      "props": {
+        "left": "4 + 9",
+        "right": "9 + 4"
+      },
+      "script": [
+        {
+          "say": [
+            "4 + 9 on one side.",
+            "9 + 4 on the other."
+          ],
+          "input": "choice",
+          "options": [
+            "Level",
+            "It tips"
+          ],
+          "answer": "Level",
+          "then": [
+            "4 + 9 = 13 and 9 + 4 = 13.",
+            "Adding works in any order."
+          ]
+        },
+        {
+          "set": {
+            "left": "9 − 4",
+            "right": "4 − 9"
+          },
+          "say": [
+            "Now 9 − 4 and 4 − 9."
+          ],
+          "input": "choice",
+          "options": [
+            "Level",
+            "It tips"
+          ],
+          "answer": "It tips",
+          "then": [
+            "9 − 4 = 5.",
+            "4 − 9 is not 5.",
+            "Order matters when we subtract."
+          ]
+        },
+        {
+          "set": {
+            "left": "12 − 5",
+            "right": "7"
+          },
+          "say": [
+            "12 − 5 = 7.",
+            "How can we check it?"
+          ],
+          "input": "choice",
+          "options": [
+            "7 + 5",
+            "12 + 5",
+            "7 − 5"
+          ],
+          "answer": "7 + 5",
+          "then": [
+            "7 + 5 = 12.",
+            "Adding undoes subtracting. It checks!"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "partwhole",
+      "props": {
+        "whole": 62,
+        "parts": [
+          34,
+          28
+        ]
+      },
+      "script": [
+        {
+          "caption": "34 + 28 = 62",
+          "say": [
+            "34 + 28 = 62.",
+            "Check it: what is 62 − 28?"
+          ],
+          "input": "numpad",
+          "answer": 34,
+          "then": [
+            "62 − 28 = 34.",
+            "We got back to 34. It checks!"
+          ]
+        },
+        {
+          "set": {
+            "whole": 50,
+            "parts": [
+              35,
+              15
+            ],
+            "hide": 0
+          },
+          "caption": "? + 15 = 50",
+          "say": [
+            "Use the inverse.",
+            "What is 50 − 15?"
+          ],
+          "input": "numpad",
+          "answer": 35,
+          "then": [
+            "35 + 15 = 50.",
+            "The missing part is 35."
+          ]
+        },
+        {
+          "set": {
+            "whole": 40,
+            "parts": [
+              26,
+              14
+            ],
+            "hide": "whole"
+          },
+          "caption": "? − 14 = 26",
+          "say": [
+            "The whole is missing now.",
+            "What is 26 + 14?"
+          ],
+          "input": "numpad",
+          "answer": 40,
+          "then": [
+            "40 − 14 = 26.",
+            "Adding found the whole."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.commutative",
+        "addsub.inverseCheck",
+        "addsub.missingNumber"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Any order? Check it!"
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.missingNumber",
+      "levels": [
+        2,
+        3,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Harder hiding numbers. Use the inverse."
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} checked 62 − 28 = 34.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "62 − 28 = 34",
+        "Check: 34 − 28 = 6",
+        "6 is not 62.",
+        "So the answer must be off."
+      ],
+      "wrong": 1,
+      "fix": [
+        "To check a subtraction, add.",
+        "34 + 28 = 62. It was right all along!",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "Which works in any order: adding or subtracting?"
+      ]
+    }
+  ]
+}

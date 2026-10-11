@@ -1,0 +1,435 @@
+{
+  "id": "l10",
+  "sector": "launchpad",
+  "title": "Clocks, Coins and Days",
+  "tagline": "O'clock, half past, coins and the days of the week",
+  "covers": [
+    "Y1-M-3",
+    "Y1-M-4",
+    "Y1-M-5",
+    "Y1-M-6"
+  ],
+  "patch": {
+    "name": "Clocks and Coins",
+    "icon": "clock"
+  },
+  "dadNotes": [
+    "Say 'o'clock' when the long hand points to 12 and 'half past' when it points to 6.",
+    "Let Finn handle real coins: sort by colour and shape first, then talk about value. A bigger coin is not always worth more.",
+    "Use yesterday, today and tomorrow at breakfast this week."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "This is the clock on the launch tower.",
+        "It has a short hand and a long hand."
+      ],
+      "question": "What do you think the hands tell us?",
+      "widget": "clock",
+      "props": {
+        "h": 7,
+        "m": 0
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you learned o'clock and half past at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "How many days are in 1 week?",
+      "art": "planet",
+      "options": [
+        "5 days",
+        "7 days",
+        "10 days"
+      ],
+      "answer": 1,
+      "reveal": [
+        "7 days.",
+        "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "clock",
+      "props": {
+        "h": 12,
+        "m": 0,
+        "snap": 30
+      },
+      "script": [
+        {
+          "say": [
+            "The short hand shows the hour.",
+            "The long hand shows the minutes."
+          ]
+        },
+        {
+          "say": [
+            "Make it 3 o'clock.",
+            "Drag the short hand to 3."
+          ],
+          "goal": {
+            "h": 3,
+            "m": 0
+          },
+          "hint": [
+            "Put your finger near the middle.",
+            "Drag the short hand round to 3."
+          ],
+          "then": [
+            "The long hand is on 12.",
+            "The short hand is on 3. It is {words}."
+          ]
+        },
+        {
+          "say": [
+            "Now drag the long hand all the way round once."
+          ],
+          "goal": {
+            "h": 4,
+            "m": 0
+          },
+          "hint": [
+            "Go the way clocks go: 12, then 3, then 6.",
+            "Keep going until it is back at 12."
+          ],
+          "then": [
+            "One hour went by.",
+            "Look: the short hand moved on to 4."
+          ]
+        },
+        {
+          "say": [
+            "Drag the long hand to 6."
+          ],
+          "goal": {
+            "m": 30
+          },
+          "then": [
+            "The long hand is on 6.",
+            "That is half past. It is {words}."
+          ]
+        },
+        {
+          "set": {
+            "h": 9,
+            "m": 30
+          },
+          "say": [
+            "Here is a new time.",
+            "What time is it?"
+          ],
+          "input": "choice",
+          "options": [
+            "half past 9",
+            "9 o'clock",
+            "half past 10"
+          ],
+          "answer": "half past 9",
+          "then": [
+            "Long hand on 6, so half past.",
+            "Short hand just past 9: half past 9."
+          ]
+        },
+        {
+          "set": {
+            "h": 12,
+            "m": 0
+          },
+          "say": [
+            "Make it half past 2."
+          ],
+          "goal": {
+            "h": 2,
+            "m": 30
+          },
+          "hint": [
+            "Long hand on 6.",
+            "Short hand halfway from 2 to 3."
+          ],
+          "then": [
+            "Half past 2! Well set."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "time.readClock",
+        "time.setClock"
+      ],
+      "levels": [
+        1,
+        1,
+        2
+      ],
+      "items": [
+        5,
+        6,
+        6
+      ],
+      "intro": [
+        "Your turn. Read and set the clocks."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "coins",
+      "props": {
+        "tray": [
+          "1p",
+          "2p",
+          "5p",
+          "10p",
+          "20p",
+          "50p",
+          "£1",
+          "£2"
+        ],
+        "purse": [],
+        "showTotal": true
+      },
+      "script": [
+        {
+          "say": [
+            "These are our coins.",
+            "Tap the 10p coin."
+          ],
+          "goal": {
+            "items": [
+              "10p"
+            ]
+          },
+          "hint": [
+            "Find the coin that says 10p.",
+            "Tap a coin in the purse to put it back."
+          ],
+          "then": [
+            "That is 10p. It is silver and round."
+          ]
+        },
+        {
+          "say": [
+            "Now add a 5p coin."
+          ],
+          "goal": {
+            "items": [
+              "10p",
+              "5p"
+            ]
+          },
+          "then": [
+            "10p and 5p make 15p."
+          ]
+        },
+        {
+          "set": {
+            "purse": [
+              "2p",
+              "5p"
+            ]
+          },
+          "say": [
+            "Which is worth more, 2p or 5p?"
+          ],
+          "input": "choice",
+          "options": [
+            "2p",
+            "5p"
+          ],
+          "answer": "5p",
+          "then": [
+            "5p is worth more.",
+            "Even though the 2p coin is bigger!"
+          ]
+        },
+        {
+          "set": {
+            "purse": []
+          },
+          "say": [
+            "Make 20p with 2 coins."
+          ],
+          "goal": {
+            "total": 20,
+            "count": 2
+          },
+          "hint": [
+            "Try two coins that are the same."
+          ],
+          "then": [
+            "{items} make 20p."
+          ]
+        },
+        {
+          "set": {
+            "tray": [
+              "£5",
+              "£10",
+              "£20"
+            ],
+            "purse": [
+              "£5",
+              "£10",
+              "£20"
+            ]
+          },
+          "say": [
+            "Notes are worth even more.",
+            "Which note is worth the most?"
+          ],
+          "input": "choice",
+          "options": [
+            "£5",
+            "£10",
+            "£20"
+          ],
+          "answer": "£20",
+          "then": [
+            "£20 is worth the most.",
+            "£ means pounds."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "money.coinValue",
+      "levels": [
+        1,
+        1,
+        2
+      ],
+      "items": [
+        4,
+        5,
+        5
+      ],
+      "intro": [
+        "Which coin is which?"
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "money.countCoins",
+      "levels": [
+        1,
+        1,
+        2
+      ],
+      "items": [
+        3,
+        4,
+        4
+      ],
+      "intro": [
+        "Now count the money in each purse."
+      ]
+    },
+    {
+      "type": "look",
+      "art": "sun",
+      "lines": [
+        "A week has 7 days. A year has 12 months.",
+        "Morning, afternoon and evening make up a day."
+      ],
+      "question": "What did you do yesterday?"
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "time.daysOfWeek",
+        "time.sequenceEvents",
+        "time.months"
+      ],
+      "levels": [
+        1,
+        2,
+        2
+      ],
+      "items": [
+        5,
+        6,
+        6
+      ],
+      "intro": [
+        "Days, months and what comes first."
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Four clocks. Pick one that doesn't belong. Then say why.",
+      "options": [
+        {
+          "label": "12 o'clock",
+          "widget": "clock",
+          "props": {
+            "h": 12,
+            "m": 0
+          }
+        },
+        {
+          "label": "6 o'clock",
+          "widget": "clock",
+          "props": {
+            "h": 6,
+            "m": 0
+          }
+        },
+        {
+          "label": "3 o'clock",
+          "widget": "clock",
+          "props": {
+            "h": 3,
+            "m": 0
+          }
+        },
+        {
+          "label": "half past 4",
+          "widget": "clock",
+          "props": {
+            "h": 4,
+            "m": 30
+          }
+        }
+      ],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "At 12 o'clock the hands point the same way.",
+        "At 6 o'clock the hands make one straight line.",
+        "3 o'clock makes a square corner. Half past 4 isn't o'clock."
+      ],
+      "followUp": "Can you find a reason for every clock?"
+    },
+    {
+      "type": "athome",
+      "title": "Clock spotting",
+      "need": [
+        "A clock with hands, or a watch"
+      ],
+      "steps": [
+        "At breakfast, look at the clock.",
+        "Is the long hand on 12 or on 6?",
+        "Say the time: o'clock or half past."
+      ],
+      "why": "Clocks are everywhere once you start looking."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What day will it be tomorrow?"
+      ]
+    }
+  ]
+}

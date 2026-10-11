@@ -1,0 +1,271 @@
+{
+ "id": "a2",
+ "sector": "blaster",
+ "title": "Flip the Array",
+ "tagline": "3 rows of 5 is 5 rows of 3",
+ "covers": [
+  "Y2-MD-3"
+ ],
+ "patch": {
+  "name": "Flip the Array",
+  "icon": "blaster"
+ },
+ "dadNotes": [
+  "Commutative means any order: 3 × 5 = 5 × 3. Division is not like that.",
+  "Turn a real egg box round to prove the total stays the same."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "A crate of fuel cans.",
+    "3 rows of 5 cans."
+   ],
+   "question": "Is it still 15 if you turn the crate?",
+   "widget": "objects",
+   "props": {
+    "n": 15,
+    "icon": "fuel",
+    "arrange": "rows",
+    "perRow": 5
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you turned arrays round at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Turn 3 rows of 5 a quarter turn. How many dots now?",
+   "options": [
+    "Fewer than 15",
+    "Still 15",
+    "More than 15"
+   ],
+   "answer": 1,
+   "reveal": [
+    "Still 15!",
+    "Turning an array never changes the total."
+   ],
+   "widget": "blaster",
+   "props": {
+    "size": 5,
+    "rows": 3,
+    "readonly": true,
+    "highlightRows": true
+   }
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 5,
+    "rows": 0,
+    "maxRows": 8,
+    "flipButton": true
+   },
+   "script": [
+    {
+     "say": [
+      "The blaster is set to 5.",
+      "Blast 3 times."
+     ],
+     "goal": {
+      "rows": 3
+     },
+     "then": [
+      "{rows} rows of {size}. That is {total} dots."
+     ]
+    },
+    {
+     "set": {
+      "caption": "3 × 5 = 15"
+     },
+     "say": [
+      "3 × 5 = 15.",
+      "Now tap Flip."
+     ],
+     "goal": {
+      "flipped": true
+     },
+     "then": [
+      "Now there are {rows} rows of {size}."
+     ]
+    },
+    {
+     "set": {
+      "caption": ""
+     },
+     "say": [
+      "How many dots now?"
+     ],
+     "input": "numpad",
+     "answer": "{total}",
+     "then": [
+      "Still {total}!",
+      "5 × 3 = 15 too."
+     ]
+    },
+    {
+     "set": {
+      "caption": "3 × 5 = 5 × 3"
+     },
+     "say": [
+      "So 3 × 5 is the same as 5 × 3.",
+      "You can multiply in any order."
+     ]
+    },
+    {
+     "set": {
+      "rows": 0,
+      "size": 2,
+      "caption": "",
+      "flipped": false
+     },
+     "say": [
+      "Blast 6 rows of 2."
+     ],
+     "goal": {
+      "rows": 6,
+      "size": 2
+     },
+     "then": [
+      "6 × 2 = {total}."
+     ]
+    },
+    {
+     "say": [
+      "Flip it!"
+     ],
+     "goal": {
+      "flipped": true
+     },
+     "then": [
+      "{rows} rows of {size}.",
+      "2 × 6 = {total} too."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "groups",
+   "props": {
+    "total": 12,
+    "mode": "share",
+    "bowls": 3,
+    "icon": "crystal"
+   },
+   "script": [
+    {
+     "say": [
+      "Share 12 crystals between 3 robots.",
+      "Tap Deal one each."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "Each robot gets {groupSize}.",
+      "12 ÷ 3 = 4."
+     ]
+    },
+    {
+     "caption": "3 ÷ 12 = ?",
+     "say": [
+      "Now share 3 crystals between 12 robots.",
+      "Is it the same?"
+     ],
+     "input": "choice",
+     "options": [
+      "Yes, the same",
+      "No, it is different"
+     ],
+     "answer": "No, it is different",
+     "then": [
+      "There are not even enough for 1 each!",
+      "Dividing does not work in any order."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": "muldiv.commutative",
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    5,
+    6,
+    6
+   ],
+   "intro": [
+    "Your turn.",
+    "Does the order matter?"
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "muldiv.arrays",
+   "levels": [
+    2,
+    3,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Match the array to the number sentence."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} wrote some facts.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "4 × 5 = 20",
+    "5 × 4 = 20",
+    "20 ÷ 5 = 4",
+    "5 ÷ 20 = 4"
+   ],
+   "wrong": 3,
+   "fix": [
+    "5 ÷ 20 is not 4.",
+    "Dividing cannot be done in any order.",
+    "What would you tell {engineer}?"
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Egg box arrays",
+   "need": [
+    "An egg box or a muffin tray"
+   ],
+   "steps": [
+    "Count the rows and the columns.",
+    "Turn the box round. Count again.",
+    "Is the total the same?"
+   ],
+   "why": "An array has the same total whichever way you turn it."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Why does flipping an array keep the same total?"
+   ]
+  }
+ ]
+}

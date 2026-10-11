@@ -1,0 +1,376 @@
+{
+ "id": "s1",
+ "sector": "shape",
+ "title": "2-D Shapes",
+ "tagline": "Sides, vertices and lines of symmetry",
+ "covers": [
+  "Y2-G-1",
+  "2G–1"
+ ],
+ "patch": {
+  "name": "2-D Shapes",
+  "icon": "shapes"
+ },
+ "dadNotes": [
+  "Count each side once and only once: put a finger on the first side you counted.",
+  "Say it the school way: 'This shape is a hexagon because it has exactly 6 straight sides.'",
+  "Year 2 only needs a vertical line of symmetry: a fold straight down the middle."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Look at these 3 space station windows.",
+    "They look very different."
+   ],
+   "question": "What is the same about them?",
+   "widget": "shapes2d",
+   "props": {
+    "shapes": [
+     {
+      "shape": "hexagon",
+      "colour": "cyan"
+     },
+     {
+      "shape": "l-hexagon",
+      "colour": "gold"
+     },
+     {
+      "shape": "irregular-hexagon",
+      "colour": "pink"
+     }
+    ]
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you counted sides and vertices at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "How many sides does this star have?",
+   "options": [
+    "5",
+    "8",
+    "10"
+   ],
+   "answer": 2,
+   "reveal": [
+    "10 sides!",
+    "It has 5 points, but 10 sides."
+   ],
+   "widget": "shapes2d",
+   "props": {
+    "shape": "star",
+    "colour": "gold"
+   },
+   "revealProps": {
+    "showAll": "sides"
+   }
+  },
+  {
+   "type": "try",
+   "widget": "shapes2d",
+   "props": {
+    "shape": "pentagon",
+    "tap": "sides"
+   },
+   "script": [
+    {
+     "say": [
+      "Tap each side once.",
+      "Count as you go."
+     ],
+     "goal": {
+      "sides": 5
+     },
+     "then": [
+      "{sides} sides.",
+      "This shape is a pentagon because it has exactly 5 straight sides."
+     ]
+    },
+    {
+     "set": {
+      "tap": "vertices"
+     },
+     "say": [
+      "A vertex is where 2 sides meet.",
+      "Tap each vertex."
+     ],
+     "goal": {
+      "vertices": 5
+     },
+     "then": [
+      "{vertices} vertices.",
+      "The same as the number of sides!"
+     ]
+    },
+    {
+     "set": {
+      "shape": "irregular-hexagon",
+      "tap": "sides"
+     },
+     "say": [
+      "This one looks bumpy.",
+      "Count its sides."
+     ],
+     "goal": {
+      "sides": 6
+     },
+     "then": [
+      "6 straight sides, so it is a hexagon.",
+      "A hexagon does not have to look neat."
+     ]
+    },
+    {
+     "set": {
+      "shape": "l-hexagon",
+      "tap": "vertices"
+     },
+     "say": [
+      "Tap every vertex on this one."
+     ],
+     "goal": {
+      "vertices": 6
+     },
+     "then": [
+      "6 vertices. Another hexagon!"
+     ]
+    },
+    {
+     "set": {
+      "shape": "octagon",
+      "tap": "sides"
+     },
+     "say": [
+      "How many sides does an octagon have?",
+      "Tap to count, then type it."
+     ],
+     "input": "numpad",
+     "answer": 8,
+     "then": [
+      "8 sides. Octo means 8, like an octopus."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "shapes2d",
+   "props": {
+    "shape": "heart",
+    "fold": true,
+    "colour": "pink"
+   },
+   "script": [
+    {
+     "say": [
+      "The dashed line goes down the middle.",
+      "Tap Fold."
+     ],
+     "goal": {
+      "folded": true
+     },
+     "then": [
+      "The halves match!",
+      "The dashed line is a line of symmetry."
+     ]
+    },
+    {
+     "set": {
+      "shape": "parallelogram",
+      "colour": "cyan"
+     },
+     "say": [
+      "Try this shape.",
+      "Tap Fold."
+     ],
+     "goal": {
+      "folded": true
+     },
+     "then": [
+      "The halves do not match.",
+      "It has no vertical line of symmetry."
+     ]
+    },
+    {
+     "set": {
+      "shape": "house",
+      "colour": "gold"
+     },
+     "say": [
+      "Will this one match?",
+      "Fold it to find out."
+     ],
+     "goal": {
+      "folded": true
+     },
+     "then": [
+      "They match. A vertical line of symmetry!"
+     ]
+    },
+    {
+     "set": {
+      "shape": "right-triangle",
+      "colour": "green"
+     },
+     "say": [
+      "Does this one have a vertical line of symmetry?",
+      "Decide first, then fold to check."
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "yes",
+       "label": "Yes"
+      },
+      {
+       "value": "no",
+       "label": "No"
+      }
+     ],
+     "answer": "no",
+     "then": [
+      "No. The two halves are different."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "geometry.countSides",
+    "geometry.countVertices",
+    "geometry.symmetry"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Your turn. Count each side once."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": [
+    "geometry.name2d",
+    "geometry.sortShapes"
+   ],
+   "levels": [
+    2,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Now name and sort shapes."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "Square",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "square",
+      "colour": "cyan"
+     }
+    },
+    {
+     "label": "Rectangle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "rectangle",
+      "colour": "gold"
+     }
+    },
+    {
+     "label": "Triangle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "triangle",
+      "colour": "pink"
+     }
+    },
+    {
+     "label": "Circle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "circle",
+      "colour": "green"
+     }
+    }
+   ],
+   "reveal": [
+    "Circle: the only one with a curved side.",
+    "Triangle: the only one with 3 sides.",
+    "Rectangle: the only one with long and short sides.",
+    "Square: the only one that looks the same turned a quarter turn."
+   ],
+   "followUp": "Every one can be the odd one out! Can you find another reason?"
+  },
+  {
+   "type": "error",
+   "tiers": [
+    2,
+    3
+   ],
+   "intro": [
+    "{engineer} counted the sides of a hexagon.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "Counting the sides of a hexagon",
+    "Side 1, side 2, side 3",
+    "Side 4, side 5, side 6",
+    "Side 7: back at the first side!",
+    "So a hexagon has 7 sides."
+   ],
+   "wrong": 3,
+   "fix": [
+    "The first side was counted twice.",
+    "Count each side once and only once: 6 sides."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Fold and cut",
+   "need": [
+    "Paper",
+    "Safety scissors and a grown-up"
+   ],
+   "steps": [
+    "Fold a sheet of paper in half.",
+    "Cut a shape along the fold.",
+    "Open it up. What do you notice?"
+   ],
+   "why": "The fold is a line of symmetry, so both halves match."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How can you check if a shape has a line of symmetry?"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,241 @@
+{
+  "id": "b5",
+  "sector": "bonds",
+  "title": "Three Numbers",
+  "tagline": "Find the bond to 10 first",
+  "covers": [
+    "Y2-AS-3"
+  ],
+  "patch": {
+    "name": "Three Numbers",
+    "icon": "star"
+  },
+  "dadNotes": [
+    "Look for a bond to 10 or a double first. Order doesn't matter when adding.",
+    "Ask 'which two would you add first, and why?'"
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "6 gold, 7 blue and 4 green.",
+        "Three groups to add."
+      ],
+      "question": "Which two would you add first?",
+      "widget": "objects",
+      "props": {
+        "n": 17,
+        "arrange": "groups",
+        "groups": [
+          6,
+          7,
+          4
+        ],
+        "colours": [
+          6,
+          7,
+          4
+        ]
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you added three numbers at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "Which two make 10?",
+      "options": [
+        "6 and 7",
+        "6 and 4",
+        "7 and 4"
+      ],
+      "answer": 1,
+      "reveal": [
+        "6 + 4 = 10!",
+        "Then 10 + 7 = 17."
+      ],
+      "widget": "objects",
+      "props": {
+        "n": 17,
+        "arrange": "groups",
+        "groups": [
+          6,
+          7,
+          4
+        ],
+        "colours": [
+          6,
+          7,
+          4
+        ]
+      }
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": {
+        "count": 0,
+        "frames": 2,
+        "twoColour": true
+      },
+      "script": [
+        {
+          "caption": "6 + 7 + 4 = ?",
+          "say": [
+            "6 + 7 + 4.",
+            "Put in 6 gold counters."
+          ],
+          "goal": {
+            "a": 6,
+            "count": 6
+          },
+          "hint": [
+            "Tap the frame 6 times."
+          ]
+        },
+        {
+          "say": [
+            "Tap blue. Add 4 to make 10."
+          ],
+          "goal": {
+            "count": 10,
+            "a": 6
+          },
+          "hint": [
+            "The blue brush is on the right."
+          ],
+          "then": [
+            "6 + 4 = 10."
+          ]
+        },
+        {
+          "say": [
+            "Now add the 7."
+          ],
+          "goal": {
+            "count": 17,
+            "a": 6
+          },
+          "then": [
+            "10 + 7 = 17.",
+            "So 6 + 7 + 4 = 17."
+          ]
+        },
+        {
+          "caption": "5 + 8 + 5 = ?",
+          "say": [
+            "Find the bond to 10 first.",
+            "What is 5 + 8 + 5?"
+          ],
+          "input": "numpad",
+          "answer": 18,
+          "hint": [
+            "5 + 5 = 10."
+          ],
+          "then": [
+            "5 + 5 = 10. 10 + 8 = 18."
+          ]
+        },
+        {
+          "caption": "3 + 9 + 7 = ?",
+          "say": [
+            "And 3 + 9 + 7?"
+          ],
+          "input": "numpad",
+          "answer": 19,
+          "hint": [
+            "Which two make 10?"
+          ],
+          "then": [
+            "3 + 7 = 10. 10 + 9 = 19."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "addsub.threeNumbers",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Hunt for the 10."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.bondsTo",
+      "params": {
+        "target": 10
+      },
+      "levels": [
+        3,
+        3,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Bonds to 10, fast!"
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Would you rather?",
+      "prompt": "Which order would you rather add?",
+      "options": [
+        {
+          "label": "7 + 3 + 5"
+        },
+        {
+          "label": "7 + 5 + 3"
+        },
+        {
+          "label": "5 + 7 + 3"
+        }
+      ],
+      "reveal": [
+        "They all make 15!",
+        "7 + 3 makes 10 straight away.",
+        "We can add in any order, so pick the easy way."
+      ],
+      "followUp": "Which order would you pick for 8 + 6 + 2?"
+    },
+    {
+      "type": "athome",
+      "title": "Three dice",
+      "need": [
+        "3 dice"
+      ],
+      "steps": [
+        "Roll all 3 dice.",
+        "Look for 2 numbers that make 10, or a double.",
+        "Add the third number."
+      ],
+      "why": "Spotting bonds to 10 makes adding 3 numbers quick."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How do you add 3 numbers quickly?"
+      ]
+    }
+  ]
+}

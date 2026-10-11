@@ -1,0 +1,284 @@
+{
+ "id": "s2",
+ "sector": "shape",
+ "title": "3-D Shapes",
+ "tagline": "Faces, edges and vertices",
+ "covers": [
+  "Y2-G-2",
+  "2G–1"
+ ],
+ "patch": {
+  "name": "3-D Shapes",
+  "icon": "cube"
+ },
+ "dadNotes": [
+  "A face is a flat or curved surface, an edge is where 2 faces meet, a vertex is a corner.",
+  "Real boxes help: stick a sticky note on each face so nothing is counted twice.",
+  "Schools usually say a cylinder has 3 faces (2 flat, 1 curved) and 2 edges."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Space supply crates are often cubes.",
+    "A cube is a 3-D shape."
+   ],
+   "question": "What can you see on it?",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cube",
+    "autoRotate": true
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you counted faces, edges and vertices at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "How many faces does a cube have?",
+   "options": [
+    "4",
+    "6",
+    "8"
+   ],
+   "answer": 1,
+   "reveal": [
+    "6 faces.",
+    "Top, bottom and 4 around the sides."
+   ],
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cube",
+    "autoRotate": true
+   }
+  },
+  {
+   "type": "try",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "cube",
+    "tap": "faces",
+    "autoRotate": true
+   },
+   "script": [
+    {
+     "say": [
+      "A face is a flat side.",
+      "Tap each face. Spin it to find more."
+     ],
+     "goal": {
+      "faces": 6
+     },
+     "then": [
+      "You found {faces} faces.",
+      "Every face of a cube is a square."
+     ],
+     "hint": [
+      "Drag to spin it.",
+      "Look underneath and at the back."
+     ]
+    },
+    {
+     "set": {
+      "tap": "edges"
+     },
+     "say": [
+      "An edge is where 2 faces meet.",
+      "Tap each edge."
+     ],
+     "goal": {
+      "edges": 12
+     },
+     "then": [
+      "{edges} edges! That is a lot."
+     ],
+     "hint": [
+      "Tap right on the white lines.",
+      "Spin it to find the back ones."
+     ]
+    },
+    {
+     "set": {
+      "tap": "vertices"
+     },
+     "say": [
+      "A vertex is a corner.",
+      "Tap each vertex."
+     ],
+     "goal": {
+      "vertices": 8
+     },
+     "then": [
+      "{vertices} vertices: 4 on top, 4 underneath."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "shapes3d",
+   "props": {
+    "shape": "pyramid",
+    "tap": "faces"
+   },
+   "script": [
+    {
+     "say": [
+      "Now a square-based pyramid.",
+      "Tap each face."
+     ],
+     "goal": {
+      "faces": 5
+     },
+     "then": [
+      "{faces} faces: 1 square and 4 triangles."
+     ]
+    },
+    {
+     "set": {
+      "tap": "vertices"
+     },
+     "say": [
+      "Tap each vertex."
+     ],
+     "goal": {
+      "vertices": 5
+     },
+     "then": [
+      "{vertices} vertices. 1 is right at the top."
+     ]
+    },
+    {
+     "set": {
+      "tap": "edges"
+     },
+     "say": [
+      "How many edges does it have?",
+      "Tap to count, then type it."
+     ],
+     "input": "numpad",
+     "answer": 8,
+     "then": [
+      "8 edges: 4 round the base, 4 up to the point."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "tiers": [
+    2,
+    3
+   ],
+   "widget": "shapes3d",
+   "props": {
+    "shape": "prism",
+    "tap": "faces"
+   },
+   "script": [
+    {
+     "say": [
+      "This is a triangular prism.",
+      "Tap each face."
+     ],
+     "goal": {
+      "faces": 5
+     },
+     "then": [
+      "2 triangles and 3 rectangles."
+     ]
+    },
+    {
+     "set": {
+      "tap": "edges"
+     },
+     "say": [
+      "Now tap each edge."
+     ],
+     "goal": {
+      "edges": 9
+     },
+     "then": [
+      "{edges} edges: 3 on each triangle and 3 joining them."
+     ]
+    },
+    {
+     "set": {
+      "shape": "cylinder",
+      "tap": "faces"
+     },
+     "say": [
+      "A cylinder has flat and curved faces.",
+      "Tap them all."
+     ],
+     "goal": {
+      "faces": 3
+     },
+     "then": [
+      "2 flat circles and 1 curved face."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "geometry.facesEdgesVertices",
+    "geometry.name3d"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    5,
+    6,
+    8
+   ],
+   "intro": [
+    "Your turn. Spin, tap and count."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} counted the edges of a cube.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "Edges on a cube",
+    "4 edges round the top",
+    "4 edges round the bottom",
+    "So a cube has 8 edges."
+   ],
+   "wrong": 3,
+   "fix": [
+    "The 4 edges going up the sides were missed.",
+    "4 + 4 + 4 = 12 edges."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Box detective",
+   "need": [
+    "A cereal box",
+    "Sticky notes"
+   ],
+   "steps": [
+    "Stick a note on each face.",
+    "How many notes did you use?",
+    "Run a finger along each edge and count."
+   ],
+   "why": "Sticky notes help you count each face once and only once."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "What is the difference between a face and an edge?"
+   ]
+  }
+ ]
+}

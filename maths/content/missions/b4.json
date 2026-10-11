@@ -1,0 +1,269 @@
+{
+  "id": "b4",
+  "sector": "bonds",
+  "title": "Two-Digit Add and Take",
+  "tagline": "Add and subtract two 2-digit numbers",
+  "covers": [
+    "Y2-AS-3",
+    "2AS–4"
+  ],
+  "patch": {
+    "name": "Two-Digit Add and Take",
+    "icon": "blocks"
+  },
+  "dadNotes": [
+    "DfE wording: 'First I partition both numbers. Then I add the tens. Then I add the ones. Then I combine.'",
+    "For subtraction, partition only the number you subtract: 52 − 27 = 52 − 20 − 7.",
+    "Written column methods are not needed in Year 2. The column picture is only a preview."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "34 + 28.",
+        "Tens and ones, and the same in columns."
+      ],
+      "question": "How many tens? How many ones?",
+      "widget": "blocks",
+      "props": {
+        "a": 34,
+        "b": 28,
+        "op": "+",
+        "interactive": false,
+        "showColumns": true
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you added two 2-digit numbers at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "34 + 28 is about...?",
+      "options": [
+        "About 50",
+        "About 60",
+        "About 80"
+      ],
+      "answer": 1,
+      "reveal": [
+        "About 60. It is 62.",
+        "30 + 30 = 60, so it is near 60."
+      ],
+      "art": "rocket"
+    },
+    {
+      "type": "try",
+      "widget": "blocks",
+      "props": {
+        "a": 34,
+        "b": 28,
+        "op": "+",
+        "showColumns": true
+      },
+      "script": [
+        {
+          "say": [
+            "First I partition both numbers.",
+            "34 is 3 tens and 4 ones.",
+            "28 is 2 tens and 8 ones."
+          ]
+        },
+        {
+          "say": [
+            "Then I add the tens. Then I add the ones.",
+            "Tap Put together."
+          ],
+          "goal": {
+            "combined": true
+          },
+          "then": [
+            "{tens} tens and {ones} ones."
+          ]
+        },
+        {
+          "say": [
+            "{ones} ones is more than 9.",
+            "Swap 10 ones for 1 ten."
+          ],
+          "goal": {
+            "exchanged": 1
+          },
+          "hint": [
+            "Tap the Swap button."
+          ],
+          "then": [
+            "Then I combine all of the tens and all of the ones.",
+            "{tens} tens and {ones} ones is {value}."
+          ]
+        },
+        {
+          "caption": "34 + 28 = ?",
+          "say": [
+            "So what is 34 + 28?"
+          ],
+          "input": "numpad",
+          "answer": 62,
+          "then": [
+            "34 + 28 = 62."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "blocks",
+      "props": {
+        "a": 52,
+        "b": 27,
+        "op": "-",
+        "showColumns": true
+      },
+      "script": [
+        {
+          "caption": "52 − 27 = ?",
+          "say": [
+            "52 − 27. Partition just the 27.",
+            "Subtract 2 tens first. Tap 2 rods."
+          ],
+          "goal": {
+            "takenTens": 2
+          },
+          "hint": [
+            "Tap the gold rods."
+          ],
+          "then": [
+            "52 − 20 = {value}."
+          ]
+        },
+        {
+          "say": [
+            "Now subtract 7 ones.",
+            "Not enough ones! Swap a ten."
+          ],
+          "goal": {
+            "exchanged": 1
+          },
+          "hint": [
+            "Tap the Swap button."
+          ],
+          "then": [
+            "{tens} tens and {ones} ones.",
+            "Still {value}."
+          ]
+        },
+        {
+          "say": [
+            "Tap ones until 27 are gone."
+          ],
+          "goal": {
+            "taken": 27
+          },
+          "hint": [
+            "Tap the blue cubes."
+          ],
+          "then": [
+            "32 − 7 = {value}.",
+            "So 52 − 27 = {value}."
+          ]
+        },
+        {
+          "caption": "52 − 20 − 7 = 25",
+          "say": [
+            "Partition one number when you subtract.",
+            "52 − 20 = 32. 32 − 7 = 25."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "blocks",
+      "props": {
+        "a": 63,
+        "b": 17,
+        "op": "-",
+        "showColumns": true
+      },
+      "script": [
+        {
+          "caption": "63 − 17 = ?",
+          "say": [
+            "63 − 17. Your turn.",
+            "Subtract 17 any way you like."
+          ],
+          "goal": {
+            "taken": 17
+          },
+          "hint": [
+            "1 ten and 7 ones.",
+            "Swap a ten if you need more ones."
+          ],
+          "then": [
+            "63 − 17 = {value}."
+          ]
+        },
+        {
+          "say": [
+            "How many tens are left?"
+          ],
+          "input": "numpad",
+          "answer": "{tens}",
+          "then": [
+            "{tens} tens and {ones} ones."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.addTwoDigit",
+        "addsub.subTwoDigit"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Use the blocks if they help."
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} worked out 36 + 27.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "36 + 27",
+        "30 + 20 = 50",
+        "6 + 7 = 13",
+        "50 + 13 = 53"
+      ],
+      "wrong": 3,
+      "fix": [
+        "50 + 13 is 63.",
+        "13 ones is 1 ten and 3 ones.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "Why do we swap 10 ones for a ten?"
+      ]
+    }
+  ]
+}

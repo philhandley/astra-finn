@@ -1,0 +1,95 @@
+{
+  "id": "l2",
+  "sector": "launchpad",
+  "title": "Numbers in Words",
+  "tagline": "Read and write numbers to 20 in digits and words",
+  "covers": ["Y1-NPV-4", "Y1-NPV-5", "1NPV–2"],
+  "patch": { "name": "Numbers in Words", "icon": "words" },
+  "dadNotes": [
+    "Teen numbers trip children up: fourteen is 14, forty is 40. Say 'teen means ten and some more'.",
+    "Use the words more than, fewer than, equal to, most and least when you compare things at home.",
+    "On a number line: 'b is 12 because it is 2 more than 10.'"
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["Here are 14 counters.", "We write 14.", "We say fourteen."],
+      "question": "How many full frames?",
+      "caption": "14",
+      "widget": "tensframe",
+      "props": { "count": 14, "frames": 2, "interactive": false }
+    },
+    { "type": "ask", "text": "Have you written numbers in words at school?" },
+    {
+      "type": "guess",
+      "prompt": "Gold or cyan: which has more?",
+      "options": ["Gold", "Cyan", "The same"],
+      "answer": 1,
+      "reveal": ["Cyan has 11. Gold has 9.", "11 is more than 9.", "9 is fewer than 11."],
+      "widget": "objects",
+      "props": { "n": 20, "icon": "dot", "arrange": "groups", "groups": [9, 11], "colours": [9, 11] }
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": { "count": 0, "frames": 2, "interactive": true },
+      "script": [
+        { "say": ["Make 13 on the tens frames.", "Tap a frame to add a counter."], "goal": { "count": 13 }, "then": ["13 is ten and 3 more."], "hint": ["Fill the first frame. That's 10.", "Then 3 more."] },
+        { "say": ["Which word says 13?"], "input": "choice", "options": ["thirty", "thirteen", "three"], "answer": "thirteen", "then": ["Thirteen. Teen means ten and some more."] },
+        { "say": ["Now make twenty."], "goal": { "count": 20 }, "then": ["Twenty is 2 full tens frames."] },
+        { "say": ["Take 1 away.", "Tap a counter."], "goal": { "count": 19 }, "then": ["19 is 1 less than 20.", "We say nineteen."] },
+        { "say": ["Which number is nineteen?"], "input": "choice", "options": [9, 19, 90], "answer": 19 }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "numberline",
+      "props": { "min": 0, "max": 20, "mode": "place", "labels": [0, 10, 20] },
+      "script": [
+        { "say": ["Land the rocket on 12.", "Drag it, or tap the line."], "goal": { "value": 12 }, "then": ["12 is 2 more than 10."], "hint": ["Find 10 first.", "Then count on 2 marks."] },
+        { "set": { "value": null }, "say": ["Now land on 19."], "goal": { "value": 19 }, "then": ["19 is 1 less than 20."], "hint": ["Start at 20 and go back 1."] },
+        { "set": { "value": null }, "say": ["Now land on 5."], "goal": { "value": 5 }, "then": ["5 is halfway between 0 and 10."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": ["number.numberWords", "number.compare"],
+      "levels": [1, 2, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn.", "Words, numbers and the crocodile signs."]
+    },
+    {
+      "type": "practise",
+      "tiers": [2, 3],
+      "gen": ["number.numberLinePlace", "number.order"],
+      "levels": [1, 1, 2],
+      "items": [4, 4, 6],
+      "intro": ["Commander level!", "Land rockets and order numbers."]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [
+        { "label": "5", "widget": "tensframe", "props": { "count": 5, "frames": 1, "interactive": false } },
+        { "label": "9", "widget": "tensframe", "props": { "count": 9, "frames": 1, "interactive": false } },
+        { "label": "10", "widget": "tensframe", "props": { "count": 10, "frames": 1, "interactive": false } },
+        { "label": "15", "widget": "tensframe", "props": { "count": 15, "frames": 2, "interactive": false } }
+      ],
+      "reveal": ["Every one can be the odd one out!", "9 is the only one you skip counting in 5s.", "10 is the only even number. 15 needs two frames.", "5 fills just one row."],
+      "followUp": "Can you find a reason for every single one?"
+    },
+    {
+      "type": "athome",
+      "title": "Number hunt",
+      "need": ["Books, clocks, door numbers, food packets"],
+      "steps": ["Find 3 numbers around the house.", "Say each one in words.", "Which is the most? Which is the least?"],
+      "why": "Numbers are everywhere. Reading them out loud builds the words."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "How do you write fourteen in digits?"]
+    }
+  ]
+}

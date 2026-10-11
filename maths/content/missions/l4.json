@@ -1,0 +1,385 @@
+{
+  "id": "l4",
+  "sector": "launchpad",
+  "title": "Bonds to 10",
+  "tagline": "Every way to make 10",
+  "covers": [
+    "Y1-AS-2",
+    "1AS–1",
+    "1NF–1"
+  ],
+  "patch": {
+    "name": "Bonds to 10",
+    "icon": "partwhole"
+  },
+  "dadNotes": [
+    "Say the whole sentence: '7 is made of 3 and 4.'",
+    "When one part goes up by 1, the other goes down by 1. Ask Finn to spot it.",
+    "Odd numbers leave one counter without a partner."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "A full tens frame.",
+        "7 gold counters and 3 blue."
+      ],
+      "question": "How many counters altogether?",
+      "widget": "tensframe",
+      "props": {
+        "colours": [
+          7,
+          3
+        ],
+        "frames": 1
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you made number bonds to 10 at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "How many ways can we split 7 into 2 parts?",
+      "options": [
+        "4 ways",
+        "8 ways",
+        "12 ways"
+      ],
+      "answer": 1,
+      "reveal": [
+        "8 ways!",
+        "0 and 7, 1 and 6, all the way to 7 and 0."
+      ],
+      "widget": "partwhole",
+      "props": {
+        "whole": 7,
+        "parts": [
+          3,
+          4
+        ],
+        "hide": 0
+      }
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": {
+        "count": 0,
+        "frames": 1,
+        "twoColour": true
+      },
+      "script": [
+        {
+          "say": [
+            "Tap the frame to add gold counters.",
+            "Put in 6."
+          ],
+          "goal": {
+            "a": 6,
+            "count": 6
+          },
+          "hint": [
+            "Tap the frame once for each counter.",
+            "Tap a counter to take it off."
+          ]
+        },
+        {
+          "say": [
+            "Now tap the blue brush.",
+            "Fill the rest of the frame."
+          ],
+          "goal": {
+            "count": 10,
+            "a": 6
+          },
+          "hint": [
+            "The blue brush is the blue circle on the right."
+          ],
+          "then": [
+            "{a} gold and {b} blue make 10.",
+            "10 is made of {a} and {b}."
+          ]
+        },
+        {
+          "say": [
+            "10 is the whole.",
+            "{a} is a part. {b} is a part."
+          ]
+        },
+        {
+          "set": {
+            "colours": [
+              3,
+              0
+            ]
+          },
+          "say": [
+            "3 gold counters now.",
+            "Fill the frame with blue."
+          ],
+          "goal": {
+            "count": 10,
+            "a": 3
+          },
+          "hint": [
+            "Use the blue brush.",
+            "Tap a counter to take it off."
+          ]
+        },
+        {
+          "say": [
+            "How many blue counters did you add?"
+          ],
+          "input": "numpad",
+          "answer": "{b}",
+          "then": [
+            "3 and {b} make 10."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "partwhole",
+      "props": {
+        "whole": 7,
+        "mode": "split"
+      },
+      "script": [
+        {
+          "say": [
+            "7 is the whole.",
+            "Tap a counter to move it across."
+          ],
+          "goal": {
+            "b": 1
+          },
+          "hint": [
+            "Tap the gold circle."
+          ],
+          "then": [
+            "7 is made of {a} and {b}."
+          ]
+        },
+        {
+          "say": [
+            "Move one more."
+          ],
+          "goal": {
+            "b": 2
+          },
+          "then": [
+            "Now {a} and {b}.",
+            "One part went down by 1. The other went up by 1."
+          ]
+        },
+        {
+          "say": [
+            "Keep going, one at a time.",
+            "Stop when the parts are 3 and 4."
+          ],
+          "goal": {
+            "a": 3,
+            "b": 4
+          },
+          "hint": [
+            "Tap the part with more counters."
+          ],
+          "then": [
+            "7 is made of 3 and 4."
+          ]
+        },
+        {
+          "say": [
+            "Find every way to split 7.",
+            "Move the counters back and forth."
+          ],
+          "goal": {
+            "ways": {
+              "gte": 8
+            }
+          },
+          "hint": [
+            "Move them all to one side.",
+            "Then move them back one at a time."
+          ],
+          "then": [
+            "You found all 8 ways!",
+            "7 and 0 counts too."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "objects",
+      "props": {
+        "n": 6,
+        "arrange": "groups",
+        "groups": [
+          2,
+          2,
+          2
+        ],
+        "icon": "boot"
+      },
+      "script": [
+        {
+          "say": [
+            "6 boots in pairs.",
+            "Is one left without a partner?"
+          ],
+          "input": "choice",
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "answer": "No",
+          "then": [
+            "6 is even.",
+            "It makes pairs with none left over."
+          ]
+        },
+        {
+          "set": {
+            "n": 7,
+            "groups": [
+              2,
+              2,
+              2,
+              1
+            ]
+          },
+          "say": [
+            "Now 7 boots.",
+            "Odd or even?"
+          ],
+          "input": "choice",
+          "options": [
+            "Odd",
+            "Even"
+          ],
+          "answer": "Odd",
+          "then": [
+            "1 boot is left over.",
+            "7 is odd."
+          ]
+        },
+        {
+          "set": {
+            "n": 10,
+            "groups": [
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "say": [
+            "What about 10 boots?"
+          ],
+          "input": "choice",
+          "options": [
+            "Odd",
+            "Even"
+          ],
+          "answer": "Even",
+          "then": [
+            "10 is even.",
+            "5 pairs, none left over."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "addsub.bondsTo",
+      "params": {
+        "target": 10
+      },
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Find the missing part."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.factsWithin10",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Facts within 10. Nice and quick!"
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [
+        {
+          "label": "6 + 4"
+        },
+        {
+          "label": "5 + 5"
+        },
+        {
+          "label": "3 + 7"
+        },
+        {
+          "label": "2 + 6"
+        }
+      ],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "5 + 5 is the only double.",
+        "2 + 6 does not make 10.",
+        "3 + 7 uses odd numbers. 6 + 4 starts with the bigger part."
+      ],
+      "followUp": "Can you find a reason for every single one?"
+    },
+    {
+      "type": "athome",
+      "title": "Ten fingers",
+      "need": [
+        "Your hands"
+      ],
+      "steps": [
+        "Hold up 10 fingers.",
+        "Fold some down. How many are still up?",
+        "Say it: 10 is made of 7 and 3."
+      ],
+      "why": "Fingers are a tens frame you always carry."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How many ways can you make 10?"
+      ]
+    }
+  ]
+}

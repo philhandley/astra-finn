@@ -1,0 +1,314 @@
+{
+  "id": "b1",
+  "sector": "bonds",
+  "title": "Fact Families",
+  "tagline": "One picture, four facts, and facts to 100",
+  "covers": [
+    "Y2-AS-2",
+    "2NF–1",
+    "2AS–3"
+  ],
+  "patch": {
+    "name": "Fact Families",
+    "icon": "partwhole"
+  },
+  "dadNotes": [
+    "One part-whole picture gives four facts: two adding, two subtracting.",
+    "Tens facts: 3 + 4 = 7, so 3 tens + 4 tens = 7 tens, which is 70."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "7 is the whole.",
+        "3 and 4 are the parts."
+      ],
+      "question": "What facts can you see?",
+      "widget": "partwhole",
+      "props": {
+        "whole": 7,
+        "parts": [
+          3,
+          4
+        ],
+        "counters": "both"
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you learned fact families at school?"
+    },
+    {
+      "type": "try",
+      "widget": "partwhole",
+      "props": {
+        "whole": 7,
+        "parts": [
+          3,
+          4
+        ],
+        "counters": "both"
+      },
+      "script": [
+        {
+          "say": [
+            "One picture. Four facts.",
+            "What is 3 + 4?"
+          ],
+          "caption": "3 + 4 = ?",
+          "input": "numpad",
+          "answer": 7,
+          "then": [
+            "3 + 4 = 7."
+          ]
+        },
+        {
+          "say": [
+            "Swap the parts.",
+            "What is 4 + 3?"
+          ],
+          "caption": "4 + 3 = ?",
+          "input": "numpad",
+          "answer": 7,
+          "then": [
+            "Same parts, same whole."
+          ]
+        },
+        {
+          "set": {
+            "hide": 1
+          },
+          "caption": "7 − 3 = ?",
+          "say": [
+            "Start with the whole.",
+            "What is 7 − 3?"
+          ],
+          "input": "numpad",
+          "answer": 4,
+          "then": [
+            "7 − 3 = 4. The other part!"
+          ]
+        },
+        {
+          "set": {
+            "hide": 0
+          },
+          "caption": "7 − 4 = ?",
+          "say": [
+            "And 7 − 4?"
+          ],
+          "input": "numpad",
+          "answer": 3,
+          "then": [
+            "That is the whole family:",
+            "3 + 4, 4 + 3, 7 − 3 and 7 − 4."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "guess",
+      "prompt": "3 + 4 = 7. So what is 30 + 40?",
+      "options": [
+        "7",
+        "34",
+        "70"
+      ],
+      "answer": 2,
+      "reveal": [
+        "70!",
+        "3 tens + 4 tens = 7 tens."
+      ],
+      "widget": "partwhole",
+      "props": {
+        "whole": 70,
+        "parts": [
+          30,
+          40
+        ],
+        "hide": "whole"
+      },
+      "revealProps": {
+        "hide": null
+      }
+    },
+    {
+      "type": "try",
+      "widget": "partwhole",
+      "props": {
+        "whole": 70,
+        "parts": [
+          30,
+          40
+        ]
+      },
+      "script": [
+        {
+          "say": [
+            "7 − 3 = 4.",
+            "So what is 70 − 30?"
+          ],
+          "caption": "70 − 30 = ?",
+          "input": "numpad",
+          "answer": 40,
+          "then": [
+            "7 tens − 3 tens = 4 tens.",
+            "70 − 30 = 40."
+          ]
+        },
+        {
+          "set": {
+            "whole": 100,
+            "parts": [
+              30,
+              70
+            ],
+            "hide": 1
+          },
+          "caption": "30 + ? = 100",
+          "say": [
+            "3 + 7 = 10.",
+            "So 30 + ? = 100."
+          ],
+          "input": "numpad",
+          "answer": 70,
+          "then": [
+            "3 tens + 7 tens = 10 tens.",
+            "10 tens is 100."
+          ]
+        },
+        {
+          "set": {
+            "whole": 100,
+            "parts": [
+              60,
+              40
+            ],
+            "hide": 0
+          },
+          "caption": "100 − 40 = ?",
+          "say": [
+            "10 − 4 = 6.",
+            "So what is 100 − 40?"
+          ],
+          "input": "numpad",
+          "answer": 60,
+          "then": [
+            "100 − 40 = 60."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.factFamily",
+        "addsub.relatedFacts100"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Families and tens."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.factsWithin10",
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Quick facts within 10."
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [
+        {
+          "label": "6 and 4",
+          "widget": "partwhole",
+          "props": {
+            "whole": 10,
+            "parts": [
+              6,
+              4
+            ],
+            "readonly": true
+          }
+        },
+        {
+          "label": "5 and 5",
+          "widget": "partwhole",
+          "props": {
+            "whole": 10,
+            "parts": [
+              5,
+              5
+            ],
+            "readonly": true
+          }
+        },
+        {
+          "label": "3 and 4",
+          "widget": "partwhole",
+          "props": {
+            "whole": 7,
+            "parts": [
+              3,
+              4
+            ],
+            "readonly": true
+          }
+        },
+        {
+          "label": "2 and 8",
+          "widget": "partwhole",
+          "props": {
+            "whole": 10,
+            "parts": [
+              2,
+              8
+            ],
+            "readonly": true
+          }
+        }
+      ],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "5 and 5 has equal parts. 3 and 4 makes 7.",
+        "6 and 4 has the bigger part first.",
+        "2 and 8 has the biggest part of all."
+      ],
+      "followUp": "Which family has only 2 facts? (Hint: 5 and 5.)"
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How many facts live in one part-whole picture?"
+      ]
+    }
+  ]
+}

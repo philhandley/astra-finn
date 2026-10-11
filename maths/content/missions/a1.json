@@ -1,0 +1,342 @@
+{
+ "id": "a1",
+ "sector": "blaster",
+ "title": "Equal Groups",
+ "tagline": "Blast rows of dots and count them the fast way",
+ "covers": [
+  "Y1-MD-1",
+  "Y2-MD-4",
+  "2MD–1"
+ ],
+ "patch": {
+  "name": "Equal Groups",
+  "icon": "blaster"
+ },
+ "dadNotes": [
+  "Say 'groups of' before 'times'. Three groups of five is fifteen.",
+  "Ask: what does the 3 stand for? What does the 5 stand for?"
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Five astronauts in a row.",
+    "Every astronaut has 2 boots."
+   ],
+   "question": "How many boots?",
+   "widget": "objects",
+   "props": {
+    "n": 5,
+    "icon": "astronaut",
+    "arrange": "row"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you made equal groups at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "About how many dots will 3 blasts of 5 make?",
+   "options": [
+    "About 8",
+    "About 15",
+    "About 30"
+   ],
+   "answer": 1,
+   "reveal": [
+    "15.",
+    "3 rows of 5."
+   ],
+   "widget": "blaster",
+   "props": {
+    "size": 5,
+    "rows": 0,
+    "readonly": true
+   }
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 1,
+    "rows": 0,
+    "maxRows": 6
+   },
+   "script": [
+    {
+     "say": [
+      "Time to blast!",
+      "Tap the empty space to fire."
+     ],
+     "goal": {
+      "rows": 1
+     },
+     "then": [
+      "Pew! One blast made 1 dot."
+     ]
+    },
+    {
+     "say": [
+      "Set the blaster to 5.",
+      "Tap the arrows."
+     ],
+     "goal": {
+      "size": 5
+     },
+     "then": [
+      "Now each blast makes a row of 5."
+     ]
+    },
+    {
+     "set": {
+      "rows": 0
+     },
+     "say": [
+      "Blast 3 times."
+     ],
+     "goal": {
+      "rows": 3
+     },
+     "then": [
+      "{rows} rows of {size}."
+     ]
+    },
+    {
+     "say": [
+      "How many dots altogether?"
+     ],
+     "input": "numpad",
+     "answer": "{total}",
+     "then": [
+      "You made {total} dots by blasting {rows} times.",
+      "Each blast made a new row of {size}."
+     ]
+    },
+    {
+     "set": {
+      "highlightRows": true
+     },
+     "say": [
+      "There are 3 equal groups.",
+      "There are 5 in each group.",
+      "There are 3 groups of 5."
+     ]
+    },
+    {
+     "caption": "5 + 5 + 5 = 15",
+     "say": [
+      "Add the rows.",
+      "5 + 5 + 5 = 15."
+     ]
+    },
+    {
+     "set": {
+      "caption": "3 × 5 = 15"
+     },
+     "say": [
+      "Say it the fast way.",
+      "3 times 5 is 15."
+     ],
+     "then": [
+      "The 3 is the number of groups.",
+      "The 5 is how many in each group."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 2,
+    "rows": 0,
+    "maxRows": 8,
+    "highlightRows": true
+   },
+   "script": [
+    {
+     "say": [
+      "New size: 2.",
+      "Blast 4 times."
+     ],
+     "goal": {
+      "rows": 4
+     },
+     "then": [
+      "4 rows of 2 is {total}."
+     ]
+    },
+    {
+     "say": [
+      "Make 10 dots with rows of 2."
+     ],
+     "goal": {
+      "total": 10,
+      "size": 2
+     },
+     "then": [
+      "5 groups of 2 is 10.",
+      "5 × 2 = 10."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "tiers": [
+    2,
+    3
+   ],
+   "widget": "blaster",
+   "props": {
+    "size": 1,
+    "rows": 0,
+    "groupsView": true,
+    "maxRows": 10
+   },
+   "script": [
+    {
+     "say": [
+      "Each blast makes a ring now.",
+      "Make 4 groups of 5."
+     ],
+     "goal": {
+      "size": 5,
+      "rows": 4
+     },
+     "then": [
+      "4 groups of 5 is {total}."
+     ]
+    },
+    {
+     "caption": "5 + 5 + 5 + 5 = ? × 5",
+     "say": [
+      "Write it as a times sentence.",
+      "How many 5s?"
+     ],
+     "input": "numpad",
+     "answer": "4",
+     "then": [
+      "5 + 5 + 5 + 5 = 4 × 5."
+     ]
+    },
+    {
+     "set": {
+      "size": 10,
+      "rows": 0
+     },
+     "say": [
+      "Make 30 with groups of 10."
+     ],
+     "goal": {
+      "total": 30,
+      "size": 10
+     },
+     "then": [
+      "{rows} groups of 10 is 30.",
+      "{rows} × 10 = 30."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wyr",
+   "title": "Would you rather?",
+   "prompt": "3 bags of 5 sweets, or 5 bags of 3 sweets?",
+   "options": [
+    {
+     "label": "3 bags of 5",
+     "widget": "blaster",
+     "props": {
+      "size": 5,
+      "rows": 3,
+      "readonly": true,
+      "bar": false,
+      "groupsView": true
+     }
+    },
+    {
+     "label": "5 bags of 3",
+     "widget": "blaster",
+     "props": {
+      "size": 3,
+      "rows": 5,
+      "readonly": true,
+      "bar": false,
+      "groupsView": true
+     }
+    }
+   ],
+   "reveal": [
+    "Some pick 3 bags: fewer bags to carry.",
+    "Some pick 5 bags: more bags to give away.",
+    "Both have 15 sweets!"
+   ],
+   "followUp": "What would change your mind?"
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "muldiv.equalGroups",
+    "muldiv.arrays"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    6,
+    8
+   ],
+   "intro": [
+    "Your turn.",
+    "Count the groups, then count in steps."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "muldiv.repeatedAddition",
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Adding the same number again and again."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Shoe pairs",
+   "need": [
+    "All the shoes by the door"
+   ],
+   "steps": [
+    "Put the shoes in pairs.",
+    "Count them in 2s.",
+    "How many pairs? How many shoes?"
+   ],
+   "why": "Pairs are equal groups of 2."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "When is counting in 5s faster than counting in 1s?"
+   ]
+  }
+ ]
+}

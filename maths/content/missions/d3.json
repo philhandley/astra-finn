@@ -1,0 +1,263 @@
+{
+ "id": "d3",
+ "sector": "data",
+ "title": "Block Diagrams",
+ "tagline": "Build a block diagram and ask questions",
+ "covers": [
+  "Y2-S-1",
+  "Y2-S-2",
+  "Y2-S-3"
+ ],
+ "patch": {
+  "name": "Data Detective",
+  "icon": "chart"
+ },
+ "dadNotes": [
+  "Read a block diagram by going to the top of a column and looking across to the numbers.",
+  "Let Finn ask you a question about the diagram, then swap."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "The crew voted on where to fly next.",
+    "Each block is 1 vote."
+   ],
+   "question": "Which place is winning?",
+   "widget": "charts",
+   "props": {
+    "kind": "block",
+    "max": 10,
+    "title": "Where shall we fly next?",
+    "cats": [
+     {
+      "label": "Moon",
+      "icon": "moon",
+      "value": 6
+     },
+     {
+      "label": "Mars",
+      "icon": "planet",
+      "value": 9
+     },
+     {
+      "label": "Sun",
+      "icon": "sun",
+      "value": 3
+     },
+     {
+      "label": "Comet",
+      "icon": "comet",
+      "value": 5
+     }
+    ]
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you made a block diagram at school?"
+  },
+  {
+   "type": "try",
+   "widget": "charts",
+   "props": {
+    "kind": "block",
+    "interactive": true,
+    "max": 10,
+    "given": [
+     4,
+     7,
+     2,
+     5
+    ],
+    "givenAs": "tally",
+    "title": "Our crew votes",
+    "cats": [
+     {
+      "label": "Moon",
+      "icon": "moon",
+      "value": 0
+     },
+     {
+      "label": "Mars",
+      "icon": "planet",
+      "value": 0
+     },
+     {
+      "label": "Sun",
+      "icon": "sun",
+      "value": 0
+     },
+     {
+      "label": "Comet",
+      "icon": "comet",
+      "value": 0
+     }
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "Make each column match its tally.",
+      "Tap + to add a block."
+     ],
+     "goal": {
+      "values": [
+       4,
+       7,
+       2,
+       5
+      ]
+     },
+     "then": [
+      "Our block diagram is ready!"
+     ],
+     "hint": [
+      "Count each tally first.",
+      "Then add that many blocks."
+     ]
+    },
+    {
+     "say": [
+      "Which place got the most votes?"
+     ],
+     "input": "choice",
+     "options": [
+      {
+       "value": "Moon",
+       "label": "Moon"
+      },
+      {
+       "value": "Mars",
+       "label": "Mars"
+      },
+      {
+       "value": "Sun",
+       "label": "Sun"
+      },
+      {
+       "value": "Comet",
+       "label": "Comet"
+      }
+     ],
+     "answer": "Mars",
+     "then": [
+      "Mars has the tallest column."
+     ]
+    },
+    {
+     "say": [
+      "How many more votes for Mars than the Moon?"
+     ],
+     "input": "numpad",
+     "answer": 3,
+     "then": [
+      "7 take away 4 is 3."
+     ]
+    },
+    {
+     "say": [
+      "How many votes altogether?"
+     ],
+     "input": "numpad",
+     "answer": 18,
+     "then": [
+      "4 + 7 + 2 + 5 = 18."
+     ]
+    },
+    {
+     "say": [
+      "Now ask {engineer} your own question about it!"
+     ],
+     "then": [
+      "Asking questions is what data scientists do."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "stats.readBlock",
+    "stats.howManyMore",
+    "stats.totalAll"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Your turn. Read the block diagrams."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": [
+    "stats.buildChart",
+    "stats.mostLeast"
+   ],
+   "levels": [
+    2,
+    3,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Build them and sort them."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} made a block diagram of crystals.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "Crystals: Pink 4, Purple 6, Gold 3",
+    "Pink column: 4 blocks",
+    "Purple column: 6 blocks",
+    "Gold column: 4 blocks"
+   ],
+   "wrong": 3,
+   "fix": [
+    "Gold should be 3 blocks, not 4.",
+    "Check each column against the numbers."
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Favourite fruit survey",
+   "need": [
+    "Your family",
+    "Squared paper and a pencil"
+   ],
+   "steps": [
+    "Ask everyone to pick a favourite fruit.",
+    "Colour 1 square for each vote.",
+    "Ask a question about your diagram."
+   ],
+   "why": "Block diagrams let you compare at a glance."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "What question would you ask about the votes?"
+   ]
+  }
+ ]
+}

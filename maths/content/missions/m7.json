@@ -1,0 +1,288 @@
+{
+  "id": "m7",
+  "sector": "measure",
+  "title": "Time Flies",
+  "tagline": "Minutes in an hour, hours in a day",
+  "covers": [
+    "Y2-M-6",
+    "Y2-M-8"
+  ],
+  "patch": {
+    "name": "Time Flies",
+    "icon": "star"
+  },
+  "dadNotes": [
+    "60 minutes in an hour and 24 hours in a day: say them like times-table facts.",
+    "Compare times with real things: a song is a few minutes, a film is a couple of hours.",
+    "Swapping the hands is a very common slip. The short hand always gives the hour."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "Time flies!",
+        "The long hand goes round once every hour."
+      ],
+      "question": "What takes about 1 hour in your day?",
+      "widget": "clock",
+      "props": {
+        "h": 12,
+        "m": 0,
+        "minuteLabels": true
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Do you know how many minutes are in an hour?"
+    },
+    {
+      "type": "guess",
+      "prompt": "How many hours are in 1 day?",
+      "art": "sun",
+      "options": [
+        "12 hours",
+        "24 hours",
+        "100 hours"
+      ],
+      "answer": 1,
+      "reveal": [
+        "24 hours.",
+        "The short hand goes round twice: day and night."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "clock",
+      "props": {
+        "h": 9,
+        "m": 0,
+        "snap": 5,
+        "minuteLabels": true,
+        "digital": true
+      },
+      "script": [
+        {
+          "say": [
+            "It is 9 o'clock.",
+            "Turn the long hand all the way round once."
+          ],
+          "goal": {
+            "h": 10,
+            "m": 0
+          },
+          "hint": [
+            "Go the way clocks go.",
+            "Stop when it is back on 12."
+          ],
+          "then": [
+            "That took 1 hour.",
+            "The long hand went round in 60 minutes."
+          ]
+        },
+        {
+          "say": [
+            "Now go half way round."
+          ],
+          "goal": {
+            "h": 10,
+            "m": 30
+          },
+          "then": [
+            "Half an hour is 30 minutes."
+          ]
+        },
+        {
+          "say": [
+            "How many minutes in 1 hour?"
+          ],
+          "input": "numpad",
+          "answer": 60,
+          "unit": "minutes",
+          "then": [
+            "60 minutes in 1 hour."
+          ]
+        },
+        {
+          "say": [
+            "In 1 day, how many times does the short hand go round?"
+          ],
+          "input": "choice",
+          "options": [
+            "1",
+            "2",
+            "24"
+          ],
+          "answer": "2",
+          "then": [
+            "Twice! 12 hours, then 12 more."
+          ]
+        },
+        {
+          "say": [
+            "So how many hours in 1 day?"
+          ],
+          "input": "numpad",
+          "answer": 24,
+          "unit": "hours",
+          "then": [
+            "12 + 12 = 24.",
+            "24 hours in 1 day."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "time.timeFacts",
+        "time.compareIntervals"
+      ],
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Minutes, hours and days."
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "clock",
+      "props": {
+        "h": 3,
+        "m": 0,
+        "snap": 5,
+        "minuteLabels": true
+      },
+      "script": [
+        {
+          "say": [
+            "The rocket launch starts at 3 o'clock.",
+            "It ends at quarter to 4. Show that."
+          ],
+          "goal": {
+            "h": 3,
+            "m": 45
+          },
+          "then": [
+            "Quarter to 4."
+          ]
+        },
+        {
+          "say": [
+            "How many minutes did the launch take?"
+          ],
+          "input": "numpad",
+          "answer": 45,
+          "unit": "minutes",
+          "hint": [
+            "Count the 5s the long hand moved."
+          ],
+          "then": [
+            "From 12 to 9 is 45 minutes."
+          ]
+        },
+        {
+          "set": {
+            "h": 4,
+            "m": 15
+          },
+          "say": [
+            "A moon walk goes from quarter past 4.",
+            "It ends at half past 4. Show that."
+          ],
+          "goal": {
+            "h": 4,
+            "m": 30
+          },
+          "then": [
+            "That took 15 minutes."
+          ]
+        },
+        {
+          "say": [
+            "Which took longer?"
+          ],
+          "input": "choice",
+          "options": [
+            "the launch",
+            "the moon walk"
+          ],
+          "answer": "the launch",
+          "then": [
+            "45 minutes is longer than 15 minutes."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} read this clock.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "The short hand is just past 6. The long hand is on 3.",
+        "The long hand is on 6, so it is half past.",
+        "The short hand is on 3, so the hour is 3.",
+        "It is half past 3."
+      ],
+      "wrong": 1,
+      "fix": [
+        "The hands got swapped!",
+        "Long hand on 3 is quarter past. The hour is 6.",
+        "It is quarter past 6. What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "time.sequenceEvents",
+        "time.compareIntervals"
+      ],
+      "levels": [
+        2,
+        3,
+        3
+      ],
+      "items": [
+        3,
+        4,
+        5
+      ],
+      "intro": [
+        "Put things in order of time."
+      ]
+    },
+    {
+      "type": "athome",
+      "title": "Minute challenge",
+      "need": [
+        "A clock or a timer"
+      ],
+      "steps": [
+        "Shut your eyes. Say stop when you think 1 minute is up.",
+        "Dad watches the clock.",
+        "Were you early or late?"
+      ],
+      "why": "Feeling how long a minute is helps when comparing times."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What takes longer: lunch or a night's sleep?"
+      ]
+    }
+  ]
+}

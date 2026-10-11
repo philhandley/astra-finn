@@ -1,0 +1,240 @@
+{
+ "id": "a7",
+ "sector": "blaster",
+ "title": "Times and Divide Missions",
+ "tagline": "Write the number sentence and solve problems",
+ "covers": [
+  "Y2-MD-2",
+  "Y2-MD-4",
+  "2MD–2"
+ ],
+ "patch": {
+  "name": "Times and Divide",
+  "icon": "rocket"
+ },
+ "dadNotes": [
+  "One array gives four facts: 4 × 5, 5 × 4, 20 ÷ 5 and 20 ÷ 4.",
+  "Ask Finn to say the number sentence before he works it out."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Mission Control needs 20 fuel cans.",
+    "Cans come in boxes of 5."
+   ],
+   "question": "How many boxes?",
+   "widget": "objects",
+   "props": {
+    "n": 20,
+    "arrange": "groups",
+    "groups": [
+     5,
+     5,
+     5,
+     5
+    ],
+    "icon": "fuel"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you written times and divide sentences at school?"
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 5,
+    "rows": 0,
+    "highlightRows": true,
+    "maxRows": 8
+   },
+   "script": [
+    {
+     "say": [
+      "Blast 4 rows of 5."
+     ],
+     "goal": {
+      "rows": 4,
+      "size": 5
+     },
+     "then": [
+      "4 × 5 = {total}."
+     ]
+    },
+    {
+     "set": {
+      "caption": "4 × 5 = 20"
+     },
+     "caption": "20 ÷ 5 = ?",
+     "say": [
+      "4 × 5 = 20.",
+      "So what is 20 ÷ 5?"
+     ],
+     "input": "numpad",
+     "answer": "4",
+     "then": [
+      "20 ÷ 5 = 4.",
+      "The 4 is the number of rows."
+     ]
+    },
+    {
+     "caption": "20 ÷ 4 = ?",
+     "say": [
+      "What is 20 ÷ 4?",
+      "Count the dots in one row."
+     ],
+     "input": "numpad",
+     "answer": "5",
+     "then": [
+      "20 ÷ 4 = 5.",
+      "One array, four facts!"
+     ]
+    },
+    {
+     "set": {
+      "rows": 0,
+      "size": 5,
+      "caption": ""
+     },
+     "caption": "? × 5 = 30",
+     "say": [
+      "Find the missing number.",
+      "Blast rows of 5 until you have 30."
+     ],
+     "goal": {
+      "total": 30,
+      "size": 5
+     },
+     "then": [
+      "{rows} × 5 = 30.",
+      "The missing number is {rows}."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "groups",
+   "props": {
+    "total": 18,
+    "mode": "share",
+    "bowls": 2,
+    "icon": "crystal"
+   },
+   "script": [
+    {
+     "say": [
+      "2 astronauts share 18 crystals.",
+      "Which number sentence matches?"
+     ],
+     "input": "choice",
+     "options": [
+      "18 ÷ 2 = 9",
+      "18 × 2 = 36",
+      "18 − 2 = 16"
+     ],
+     "answer": "18 ÷ 2 = 9",
+     "then": [
+      "Sharing is dividing.",
+      "18 ÷ 2 = 9."
+     ]
+    },
+    {
+     "say": [
+      "Check it! Deal them out."
+     ],
+     "goal": {
+      "done": true
+     },
+     "then": [
+      "Each astronaut gets {groupSize}."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "muldiv.mulDivProblem",
+    "muldiv.divisionFacts"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Your turn.",
+    "Times or divide?"
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "muldiv.mixedTables",
+   "levels": [
+    2,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Missing numbers and divide facts."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} solved a mission.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "30 crystals in bags of 5.",
+    "How many bags?",
+    "30 ÷ 5 = ?",
+    "5 × 5 = 30",
+    "So 5 bags."
+   ],
+   "wrong": 3,
+   "fix": [
+    "5 × 5 is 25, not 30.",
+    "6 × 5 = 30, so 6 bags.",
+    "What would you tell {engineer}?"
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Kitchen missions",
+   "need": [
+    "Knives and forks for the table"
+   ],
+   "steps": [
+    "4 people need 2 pieces each. How many pieces?",
+    "Share the forks between the people.",
+    "Say the times or divide sentence."
+   ],
+   "why": "Real life is full of times and divide."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How does 4 × 5 help you find 20 ÷ 5?"
+   ]
+  }
+ ]
+}

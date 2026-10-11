@@ -1,0 +1,86 @@
+{
+  "id": "n2",
+  "sector": "number",
+  "title": "Count in 2s, 3s, 5s and 10s",
+  "tagline": "Hop along the number line from any number",
+  "covers": ["Y2-NPV-1"],
+  "patch": { "name": "Skip Counter", "icon": "numberline" },
+  "dadNotes": [
+    "Counting in 3s from 0 (3, 6, 9, 12...) gets ready for thirds later.",
+    "Counting in 10s from any number: only the tens digit changes (7, 17, 27, 37).",
+    "Practise out loud in the car: count back in 10s from 93."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["These are the 5s on a 100 square.", "Spot the pattern."],
+      "question": "What do all the 5s end in?",
+      "widget": "hundred",
+      "props": { "pattern": { "every": 5, "from": 5 } }
+    },
+    { "type": "ask", "text": "Have you counted in 3s at school?" },
+    {
+      "type": "guess",
+      "prompt": "Count in 3s from 0. Will you land on 10?",
+      "options": ["Yes", "No"],
+      "answer": 1,
+      "reveal": ["No! 9, then 12.", "10 is not in the 3s."],
+      "widget": "numberline",
+      "props": { "min": 0, "max": 15, "step": 1, "labels": "all" },
+      "revealProps": { "hops": [{ "from": 0, "to": 3 }, { "from": 3, "to": 6 }, { "from": 6, "to": 9 }, { "from": 9, "to": 12 }, { "from": 12, "to": 15 }] }
+    },
+    {
+      "type": "try",
+      "widget": "numberline",
+      "props": { "min": 0, "max": 30, "mode": "hop", "hopSize": 3, "start": 0, "step": 3, "minor": 1 },
+      "script": [
+        { "say": ["Hop in 3s from 0.", "Stop on 12."], "goal": { "value": 12 }, "then": ["0, 3, 6, 9, 12.", "{hops} hops of 3."], "hint": ["Back undoes a hop."] },
+        { "say": ["Keep going to 30."], "goal": { "value": 30 }, "then": ["{hops} hops of 3 make 30."] },
+        { "set": { "start": 30, "hopSize": -3 }, "say": ["Now hop back in 3s.", "Stop on 15."], "goal": { "value": 15 }, "then": ["30, 27, 24, 21, 18, 15."] },
+        { "say": ["What comes next, going back?"], "input": "numpad", "answer": 12, "then": ["15 take away 3 is 12."] }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "hundred",
+      "props": { "mode": "tap" },
+      "script": [
+        { "say": ["Count in 10s from 7.", "Tap 7 and the next 4 numbers."], "goal": { "taps": [7, 17, 27, 37, 47] }, "then": ["7, 17, 27, 37, 47.", "Only the tens digit changes!"], "hint": ["10 more is one row down.", "Tap a gold square again to undo it."] },
+        { "set": { "highlight": [] }, "say": ["Now count back in 10s from 93.", "Tap 93 and the next 4."], "goal": { "taps": [93, 83, 73, 63, 53] }, "then": ["93, 83, 73, 63, 53.", "Back in 10s: one row up each time."], "hint": ["10 less is one row up."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "number.skipCount",
+      "levels": [1, 2, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn.", "2s, 5s and 10s."]
+    },
+    {
+      "type": "practise",
+      "gen": "number.skipCount",
+      "params": { "steps": [3] },
+      "levels": [1, 2, 3],
+      "items": [3, 4, 5],
+      "intro": ["Now the 3s."]
+    },
+    {
+      "type": "error",
+      "intro": ["{engineer} counted back in 10s from 64.", "Can you spot the slip?"],
+      "lines": ["Count back in 10s from 64:", "64, 54, 44", "44, 34, 23", "23, 13, 3"],
+      "wrong": 2,
+      "fix": ["34 take away 10 is 24, not 23.", "The ones digit should stay 4."]
+    },
+    {
+      "type": "athome",
+      "title": "Clap and count",
+      "need": ["Your hands"],
+      "steps": ["Clap and count in 3s: 3, 6, 9...", "Count back in 10s from 97.", "Take turns. Who can go furthest?"],
+      "why": "Saying the counts out loud, with no pictures, is the Year 2 goal."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "Counting in 10s from 7: what stays the same?"]
+    }
+  ]
+}

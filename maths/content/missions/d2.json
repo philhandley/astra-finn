@@ -1,0 +1,357 @@
+{
+ "id": "d2",
+ "sector": "data",
+ "title": "Pictograms",
+ "tagline": "One picture can stand for 2, 5 or 10",
+ "covers": [
+  "Y2-S-1",
+  "Y2-S-3"
+ ],
+ "patch": {
+  "name": "Pictogram Pilot",
+  "icon": "chart"
+ },
+ "dadNotes": [
+  "Always read the key first: one picture might stand for 2, 5 or 10.",
+  "Half a picture is half the key: half of 2 is 1, half of 10 is 5."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "This is a pictogram.",
+    "Each rocket picture is 1 launch."
+   ],
+   "question": "Which day had the most launches?",
+   "widget": "charts",
+   "props": {
+    "kind": "pictogram",
+    "key": 1,
+    "icon": "rocket",
+    "title": "Rocket launches this week",
+    "cats": [
+     {
+      "label": "Mon",
+      "icon": "rocket",
+      "value": 3
+     },
+     {
+      "label": "Tue",
+      "icon": "rocket",
+      "value": 5
+     },
+     {
+      "label": "Wed",
+      "icon": "rocket",
+      "value": 2
+     },
+     {
+      "label": "Thu",
+      "icon": "rocket",
+      "value": 4
+     }
+    ]
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you read a pictogram at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Each rocket now stands for 2. How many launches on Wednesday?",
+   "options": [
+    "4",
+    "8",
+    "6"
+   ],
+   "answer": 1,
+   "reveal": [
+    "8 launches.",
+    "4 rockets, and each one stands for 2."
+   ],
+   "widget": "charts",
+   "props": {
+    "kind": "pictogram",
+    "key": 2,
+    "icon": "rocket",
+    "title": "Rocket launches next week",
+    "cats": [
+     {
+      "label": "Mon",
+      "icon": "rocket",
+      "value": 6
+     },
+     {
+      "label": "Tue",
+      "icon": "rocket",
+      "value": 4
+     },
+     {
+      "label": "Wed",
+      "icon": "rocket",
+      "value": 8
+     },
+     {
+      "label": "Thu",
+      "icon": "rocket",
+      "value": 2
+     }
+    ]
+   }
+  },
+  {
+   "type": "try",
+   "widget": "charts",
+   "props": {
+    "kind": "pictogram",
+    "key": 2,
+    "icon": "rocket",
+    "interactive": true,
+    "given": [
+     6,
+     4,
+     10
+    ],
+    "givenAs": "number",
+    "title": "Launches to build",
+    "cats": [
+     {
+      "label": "Mon",
+      "icon": "rocket",
+      "value": 0
+     },
+     {
+      "label": "Tue",
+      "icon": "rocket",
+      "value": 0
+     },
+     {
+      "label": "Wed",
+      "icon": "rocket",
+      "value": 0
+     }
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "Each rocket stands for 2 launches.",
+      "Make each row match its number."
+     ],
+     "goal": {
+      "values": [
+       6,
+       4,
+       10
+      ]
+     },
+     "then": [
+      "6 is 3 rockets. 10 is 5 rockets."
+     ],
+     "hint": [
+      "Each tap adds 1 rocket, which is 2.",
+      "Count in 2s as you tap."
+     ]
+    },
+    {
+     "say": [
+      "How many launches altogether?"
+     ],
+     "input": "numpad",
+     "answer": 20,
+     "then": [
+      "6 + 4 + 10 = 20."
+     ]
+    },
+    {
+     "say": [
+      "How many more on Wednesday than Tuesday?"
+     ],
+     "input": "numpad",
+     "answer": 6,
+     "then": [
+      "10 take away 4 is 6."
+     ]
+    },
+    {
+     "set": {
+      "key": 10,
+      "interactive": false,
+      "given": null,
+      "title": "Launches this month",
+      "cats": [
+       {
+        "label": "Mon",
+        "icon": "rocket",
+        "value": 30
+       },
+       {
+        "label": "Tue",
+        "icon": "rocket",
+        "value": 50
+       },
+       {
+        "label": "Wed",
+        "icon": "rocket",
+        "value": 25
+       }
+      ]
+     },
+     "say": [
+      "Now each rocket stands for 10.",
+      "How many launches on Monday?"
+     ],
+     "input": "numpad",
+     "answer": 30,
+     "then": [
+      "3 rockets of 10 is 30."
+     ]
+    },
+    {
+     "say": [
+      "Wednesday has half a rocket.",
+      "What is half a rocket worth?"
+     ],
+     "input": "numpad",
+     "answer": 5,
+     "then": [
+      "Half of 10 is 5.",
+      "So Wednesday had 25."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "stats.readPictogram",
+    "stats.totalAll"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    6,
+    8
+   ],
+   "intro": [
+    "Your turn. Look at the key first."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": [
+    "stats.howManyMore",
+    "stats.buildChart"
+   ],
+   "levels": [
+    2,
+    3,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Compare and build."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wyr",
+   "title": "Would you rather...?",
+   "prompt": "One rocket for 2, or one rocket for 10: which pictogram tells the story better?",
+   "options": [
+    {
+     "label": "One rocket = 2",
+     "widget": "charts",
+     "props": {
+      "kind": "pictogram",
+      "key": 2,
+      "icon": "rocket",
+      "cats": [
+       {
+        "label": "Mon",
+        "icon": "rocket",
+        "value": 20
+       },
+       {
+        "label": "Tue",
+        "icon": "rocket",
+        "value": 10
+       },
+       {
+        "label": "Wed",
+        "icon": "rocket",
+        "value": 30
+       }
+      ]
+     }
+    },
+    {
+     "label": "One rocket = 10",
+     "widget": "charts",
+     "props": {
+      "kind": "pictogram",
+      "key": 10,
+      "icon": "rocket",
+      "cats": [
+       {
+        "label": "Mon",
+        "icon": "rocket",
+        "value": 20
+       },
+       {
+        "label": "Tue",
+        "icon": "rocket",
+        "value": 10
+       },
+       {
+        "label": "Wed",
+        "icon": "rocket",
+        "value": 30
+       }
+      ]
+     }
+    }
+   ],
+   "reveal": [
+    "With 2, you see lots of detail, but there are lots to draw.",
+    "With 10, it is quick to draw and easy to compare.",
+    "Some crews like detail, some like quick. Both are true!"
+   ],
+   "followUp": "What numbers would make you pick the other one?"
+  },
+  {
+   "type": "athome",
+   "title": "Fruit bowl pictogram",
+   "need": [
+    "The fruit in your kitchen",
+    "Paper and a pencil"
+   ],
+   "steps": [
+    "Count each kind of fruit.",
+    "Draw 1 circle for every 2 fruits.",
+    "Draw half a circle for 1 left over."
+   ],
+   "why": "One picture can stand for more than 1 thing."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Why might one picture stand for 10?"
+   ]
+  }
+ ]
+}

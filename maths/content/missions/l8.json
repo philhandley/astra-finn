@@ -1,0 +1,326 @@
+{
+ "id": "l8",
+ "sector": "launchpad",
+ "title": "Halves and Quarters",
+ "tagline": "Equal parts of shapes and sets",
+ "covers": [
+  "Y1-F-1",
+  "Y1-F-2"
+ ],
+ "patch": {
+  "name": "Halves and Quarters",
+  "icon": "fraction"
+ },
+ "dadNotes": [
+  "A half is 1 of 2 EQUAL parts. Ask: are they the same size?",
+  "Fold paper to check. Equal parts match exactly when folded."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Two astronauts share one space pizza.",
+    "They want it to be fair."
+   ],
+   "question": "How should they cut it?",
+   "widget": "fractions",
+   "props": {
+    "readonly": true,
+    "shape": "circle",
+    "parts": 1
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you cut things into halves at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Is this square cut into halves?",
+   "options": [
+    "Yes, 2 equal parts",
+    "No, one part is bigger"
+   ],
+   "answer": 1,
+   "reveal": [
+    "One part is bigger.",
+    "Halves must be 2 equal parts."
+   ],
+   "widget": "fractions",
+   "props": {
+    "readonly": true,
+    "shape": "square",
+    "parts": 2,
+    "unequal": true
+   }
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "square",
+    "parts": 1,
+    "tools": [
+     "2",
+     "glue"
+    ],
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "Tap the hammer with a 2.",
+      "Smash the square!"
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "You made 2 equal parts.",
+      "Each part is a half."
+     ]
+    },
+    {
+     "say": [
+      "Colour one half.",
+      "Tap a part."
+     ],
+     "goal": {
+      "shaded": 1
+     },
+     "caption": "1/2",
+     "then": [
+      "1 of 2 equal parts.",
+      "That is 1/2."
+     ]
+    },
+    {
+     "say": [
+      "Smash it again with the 2."
+     ],
+     "goal": {
+      "parts": 4
+     },
+     "then": [
+      "Now there are 4 equal parts.",
+      "Each part is a quarter."
+     ]
+    },
+    {
+     "say": [
+      "How many quarters are coloured?"
+     ],
+     "input": "numpad",
+     "answer": "{shaded}",
+     "then": [
+      "Your half is now {shaded} quarters."
+     ]
+    },
+    {
+     "say": [
+      "Tap Glue.",
+      "Stick the quarters back into halves."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "2 quarters make 1 half."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "circle",
+    "parts": 4,
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "This pizza has 4 equal slices.",
+      "Colour 1 quarter."
+     ],
+     "goal": {
+      "shaded": 1
+     },
+     "caption": "1/4",
+     "then": [
+      "1 of 4 equal parts is 1/4."
+     ]
+    },
+    {
+     "say": [
+      "Colour the whole pizza."
+     ],
+     "goal": {
+      "shaded": 4
+     },
+     "then": [
+      "4 quarters make 1 whole."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "set",
+    "setSize": 8,
+    "parts": 1,
+    "tools": [
+     "2"
+    ],
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "8 dots.",
+      "Smash them into 2 equal groups."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "4 in each group.",
+      "Half of 8 is 4."
+     ]
+    },
+    {
+     "say": [
+      "Smash again to make quarters."
+     ],
+     "goal": {
+      "parts": 4
+     },
+     "then": [
+      "2 in each group.",
+      "A quarter of 8 is 2."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "fractions.isEqualParts",
+    "fractions.nameFraction"
+   ],
+   "levels": [
+    1,
+    1,
+    2
+   ],
+   "items": [
+    5,
+    6,
+    6
+   ],
+   "intro": [
+    "Your turn.",
+    "Look for equal parts."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "fractions.fractionOfSet",
+   "levels": [
+    1,
+    1,
+    2
+   ],
+   "items": [
+    4,
+    4,
+    5
+   ],
+   "intro": [
+    "Now halves and quarters of sets."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "A",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "square",
+      "parts": 2
+     }
+    },
+    {
+     "label": "B",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "circle",
+      "parts": 4,
+      "shaded": 1
+     }
+    },
+    {
+     "label": "C",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "square",
+      "parts": 2,
+      "unequal": true,
+      "shaded": 1
+     }
+    },
+    {
+     "label": "D",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "set",
+      "setSize": 8,
+      "parts": 2,
+      "shaded": 1
+     }
+    }
+   ],
+   "reveal": [
+    "Every one can be the odd one out!",
+    "A has nothing coloured. B has 4 parts.",
+    "C has unequal parts. D is made of dots."
+   ],
+   "followUp": "Can you find a reason for every single one?"
+  },
+  {
+   "type": "athome",
+   "title": "Fold it fair",
+   "need": [
+    "A square of paper"
+   ],
+   "steps": [
+    "Fold the paper in half. Do the edges match?",
+    "Fold it again. How many parts now?",
+    "Colour 1 part. That is a quarter."
+   ],
+   "why": "Halves are 2 equal parts. Quarters are 4 equal parts."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How can you tell if 2 parts are halves?"
+   ]
+  }
+ ]
+}

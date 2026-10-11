@@ -1,0 +1,118 @@
+{
+  "sectors": [
+    {
+      "id": "launchpad", "title": "Launch Pad", "year": "Year 1", "icon": "rocket", "img": "assets/img/starship-liftoff.jpg",
+      "tagline": "The Year 1 fundamentals: counting, bonds, halves, shapes, clocks and coins.",
+      "missions": [
+        { "id": "l1", "title": "Count the Stars", "tagline": "Count forwards and back to 100, one more and one less" },
+        { "id": "l2", "title": "Numbers in Words", "tagline": "Read and write numbers to 20 in digits and words" },
+        { "id": "l3", "title": "Skip-count Rockets", "tagline": "Count in 2s, 5s and 10s" },
+        { "id": "l4", "title": "Bonds to 10", "tagline": "Every way to make 10" },
+        { "id": "l5", "title": "Bonds to 20 and Doubles", "tagline": "Make 20, doubles and near doubles" },
+        { "id": "l6", "title": "Add and Take Away", "tagline": "Add and subtract within 20" },
+        { "id": "l7", "title": "The Equals Sign", "tagline": "Balance the scales and find missing numbers" },
+        { "id": "l8", "title": "Halves and Quarters", "tagline": "Equal parts of shapes and sets" },
+        { "id": "l9", "title": "Shape Spotter", "tagline": "Name 2-D and 3-D shapes and make turns" },
+        { "id": "l10", "title": "Clocks, Coins and Days", "tagline": "O'clock, half past, coins and the days of the week" },
+        { "id": "l11", "title": "Longer, Heavier, Fuller", "tagline": "Compare and measure length, weight and capacity" }
+      ]
+    },
+    {
+      "id": "number", "title": "Number Station", "year": "Year 2", "icon": "blocks", "img": "assets/img/earth-from-orion.jpg",
+      "tagline": "Place value to 100: tens and ones, the number line, comparing and partitioning.",
+      "missions": [
+        { "id": "n1", "title": "Tens and Ones", "tagline": "Build two-digit numbers from tens and ones" },
+        { "id": "n2", "title": "Count in 2s, 3s, 5s and 10s", "tagline": "Hop along the number line from any number" },
+        { "id": "n3", "title": "Number Line Landing", "tagline": "Land the rocket where the number belongs" },
+        { "id": "n4", "title": "Compare and Order", "tagline": "Greater than, less than and equal to" },
+        { "id": "n5", "title": "Numbers in Words to 100", "tagline": "Read and write numbers to 100" },
+        { "id": "n6", "title": "Partition Lab", "tagline": "Split numbers in more than one way" }
+      ]
+    },
+    {
+      "id": "bonds", "title": "Bonds Bay", "year": "Year 2", "icon": "partwhole", "img": "assets/img/moon-full.jpg",
+      "tagline": "Addition and subtraction: fact families, across 10 and two-digit numbers.",
+      "missions": [
+        { "id": "b1", "title": "Fact Families", "tagline": "One picture, four facts, and facts to 100" },
+        { "id": "b2", "title": "Across the Ten", "tagline": "Make 10 first, then add the rest" },
+        { "id": "b3", "title": "Ones and Tens", "tagline": "Add and subtract ones or tens" },
+        { "id": "b4", "title": "Two-Digit Add and Take", "tagline": "Add and subtract two 2-digit numbers" },
+        { "id": "b5", "title": "Three Numbers", "tagline": "Find the bond to 10 first" },
+        { "id": "b6", "title": "Any Order?", "tagline": "Adding in any order, and checking with the inverse" },
+        { "id": "b7", "title": "How Many More?", "tagline": "Find the difference with bar models" }
+      ]
+    },
+    {
+      "id": "blaster", "title": "Array Blaster", "year": "Year 2", "icon": "blaster", "img": "assets/img/bennu.jpg",
+      "tagline": "Multiplication and division: equal groups, arrays, the 2, 5 and 10 times tables.",
+      "missions": [
+        { "id": "a1", "title": "Equal Groups", "tagline": "Blast rows of dots and count them the fast way" },
+        { "id": "a2", "title": "Flip the Array", "tagline": "3 rows of 5 is 5 rows of 3" },
+        { "id": "a3", "title": "The 2 Times Table", "tagline": "Pairs, doubles and counting in 2s" },
+        { "id": "a4", "title": "The 10s and the 5s", "tagline": "The 10 and 5 times tables" },
+        { "id": "a5", "title": "Odd and Even", "tagline": "Pair up the dots and look for the odd one out" },
+        { "id": "a6", "title": "Sharing and Grouping", "tagline": "Two kinds of division" },
+        { "id": "a7", "title": "Times and Divide Missions", "tagline": "Write the number sentence and solve problems" }
+      ]
+    },
+    {
+      "id": "fractions", "title": "Fraction Forge", "year": "Year 2", "icon": "fraction", "img": "assets/img/mars-globe.jpg",
+      "tagline": "Halves, quarters and thirds of shapes, lengths and amounts.",
+      "missions": [
+        { "id": "f1", "title": "Equal Parts", "tagline": "Smash shapes into equal parts" },
+        { "id": "f2", "title": "Quarters", "tagline": "Quarters, two quarters and three quarters" },
+        { "id": "f3", "title": "Thirds", "tagline": "Three equal parts" },
+        { "id": "f4", "title": "Fractions of Amounts", "tagline": "Half of 6, a quarter of 12" },
+        { "id": "f5", "title": "Counting in Fractions", "tagline": "Halves and quarters on the number line" }
+      ]
+    },
+    {
+      "id": "measure", "title": "Measure Lab", "year": "Year 2", "icon": "clock", "img": "assets/img/apollo17-rover.jpg",
+      "tagline": "Length, mass, capacity, temperature, money and time.",
+      "missions": [
+        { "id": "m1", "title": "Length", "tagline": "Centimetres and metres with a ruler" },
+        { "id": "m2", "title": "Mass", "tagline": "Grams and kilograms on the scales" },
+        { "id": "m3", "title": "Capacity and Temperature", "tagline": "Millilitres, litres and degrees" },
+        { "id": "m4", "title": "Coins and Notes", "tagline": "Pounds and pence, and making amounts" },
+        { "id": "m5", "title": "The Space Shop", "tagline": "Buy supplies and give change" },
+        { "id": "m6", "title": "Clock Tower", "tagline": "Quarter past, quarter to and five minutes" },
+        { "id": "m7", "title": "Time Flies", "tagline": "Minutes in an hour, hours in a day" }
+      ]
+    },
+    {
+      "id": "shape", "title": "Shape Dock", "year": "Year 2", "icon": "shapes", "img": "assets/img/voyager.jpg",
+      "tagline": "Properties of 2-D and 3-D shapes, patterns, position and turns.",
+      "missions": [
+        { "id": "s1", "title": "2-D Shapes", "tagline": "Sides, vertices and lines of symmetry" },
+        { "id": "s2", "title": "3-D Shapes", "tagline": "Faces, edges and vertices" },
+        { "id": "s3", "title": "Shapes on Shapes", "tagline": "Find 2-D shapes on 3-D shapes, and sort them" },
+        { "id": "s4", "title": "Patterns", "tagline": "Continue and make repeating patterns" },
+        { "id": "s5", "title": "Rover Drive", "tagline": "Straight lines, quarter turns and right angles" }
+      ]
+    },
+    {
+      "id": "data", "title": "Data Deck", "year": "Year 2", "icon": "chart", "img": "assets/img/sun.jpg",
+      "tagline": "Tally charts, tables, pictograms and block diagrams.",
+      "missions": [
+        { "id": "d1", "title": "Tally and Table", "tagline": "Count and record in tallies and tables" },
+        { "id": "d2", "title": "Pictograms", "tagline": "One picture can stand for 2, 5 or 10" },
+        { "id": "d3", "title": "Block Diagrams", "tagline": "Build a block diagram and ask questions" }
+      ]
+    }
+  ],
+  "path": [
+    "l1", "l2", "l4", "l3", "l5", "l6", "l7", "l8", "l9", "l10", "l11",
+    "n1", "n2", "n3", "n4", "n5", "n6",
+    "b1", "b2", "b3", "b4", "b5", "b6", "b7",
+    "m4", "m5", "s1", "s2", "s3",
+    "a1", "a2", "a3", "a4", "a5", "a6", "a7",
+    "m1", "m2", "m3",
+    "f1", "f2", "f3", "f4", "f5",
+    "m6", "m7", "d1", "d2", "d3", "s4", "s5"
+  ],
+  "tiers": [
+    { "n": 1, "name": "Cadet", "about": "First flight. Earns the patch." },
+    { "n": 2, "name": "Pilot", "about": "Bigger numbers, fewer helpers." },
+    { "n": 3, "name": "Commander", "about": "The hardest version. Earns the third star." }
+  ]
+}

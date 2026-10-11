@@ -1,0 +1,326 @@
+{
+ "id": "f5",
+ "sector": "fractions",
+ "title": "Counting in Fractions",
+ "tagline": "Halves and quarters on the number line",
+ "covers": [
+  "Y2-F-1"
+ ],
+ "patch": {
+  "name": "Counting in Fractions",
+  "icon": "star"
+ },
+ "dadNotes": [
+  "This is from the Year 2 guidance (non-statutory): count in halves and quarters past 1.",
+  "Say 'one and two quarters is one and a half' to link 2/4 and 1/2."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "The rover moves half a step each hop.",
+    "Halves keep going past 1."
+   ],
+   "question": "Where will it be after 2 hops?",
+   "widget": "numberline",
+   "props": {
+    "min": 0,
+    "max": 3,
+    "step": 0.5,
+    "minor": 0,
+    "labels": [
+     {
+      "at": 0.0,
+      "text": "0"
+     },
+     {
+      "at": 0.5,
+      "text": "½"
+     },
+     {
+      "at": 1.0,
+      "text": "1"
+     },
+     {
+      "at": 1.5,
+      "text": "1½"
+     },
+     {
+      "at": 2.0,
+      "text": "2"
+     },
+     {
+      "at": 2.5,
+      "text": "2½"
+     },
+     {
+      "at": 3.0,
+      "text": "3"
+     }
+    ],
+    "readonly": true,
+    "markerArt": "rocket",
+    "value": 0
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you counted in halves before?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Count in halves: 1/2, 1, 1 and 1/2. What comes next?",
+   "options": [
+    "2",
+    "1 and 3/4",
+    "3"
+   ],
+   "answer": 0,
+   "reveal": [
+    "2.",
+    "1 and 1/2, then 1/2 more, makes 2."
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "numberline",
+   "props": {
+    "min": 0,
+    "max": 3,
+    "step": 0.5,
+    "minor": 0,
+    "labels": [
+     {
+      "at": 0.0,
+      "text": "0"
+     },
+     {
+      "at": 0.5,
+      "text": "½"
+     },
+     {
+      "at": 1.0,
+      "text": "1"
+     },
+     {
+      "at": 1.5,
+      "text": "1½"
+     },
+     {
+      "at": 2.0,
+      "text": "2"
+     },
+     {
+      "at": 2.5,
+      "text": "2½"
+     },
+     {
+      "at": 3.0,
+      "text": "3"
+     }
+    ],
+    "mode": "hop",
+    "hopSize": 0.5,
+    "start": 0,
+    "markerArt": "rocket"
+   },
+   "script": [
+    {
+     "say": [
+      "Each hop is 1/2.",
+      "Hop 2 times."
+     ],
+     "goal": {
+      "hops": 2
+     },
+     "then": [
+      "2 halves make 1 whole.",
+      "You are at 1."
+     ]
+    },
+    {
+     "say": [
+      "Hop 3 more times."
+     ],
+     "goal": {
+      "hops": 5
+     },
+     "then": [
+      "5 halves.",
+      "You are at 2 and a half."
+     ]
+    },
+    {
+     "say": [
+      "How many halves make 3?",
+      "Hop to 3 and count."
+     ],
+     "input": "numpad",
+     "answer": "6",
+     "then": [
+      "6 halves make 3.",
+      "Fractions can add up to more than 1!"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "numberline",
+   "props": {
+    "min": 0,
+    "max": 2,
+    "step": 0.25,
+    "minor": 0,
+    "labels": [
+     {
+      "at": 0.0,
+      "text": "0"
+     },
+     {
+      "at": 0.25,
+      "text": "¼"
+     },
+     {
+      "at": 0.5,
+      "text": "½"
+     },
+     {
+      "at": 0.75,
+      "text": "¾"
+     },
+     {
+      "at": 1.0,
+      "text": "1"
+     },
+     {
+      "at": 1.25,
+      "text": "1¼"
+     },
+     {
+      "at": 1.5,
+      "text": "1½"
+     },
+     {
+      "at": 1.75,
+      "text": "1¾"
+     },
+     {
+      "at": 2.0,
+      "text": "2"
+     }
+    ],
+    "mode": "hop",
+    "hopSize": 0.25,
+    "start": 0,
+    "markerArt": "rocket"
+   },
+   "script": [
+    {
+     "say": [
+      "Now each hop is 1/4.",
+      "Hop 4 times."
+     ],
+     "goal": {
+      "hops": 4
+     },
+     "then": [
+      "4 quarters make 1 whole."
+     ]
+    },
+    {
+     "say": [
+      "Hop 2 more."
+     ],
+     "goal": {
+      "hops": 6
+     },
+     "then": [
+      "1 and 2/4.",
+      "That is the same as 1 and 1/2!"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "fractions.countInFractions",
+    "fractions.halvesMakeWholes"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    5,
+    6,
+    7
+   ],
+   "intro": [
+    "Your turn.",
+    "Count in halves and quarters."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "fractions.countInFractions",
+   "levels": [
+    2,
+    3,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Now count back too."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} counted in halves.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "Count in halves from 0.",
+    "1/2, 1, 1 and 1/2",
+    "2, 3, 3 and 1/2"
+   ],
+   "wrong": 2,
+   "fix": [
+    "After 2 comes 2 and 1/2, not 3.",
+    "Each step is only 1/2.",
+    "What would you tell {engineer}?"
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Orange halves",
+   "need": [
+    "Some oranges cut in half, with a grown-up"
+   ],
+   "steps": [
+    "Lay the halves in a line.",
+    "Count them: 1/2, 1, 1 and 1/2, 2...",
+    "How many halves make 3 oranges?"
+   ],
+   "why": "Counting in halves goes past 1 and keeps going."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Can fractions add up to more than 1?"
+   ]
+  }
+ ]
+}

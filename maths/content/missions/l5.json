@@ -1,0 +1,306 @@
+{
+  "id": "l5",
+  "sector": "launchpad",
+  "title": "Bonds to 20 and Doubles",
+  "tagline": "Make 20, doubles and near doubles",
+  "covers": [
+    "Y1-AS-2"
+  ],
+  "patch": {
+    "name": "Bonds to 20",
+    "icon": "tensframe"
+  },
+  "dadNotes": [
+    "Bonds to 20 come straight from bonds to 10: 3 + 7 = 10, so 13 + 7 = 20.",
+    "Near doubles: 6 + 7 is double 6 and 1 more. Ask 'which double helps?'"
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "Two tens frames.",
+        "13 gold counters and 7 blue."
+      ],
+      "question": "Are both frames full?",
+      "widget": "tensframe",
+      "props": {
+        "colours": [
+          13,
+          7
+        ],
+        "frames": 2
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you made bonds to 20 at school?"
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": {
+        "colours": [
+          3,
+          0
+        ],
+        "frames": 1,
+        "twoColour": true
+      },
+      "script": [
+        {
+          "say": [
+            "3 gold counters.",
+            "Tap blue, then fill the frame."
+          ],
+          "goal": {
+            "count": 10,
+            "a": 3
+          },
+          "hint": [
+            "The blue brush is on the right.",
+            "Tap a counter to take it off."
+          ],
+          "then": [
+            "3 and {b} make 10."
+          ]
+        },
+        {
+          "set": {
+            "colours": [
+              13,
+              0
+            ],
+            "frames": 2
+          },
+          "say": [
+            "Now 13 gold counters.",
+            "Fill both frames with blue."
+          ],
+          "goal": {
+            "count": 20,
+            "a": 13
+          },
+          "hint": [
+            "Use the blue brush.",
+            "Fill every empty space."
+          ],
+          "then": [
+            "13 and {b} make 20."
+          ]
+        },
+        {
+          "say": [
+            "3 + 7 = 10.",
+            "So what is 13 + 7?"
+          ],
+          "caption": "13 + 7 = ?",
+          "input": "numpad",
+          "answer": 20,
+          "then": [
+            "13 + 7 = 20.",
+            "3 + 7 = 10 helped us."
+          ]
+        },
+        {
+          "say": [
+            "What goes with 16 to make 20?"
+          ],
+          "caption": "16 + ? = 20",
+          "input": "numpad",
+          "answer": 4,
+          "hint": [
+            "6 + 4 = 10."
+          ],
+          "then": [
+            "6 + 4 = 10, so 16 + 4 = 20."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "guess",
+      "prompt": "Which is bigger: double 6 or 5 + 8?",
+      "options": [
+        "Double 6",
+        "5 + 8",
+        "The same"
+      ],
+      "answer": 1,
+      "reveal": [
+        "Double 6 is 12. 5 + 8 is 13.",
+        "5 + 8 is bigger, just!"
+      ],
+      "art": "planet"
+    },
+    {
+      "type": "try",
+      "widget": "tensframe",
+      "props": {
+        "count": 0,
+        "frames": 2,
+        "twoColour": true
+      },
+      "script": [
+        {
+          "say": [
+            "Make double 4.",
+            "4 gold, then 4 blue."
+          ],
+          "goal": {
+            "a": 4,
+            "b": 4
+          },
+          "hint": [
+            "Tap the frame 4 times with gold.",
+            "Switch to blue and tap 4 more."
+          ],
+          "then": [
+            "Double 4 is {count}."
+          ]
+        },
+        {
+          "set": {
+            "colours": [
+              6,
+              0
+            ],
+            "frames": 2
+          },
+          "say": [
+            "6 gold counters.",
+            "Add 6 blue to make double 6."
+          ],
+          "goal": {
+            "a": 6,
+            "b": 6
+          },
+          "hint": [
+            "Use the blue brush."
+          ],
+          "then": [
+            "Double 6 is {count}."
+          ]
+        },
+        {
+          "say": [
+            "Now add 1 more blue."
+          ],
+          "goal": {
+            "a": 6,
+            "b": 7
+          },
+          "then": [
+            "Double 6 is equal to 12.",
+            "So 6 plus 7 is equal to {count}."
+          ]
+        },
+        {
+          "say": [
+            "What is 7 + 8?",
+            "Use double 7 to help."
+          ],
+          "caption": "7 + 8 = ?",
+          "input": "numpad",
+          "answer": 15,
+          "hint": [
+            "Double 7 is 14."
+          ],
+          "then": [
+            "Double 7 is 14. 1 more is 15."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.bondsTo",
+        "addsub.doubles"
+      ],
+      "params": {
+        "target": 20
+      },
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Bonds to 20 and doubles."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "addsub.nearDoubles",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        5,
+        6
+      ],
+      "intro": [
+        "Near doubles. Which double helps?"
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [
+        {
+          "label": "10 + 10"
+        },
+        {
+          "label": "12 + 6"
+        },
+        {
+          "label": "13 + 7"
+        },
+        {
+          "label": "20 + 0"
+        }
+      ],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "10 + 10 is the only double.",
+        "12 + 6 makes 18, not 20.",
+        "13 + 7 uses odd numbers. 20 + 0 has a 0."
+      ],
+      "followUp": "Which reason did you like best?"
+    },
+    {
+      "type": "athome",
+      "title": "Double dice",
+      "need": [
+        "One dice"
+      ],
+      "steps": [
+        "Roll the dice.",
+        "Say the double out loud: double 4 is 8.",
+        "Now say the near double: 4 + 5 is 9."
+      ],
+      "why": "Doubles are anchors. They help with near doubles like 6 + 7."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How does 3 + 7 help with 13 + 7?"
+      ]
+    }
+  ]
+}

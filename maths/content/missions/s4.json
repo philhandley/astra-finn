@@ -1,0 +1,674 @@
+{
+ "id": "s4",
+ "sector": "shape",
+ "title": "Patterns",
+ "tagline": "Continue and make repeating patterns",
+ "covers": [
+  "Y2-PD-1"
+ ],
+ "patch": {
+  "name": "Pattern Maker",
+  "icon": "star"
+ },
+ "dadNotes": [
+  "Say patterns out loud together: \"circle, square, circle, square...\" The rhythm helps.",
+  "Find the chunk that repeats, then keep copying it.",
+  "Turning patterns count too: an arrow that makes a quarter turn each time."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "The landing lights flash in a pattern.",
+    "Rocket, star, rocket, star..."
+   ],
+   "question": "What comes next?",
+   "widget": "pattern",
+   "props": {
+    "items": [
+     {
+      "art": "rocket"
+     },
+     {
+      "art": "star"
+     },
+     {
+      "art": "rocket"
+     },
+     {
+      "art": "star"
+     },
+     {
+      "art": "rocket"
+     },
+     {
+      "art": "star"
+     }
+    ],
+    "gap": "end"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you made repeating patterns at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "What will the 8th shape be?",
+   "options": [
+    "A circle",
+    "A triangle",
+    "A square"
+   ],
+   "answer": 1,
+   "reveal": [
+    "A triangle!",
+    "Circle, triangle, triangle, then again."
+   ],
+   "widget": "pattern",
+   "props": {
+    "items": [
+     {
+      "shape": "circle",
+      "colour": "gold"
+     },
+     {
+      "shape": "triangle",
+      "colour": "cyan"
+     },
+     {
+      "shape": "triangle",
+      "colour": "cyan"
+     },
+     {
+      "shape": "circle",
+      "colour": "gold"
+     },
+     {
+      "shape": "triangle",
+      "colour": "cyan"
+     },
+     {
+      "shape": "triangle",
+      "colour": "cyan"
+     }
+    ],
+    "gap": "end",
+    "slots": 2
+   },
+   "revealProps": {
+    "filled": [
+     {
+      "shape": "circle",
+      "colour": "gold"
+     },
+     {
+      "shape": "triangle",
+      "colour": "cyan"
+     }
+    ]
+   }
+  },
+  {
+   "type": "try",
+   "widget": "pattern",
+   "props": {
+    "items": [
+     {
+      "shape": "circle",
+      "colour": "gold"
+     },
+     {
+      "shape": "square",
+      "colour": "cyan"
+     },
+     {
+      "shape": "circle",
+      "colour": "gold"
+     },
+     {
+      "shape": "square",
+      "colour": "cyan"
+     },
+     {
+      "shape": "circle",
+      "colour": "gold"
+     }
+    ],
+    "gap": "end",
+    "slots": 1,
+    "interactive": true,
+    "palette": [
+     {
+      "shape": "circle",
+      "colour": "gold"
+     },
+     {
+      "shape": "square",
+      "colour": "cyan"
+     },
+     {
+      "shape": "triangle",
+      "colour": "pink"
+     }
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "Gold circle, cyan square, gold circle...",
+      "What comes next? Tap it."
+     ],
+     "goal": {
+      "lastShape": "square",
+      "lastColour": "cyan"
+     },
+     "then": [
+      "Yes! The pattern repeats every 2."
+     ]
+    },
+    {
+     "set": {
+      "items": [
+       {
+        "shape": "star",
+        "colour": "gold"
+       },
+       {
+        "shape": "heart",
+        "colour": "pink"
+       },
+       {
+        "shape": "heart",
+        "colour": "pink"
+       },
+       {
+        "shape": "star",
+        "colour": "gold"
+       },
+       {
+        "shape": "heart",
+        "colour": "pink"
+       },
+       {
+        "shape": "heart",
+        "colour": "pink"
+       },
+       {
+        "shape": "star",
+        "colour": "gold"
+       }
+      ],
+      "gap": "end",
+      "slots": 3,
+      "palette": [
+       {
+        "shape": "star",
+        "colour": "gold"
+       },
+       {
+        "shape": "heart",
+        "colour": "pink"
+       },
+       {
+        "shape": "circle",
+        "colour": "cyan"
+       }
+      ]
+     },
+     "say": [
+      "This one is trickier.",
+      "Build the next 3."
+     ],
+     "goal": {
+      "seq": [
+       "heart-pink",
+       "heart-pink",
+       "star-gold"
+      ]
+     },
+     "then": [
+      "Star, heart, heart. It repeats every 3."
+     ],
+     "hint": [
+      "Say it out loud: star, heart, heart..."
+     ]
+    },
+    {
+     "set": {
+      "items": [
+       {
+        "shape": "arrow",
+        "colour": "gold"
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 90
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 180
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 270
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold"
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 90
+       }
+      ],
+      "gap": "end",
+      "slots": 1,
+      "palette": [
+       {
+        "shape": "arrow",
+        "colour": "gold"
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 90
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 180
+       },
+       {
+        "shape": "arrow",
+        "colour": "gold",
+        "rotate": 270
+       }
+      ]
+     },
+     "say": [
+      "Now the arrow turns.",
+      "Which way will it point next?"
+     ],
+     "goal": {
+      "lastShape": "arrow",
+      "lastRotate": 180
+     },
+     "then": [
+      "Each arrow makes a quarter turn clockwise."
+     ]
+    },
+    {
+     "set": {
+      "items": [
+       {
+        "shape": "triangle",
+        "colour": "green"
+       },
+       {
+        "shape": "circle",
+        "colour": "purple"
+       },
+       {
+        "shape": "hexagon",
+        "colour": "orange"
+       },
+       {
+        "shape": "triangle",
+        "colour": "green"
+       },
+       {
+        "shape": "circle",
+        "colour": "purple"
+       },
+       {
+        "shape": "hexagon",
+        "colour": "orange"
+       }
+      ],
+      "gap": 4,
+      "palette": [
+       {
+        "shape": "hexagon",
+        "colour": "orange"
+       },
+       {
+        "shape": "circle",
+        "colour": "purple"
+       },
+       {
+        "shape": "triangle",
+        "colour": "green"
+       }
+      ]
+     },
+     "say": [
+      "Something is missing.",
+      "Fill the gap."
+     ],
+     "goal": {
+      "lastShape": "circle",
+      "lastColour": "purple"
+     },
+     "then": [
+      "Triangle, circle, hexagon, again and again."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": "geometry.patternNext",
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    6,
+    8
+   ],
+   "intro": [
+    "Your turn. What comes next?"
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "pattern",
+   "props": {
+    "items": [],
+    "gap": "end",
+    "slots": 6,
+    "interactive": true,
+    "palette": [
+     {
+      "shape": "star",
+      "colour": "gold"
+     },
+     {
+      "shape": "circle",
+      "colour": "cyan"
+     },
+     {
+      "shape": "triangle",
+      "colour": "pink"
+     },
+     {
+      "shape": "square",
+      "colour": "green"
+     }
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "Now make your own repeating pattern.",
+      "Use 6 shapes."
+     ],
+     "goal": {
+      "count": 6
+     },
+     "then": [
+      "Ask {engineer} what comes next!"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "tiers": [
+    2,
+    3
+   ],
+   "widget": "pattern",
+   "props": {
+    "items": [
+     {
+      "shape": "arrow",
+      "colour": "cyan"
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 270
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 180
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 90
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan"
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 270
+     }
+    ],
+    "gap": "end",
+    "slots": 4,
+    "interactive": true,
+    "palette": [
+     {
+      "shape": "arrow",
+      "colour": "cyan"
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 90
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 180
+     },
+     {
+      "shape": "arrow",
+      "colour": "cyan",
+      "rotate": 270
+     }
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "This arrow turns anticlockwise.",
+      "Build the next 4."
+     ],
+     "goal": {
+      "seq": [
+       "arrow-cyan-r180",
+       "arrow-cyan-r90",
+       "arrow-cyan",
+       "arrow-cyan-r270"
+      ]
+     },
+     "then": [
+      "Each one is a quarter turn anticlockwise."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "A",
+     "widget": "pattern",
+     "props": {
+      "items": [
+       {
+        "shape": "circle",
+        "colour": "gold"
+       },
+       {
+        "shape": "circle",
+        "colour": "cyan"
+       },
+       {
+        "shape": "circle",
+        "colour": "gold"
+       },
+       {
+        "shape": "circle",
+        "colour": "cyan"
+       },
+       {
+        "shape": "circle",
+        "colour": "gold"
+       },
+       {
+        "shape": "circle",
+        "colour": "cyan"
+       }
+      ]
+     }
+    },
+    {
+     "label": "B",
+     "widget": "pattern",
+     "props": {
+      "items": [
+       {
+        "shape": "square",
+        "colour": "pink"
+       },
+       {
+        "shape": "star",
+        "colour": "pink"
+       },
+       {
+        "shape": "triangle",
+        "colour": "pink"
+       },
+       {
+        "shape": "square",
+        "colour": "pink"
+       },
+       {
+        "shape": "star",
+        "colour": "pink"
+       },
+       {
+        "shape": "triangle",
+        "colour": "pink"
+       }
+      ]
+     }
+    },
+    {
+     "label": "C",
+     "widget": "pattern",
+     "props": {
+      "items": [
+       {
+        "shape": "heart",
+        "colour": "green"
+       },
+       {
+        "shape": "heart",
+        "colour": "green"
+       },
+       {
+        "shape": "square",
+        "colour": "green"
+       },
+       {
+        "shape": "heart",
+        "colour": "green"
+       },
+       {
+        "shape": "heart",
+        "colour": "green"
+       },
+       {
+        "shape": "square",
+        "colour": "green"
+       }
+      ]
+     }
+    },
+    {
+     "label": "D",
+     "widget": "pattern",
+     "props": {
+      "items": [
+       {
+        "shape": "arrow",
+        "colour": "purple"
+       },
+       {
+        "shape": "arrow",
+        "colour": "purple",
+        "rotate": 90
+       },
+       {
+        "shape": "arrow",
+        "colour": "purple",
+        "rotate": 180
+       },
+       {
+        "shape": "arrow",
+        "colour": "purple",
+        "rotate": 270
+       },
+       {
+        "shape": "arrow",
+        "colour": "purple"
+       },
+       {
+        "shape": "arrow",
+        "colour": "purple",
+        "rotate": 90
+       }
+      ]
+     }
+    }
+   ],
+   "reveal": [
+    "A: the only one where just the colour changes.",
+    "B: the only one with 3 different shapes.",
+    "C: the only one with the same shape twice in a row.",
+    "D: the only one that turns."
+   ],
+   "followUp": "Every one can be the odd one out! Which reason did you spot first?"
+  },
+  {
+   "type": "athome",
+   "title": "Pasta patterns",
+   "need": [
+    "2 or 3 kinds of dried pasta",
+    "String or a shoelace"
+   ],
+   "steps": [
+    "Thread a repeating pattern.",
+    "Ask your crew mate what comes next.",
+    "Make a pattern with turns, using your hand."
+   ],
+   "why": "A pattern repeats the same chunk again and again."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "How do you know what comes next in a pattern?"
+   ]
+  }
+ ]
+}

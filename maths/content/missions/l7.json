@@ -1,0 +1,272 @@
+{
+  "id": "l7",
+  "sector": "launchpad",
+  "title": "The Equals Sign",
+  "tagline": "Balance the scales and find missing numbers",
+  "covers": [
+    "Y1-AS-1",
+    "Y1-AS-4",
+    "1AS–2"
+  ],
+  "patch": {
+    "name": "The Equals Sign",
+    "icon": "scales"
+  },
+  "dadNotes": [
+    "Read '=' as 'is the same as'. Avoid 'makes' or 'the answer is'.",
+    "Missing numbers: use the inverse. 7 = ? − 9, so ? = 7 + 9."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "A balance scale.",
+        "3 + 4 on one side. 7 on the other."
+      ],
+      "question": "Why is it level?",
+      "widget": "balance",
+      "props": {
+        "left": "3 + 4",
+        "right": "7"
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you used the equals sign at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "Take away the supports. Which side goes down?",
+      "options": [
+        "The 6 + 3 side",
+        "The 10 side",
+        "Neither: it stays level"
+      ],
+      "answer": 1,
+      "reveal": [
+        "6 + 3 is 9.",
+        "9 is less than 10.",
+        "The 10 side goes down."
+      ],
+      "widget": "balance",
+      "props": {
+        "left": "6 + 3",
+        "right": "10",
+        "hold": true
+      },
+      "revealProps": {
+        "hold": false
+      }
+    },
+    {
+      "type": "try",
+      "widget": "balance",
+      "props": {
+        "left": "? + 4",
+        "right": "9"
+      },
+      "script": [
+        {
+          "say": [
+            "The scales are level.",
+            "What number is hiding?"
+          ],
+          "caption": "? + 4 = 9",
+          "input": "choice",
+          "options": [
+            4,
+            5,
+            13
+          ],
+          "answer": 5,
+          "then": [
+            "5 + 4 = 9.",
+            "Both sides are the same."
+          ]
+        },
+        {
+          "set": {
+            "left": "7",
+            "right": "? − 9"
+          },
+          "caption": "7 = ? − 9",
+          "say": [
+            "Now the equals sign comes first.",
+            "7 is the same as ? − 9."
+          ],
+          "input": "numpad",
+          "answer": 16,
+          "hint": [
+            "Think: 7 + 9 = ?"
+          ],
+          "then": [
+            "16 − 9 = 7.",
+            "7 is equal to 16 minus 9."
+          ]
+        },
+        {
+          "set": {
+            "left": "8",
+            "right": "8"
+          },
+          "caption": "8 = 8",
+          "say": [
+            "Is 8 = 8 true?"
+          ],
+          "input": "choice",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": "True",
+          "then": [
+            "Yes! 8 is the same as 8.",
+            "Equals means 'is the same as'."
+          ]
+        },
+        {
+          "set": {
+            "left": "3 + 4",
+            "right": "5 + 2"
+          },
+          "caption": "3 + 4 = 5 + 2",
+          "say": [
+            "Is this true?"
+          ],
+          "input": "choice",
+          "options": [
+            "True",
+            "False"
+          ],
+          "answer": "True",
+          "then": [
+            "Both sides make 7.",
+            "We can have sums on both sides."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "balance",
+      "props": {
+        "left": "9 + ?",
+        "right": "6 + 8"
+      },
+      "script": [
+        {
+          "say": [
+            "Both sides must be the same.",
+            "What is hiding?"
+          ],
+          "caption": "9 + ? = 6 + 8",
+          "input": "numpad",
+          "answer": 5,
+          "hint": [
+            "6 + 8 = 14.",
+            "9 + ? = 14."
+          ],
+          "then": [
+            "9 + 5 = 14 and 6 + 8 = 14."
+          ]
+        },
+        {
+          "set": {
+            "left": "15 − ?",
+            "right": "4 + 4"
+          },
+          "caption": "15 − ? = 4 + 4",
+          "say": [
+            "Now this one."
+          ],
+          "input": "numpad",
+          "answer": 7,
+          "hint": [
+            "4 + 4 = 8.",
+            "15 − ? = 8."
+          ],
+          "then": [
+            "15 − 7 = 8 and 4 + 4 = 8."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "addsub.equalsTrueFalse",
+        "addsub.missingNumber"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "True or false? And find the hiding numbers."
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [
+        {
+          "label": "8 = 8"
+        },
+        {
+          "label": "10 − 2 = 8"
+        },
+        {
+          "label": "4 + 4 = 6 + 2"
+        },
+        {
+          "label": "8 = 5 + 3"
+        }
+      ],
+      "reveal": [
+        "Every one can be the odd one out. And all 4 are true!",
+        "8 = 8 has no adding. 10 − 2 has a minus.",
+        "4 + 4 = 6 + 2 has no 8 in it.",
+        "8 = 5 + 3 uses odd numbers."
+      ],
+      "followUp": "Can you make up a true one with 8 on both sides?"
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} found the hiding number.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "3 + 4 = ? + 2",
+        "3 + 4 is 7.",
+        "So ? = 7.",
+        "3 + 4 = 7 + 2"
+      ],
+      "wrong": 2,
+      "fix": [
+        "7 + 2 is 9, not 7.",
+        "Both sides must be the same, so ? is 5.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What does the equals sign mean?"
+      ]
+    }
+  ]
+}

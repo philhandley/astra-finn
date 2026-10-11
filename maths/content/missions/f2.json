@@ -1,0 +1,281 @@
+{
+ "id": "f2",
+ "sector": "fractions",
+ "title": "Quarters",
+ "tagline": "Quarters, two quarters and three quarters",
+ "covers": [
+  "Y1-F-2",
+  "Y2-F-1",
+  "Y2-F-2"
+ ],
+ "patch": {
+  "name": "Quarters",
+  "icon": "fraction"
+ },
+ "dadNotes": [
+  "Two quarters is the same as one half. Glue makes that visible.",
+  "3/4 is the first fraction Finn meets that is more than 'one of' something."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "A space pizza cut into 4 equal slices.",
+    "Each slice is a quarter."
+   ],
+   "widget": "fractions",
+   "props": {
+    "readonly": true,
+    "shape": "circle",
+    "parts": 4,
+    "labels": true
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Do you know about quarters?"
+  },
+  {
+   "type": "guess",
+   "prompt": "3 slices are eaten. How much of the pizza is that?",
+   "options": [
+    "1/4",
+    "2/4",
+    "3/4"
+   ],
+   "answer": 2,
+   "reveal": [
+    "3/4.",
+    "3 of the 4 equal slices."
+   ],
+   "widget": "fractions",
+   "props": {
+    "readonly": true,
+    "shape": "circle",
+    "parts": 4,
+    "shaded": 3
+   }
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "square",
+    "parts": 4,
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "Colour 1/4 of the square."
+     ],
+     "goal": {
+      "shaded": 1
+     },
+     "then": [
+      "1 of 4 equal parts."
+     ]
+    },
+    {
+     "say": [
+      "Now make it 2/4."
+     ],
+     "goal": {
+      "shaded": 2
+     },
+     "then": [
+      "2 of 4 equal parts is 2/4."
+     ]
+    },
+    {
+     "say": [
+      "Is 2/4 the same as 1/2?",
+      "Look at the square."
+     ],
+     "input": "choice",
+     "options": [
+      "Yes",
+      "No"
+     ],
+     "answer": "Yes",
+     "then": [
+      "2 quarters fill half the square."
+     ]
+    },
+    {
+     "say": [
+      "Now make it 3/4."
+     ],
+     "goal": {
+      "shaded": 3
+     },
+     "then": [
+      "3/4 is coloured.",
+      "Only 1/4 is left."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "square",
+    "parts": 4,
+    "shadedIdx": [
+     0,
+     2
+    ],
+    "labels": true,
+    "tools": [
+     "glue",
+     "2"
+    ]
+   },
+   "script": [
+    {
+     "say": [
+      "2/4 is coloured.",
+      "Tap Glue."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "Now it is {fraction}.",
+      "2/4 is the same as 1/2!"
+     ]
+    },
+    {
+     "say": [
+      "Smash it with the 2 again."
+     ],
+     "goal": {
+      "parts": 4
+     },
+     "then": [
+      "Back to {fraction}.",
+      "Same amount, more pieces."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "set",
+    "setSize": 8,
+    "parts": 4,
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "8 dots in 4 equal groups.",
+      "Colour 1/4 of them."
+     ],
+     "goal": {
+      "shaded": 1
+     },
+     "then": [
+      "1/4 of 8 is 2."
+     ]
+    },
+    {
+     "say": [
+      "Now colour 3/4."
+     ],
+     "goal": {
+      "shaded": 3
+     },
+     "then": [
+      "3/4 of 8 is 6."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "fractions.nameFraction",
+    "fractions.shadeFraction"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    5,
+    6,
+    7
+   ],
+   "intro": [
+    "Your turn.",
+    "Count the equal parts."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "fractions.equivalence",
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    5
+   ],
+   "intro": [
+    "Is 2/4 the same as 1/2?"
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} found 3/4 of 8.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "3/4 of 8",
+    "8 in 4 equal groups is 2 each.",
+    "3/4 is 3 groups.",
+    "3 groups of 2 is 8."
+   ],
+   "wrong": 3,
+   "fix": [
+    "3 groups of 2 is 6, not 8.",
+    "3/4 of 8 is 6.",
+    "What would you tell {engineer}?"
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Quarter the sandwich",
+   "need": [
+    "A sandwich or toast",
+    "A grown-up with a knife"
+   ],
+   "steps": [
+    "Cut it into 4 equal parts.",
+    "Eat 1 part. What fraction is left?",
+    "Can you cut quarters a different way?"
+   ],
+   "why": "Quarters are 4 equal parts. 3/4 is left after you eat 1/4."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Why is 2/4 the same as 1/2?"
+   ]
+  }
+ ]
+}

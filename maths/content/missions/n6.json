@@ -1,0 +1,84 @@
+{
+  "id": "n6",
+  "sector": "number",
+  "title": "Partition Lab",
+  "tagline": "Split numbers in more than one way",
+  "covers": ["Y2-NPV-6", "2NPV–1"],
+  "patch": { "name": "Partition Lab", "icon": "blocks" },
+  "dadNotes": [
+    "68 = 60 + 8 = 50 + 18 = 40 + 28. All the same number, split different ways.",
+    "Ask: 'Can you make it with one fewer ten?' Then: 'How many ones do you need now?'",
+    "Splitting like this is what makes 45 + 23 or 63 − 17 easier later."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["This is 68.", "68 = 60 + 8.", "That's the tens and the ones."],
+      "widget": "placevalue",
+      "props": { "tens": 6, "ones": 8, "showExpanded": true, "interactive": false }
+    },
+    { "type": "ask", "text": "Have you split numbers into tens and ones at school?" },
+    {
+      "type": "guess",
+      "prompt": "Can you make 68 with only 5 tens?",
+      "options": ["Yes", "No"],
+      "answer": 0,
+      "reveal": ["Yes! 5 tens and 18 ones.", "68 = 50 + 18."],
+      "widget": "placevalue",
+      "props": { "tens": 5, "ones": 0, "interactive": false },
+      "revealProps": { "ones": 18, "showExpanded": true, "showValue": true }
+    },
+    {
+      "type": "try",
+      "widget": "placevalue",
+      "props": { "tens": 6, "ones": 8, "showExpanded": true, "showValue": true },
+      "script": [
+        { "say": ["This is 68.", "Tap a ten.", "Swap it for 10 ones."], "goal": { "tens": 5, "ones": 18 }, "then": ["{tens} tens and {ones} ones.", "68 = 50 + 18."], "hint": ["Tap a gold rod.", "Then tap the swap button."] },
+        { "say": ["Do it again!"], "goal": { "tens": 4, "ones": 28 }, "then": ["68 = 40 + 28.", "Still {value}!"] },
+        { "say": ["Make 68 with just 3 tens."], "goal": { "tens": 3, "ones": 38 }, "then": ["68 = 30 + 38.", "Lots of ways to make 68!"] },
+        { "set": { "tens": 4, "ones": 7 }, "say": ["Here is 47.", "Make it with 3 tens."], "goal": { "tens": 3, "value": 47 }, "then": ["47 = 30 + 17."] },
+        { "caption": "47 = 20 + ?", "say": ["Now think it.", "What goes with 20 to make 47?"], "input": "numpad", "answer": 27, "then": ["47 = 20 + 27."], "hint": ["Imagine one more ten as ones."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": ["number.partition", "number.placeValueProblem"],
+      "levels": [1, 2, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn, {commander}.", "Split numbers and solve puzzles."]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [{ "label": "25" }, { "label": "52" }, { "label": "50" }, { "label": "15" }],
+      "reveal": ["Every one can be the odd one out!", "52 is the only one not in the 5s. 50 has no ones.", "15 is the only one under 20.", "25 has the same digits as 52."],
+      "followUp": "Can you find a reason for every single one?"
+    },
+    {
+      "type": "question",
+      "tiers": [2, 3],
+      "format": "wyr",
+      "title": "Would you rather?",
+      "prompt": "Would you rather have 6 tens or 58 ones of moon gold?",
+      "options": [
+        { "label": "6 tens", "widget": "placevalue", "props": { "tens": 6, "ones": 0, "interactive": false } },
+        { "label": "58 ones", "widget": "placevalue", "props": { "tens": 0, "ones": 58, "interactive": false } }
+      ],
+      "reveal": ["6 tens is 60. That's 2 more than 58.", "58 ones would take ages to count!", "But ones are easy to share out."],
+      "followUp": "What would change your mind?"
+    },
+    {
+      "type": "athome",
+      "title": "Coin split",
+      "need": ["Some 10p and 1p coins, or pasta and cups"],
+      "steps": ["Make 35p with 10p and 1p coins.", "Now make 35p a different way.", "How many ways can you find?"],
+      "why": "Splitting numbers different ways helps with adding and taking away."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "Can you split 47 in 2 different ways?"]
+    }
+  ]
+}

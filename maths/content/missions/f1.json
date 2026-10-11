@@ -1,0 +1,301 @@
+{
+ "id": "f1",
+ "sector": "fractions",
+ "title": "Equal Parts",
+ "tagline": "Smash shapes into equal parts",
+ "covers": [
+  "Y1-F-1",
+  "Y2-F-1"
+ ],
+ "patch": {
+  "name": "Equal Parts",
+  "icon": "fraction"
+ },
+ "dadNotes": [
+  "Equal matters more than shape: halves of a square can be rectangles or triangles.",
+  "Ask 'how do you know they are equal?' more than 'what is it called?'"
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Two pilots share a fuel bar.",
+    "One piece is much bigger."
+   ],
+   "question": "Is that fair?",
+   "widget": "fractions",
+   "props": {
+    "readonly": true,
+    "shape": "bar",
+    "parts": 2,
+    "unequal": true
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Have you learned about equal parts at school?"
+  },
+  {
+   "type": "guess",
+   "prompt": "Is this circle cut into halves?",
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "answer": 1,
+   "reveal": [
+    "No.",
+    "The cut misses the middle, so the parts are not equal."
+   ],
+   "widget": "fractions",
+   "props": {
+    "readonly": true,
+    "shape": "circle",
+    "parts": 2,
+    "unequal": true
+   }
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "rect",
+    "parts": 1,
+    "tools": [
+     "2",
+     "4",
+     "glue"
+    ],
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "Smash the rectangle into 2 equal parts."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "2 equal parts.",
+      "Each one is 1/2."
+     ]
+    },
+    {
+     "say": [
+      "Colour 1/2."
+     ],
+     "goal": {
+      "shaded": 1
+     },
+     "then": [
+      "1 of 2 equal parts is 1/2."
+     ]
+    },
+    {
+     "say": [
+      "Smash it into 4 equal parts."
+     ],
+     "goal": {
+      "parts": 4
+     },
+     "then": [
+      "Now each part is 1/4.",
+      "Your half became {shaded} quarters."
+     ]
+    },
+    {
+     "say": [
+      "Glue them back into halves."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "{fraction} is coloured again."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "bar",
+    "parts": 1,
+    "tools": [
+     "2"
+    ],
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "This strip is 10 cm long.",
+      "Smash it in half."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "Each half is 5 cm.",
+      "Half of 10 cm is 5 cm."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "fractions",
+   "props": {
+    "shape": "set",
+    "setSize": 6,
+    "parts": 1,
+    "tools": [
+     "2"
+    ],
+    "labels": true
+   },
+   "script": [
+    {
+     "say": [
+      "6 crystals.",
+      "Smash them into 2 equal groups."
+     ],
+     "goal": {
+      "parts": 2
+     },
+     "then": [
+      "3 in each group.",
+      "Half of 6 is 3."
+     ]
+    },
+    {
+     "caption": "1/2 of 6 = 3",
+     "say": [
+      "We write it like this.",
+      "1/2 of 6 = 3."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "practise",
+   "gen": [
+    "fractions.isEqualParts",
+    "fractions.shadeFraction"
+   ],
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    5,
+    6,
+    7
+   ],
+   "intro": [
+    "Your turn.",
+    "Equal parts only!"
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "fractions.fractionOfLength",
+   "levels": [
+    1,
+    2,
+    2
+   ],
+   "items": [
+    4,
+    5,
+    5
+   ],
+   "intro": [
+    "Halves and quarters of a strip."
+   ]
+  },
+  {
+   "type": "question",
+   "format": "wodb",
+   "title": "Which one doesn't belong?",
+   "prompt": "Pick one. Then say why.",
+   "options": [
+    {
+     "label": "A",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "rect",
+      "parts": 2,
+      "shaded": 1
+     }
+    },
+    {
+     "label": "B",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "circle",
+      "parts": 2,
+      "shaded": 1
+     }
+    },
+    {
+     "label": "C",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "square",
+      "parts": 2,
+      "unequal": true,
+      "shaded": 1
+     }
+    },
+    {
+     "label": "D",
+     "widget": "fractions",
+     "props": {
+      "readonly": true,
+      "shape": "square",
+      "parts": 4,
+      "shaded": 2
+     }
+    }
+   ],
+   "reveal": [
+    "Every one can be the odd one out!",
+    "A is the only rectangle. B is the only circle.",
+    "C has parts that are not equal. D has 4 parts."
+   ],
+   "followUp": "Can you find a reason for every single one?"
+  },
+  {
+   "type": "athome",
+   "title": "Fold it fair",
+   "need": [
+    "A sheet of paper",
+    "Scissors, with a grown-up"
+   ],
+   "steps": [
+    "Fold the paper in half. Do the edges match?",
+    "Fold again. How many parts now?",
+    "Cut along the folds. Are the parts the same?"
+   ],
+   "why": "Equal parts match exactly when you fold them."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Is a half always the same size?"
+   ]
+  }
+ ]
+}

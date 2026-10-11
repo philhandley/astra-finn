@@ -1,0 +1,255 @@
+{
+ "id": "a3",
+ "sector": "blaster",
+ "title": "The 2 Times Table",
+ "tagline": "Pairs, doubles and counting in 2s",
+ "covers": [
+  "Y2-MD-1"
+ ],
+ "patch": {
+  "name": "The 2s",
+  "icon": "blaster"
+ },
+ "dadNotes": [
+  "Every answer in the 2 times table is even. Doubling is the same as × 2.",
+  "Count in 2s out loud together, then try it backwards from 20."
+ ],
+ "steps": [
+  {
+   "type": "look",
+   "lines": [
+    "Six astronauts step out of the rocket.",
+    "Each one has 2 boots."
+   ],
+   "question": "How many boots?",
+   "widget": "objects",
+   "props": {
+    "n": 6,
+    "icon": "astronaut",
+    "arrange": "row"
+   }
+  },
+  {
+   "type": "ask",
+   "text": "Do you know the 2 times table?"
+  },
+  {
+   "type": "guess",
+   "prompt": "How many boots do 10 astronauts have?",
+   "options": [
+    "About 10",
+    "About 20",
+    "About 50"
+   ],
+   "answer": 1,
+   "reveal": [
+    "20 boots.",
+    "10 × 2 = 20."
+   ],
+   "widget": "objects",
+   "props": {
+    "n": 10,
+    "icon": "astronaut",
+    "arrange": "rows",
+    "perRow": 5
+   }
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 2,
+    "rows": 0,
+    "lockSize": true,
+    "highlightRows": true,
+    "maxRows": 10
+   },
+   "script": [
+    {
+     "say": [
+      "Each blast is a pair of boots.",
+      "Blast 3 times."
+     ],
+     "goal": {
+      "rows": 3
+     },
+     "then": [
+      "3 pairs. Count in 2s: 2, 4, 6."
+     ]
+    },
+    {
+     "say": [
+      "Keep blasting to 6 pairs."
+     ],
+     "goal": {
+      "rows": 6
+     },
+     "then": [
+      "6 × 2 = {total}."
+     ]
+    },
+    {
+     "say": [
+      "Blast all the way to 10 pairs."
+     ],
+     "goal": {
+      "rows": 10
+     },
+     "then": [
+      "10 × 2 = {total}."
+     ]
+    },
+    {
+     "say": [
+      "Count in 2s together.",
+      "2, 4, 6, 8, 10, 12, 14, 16, 18, 20."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "try",
+   "widget": "blaster",
+   "props": {
+    "size": 1,
+    "rows": 0,
+    "maxRows": 4,
+    "highlightRows": true
+   },
+   "script": [
+    {
+     "say": [
+      "Doubles are 2 rows the same.",
+      "Set the blaster to 7. Blast twice."
+     ],
+     "goal": {
+      "size": 7,
+      "rows": 2
+     },
+     "then": [
+      "2 rows of 7 is double 7.",
+      "Double 7 is {total}."
+     ]
+    },
+    {
+     "set": {
+      "rows": 0
+     },
+     "say": [
+      "What is double 8?",
+      "Use the blaster if you like."
+     ],
+     "input": "numpad",
+     "answer": "16",
+     "then": [
+      "Double 8 is 16.",
+      "2 × 8 = 16."
+     ]
+    }
+   ]
+  },
+  {
+   "type": "look",
+   "lines": [
+    "Every answer in the 2 times table is even.",
+    "Even numbers end in 0, 2, 4, 6 or 8."
+   ],
+   "widget": "objects",
+   "props": {
+    "n": 10,
+    "arrange": "groups",
+    "groups": [
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "icon": "dot"
+   }
+  },
+  {
+   "type": "practise",
+   "gen": "muldiv.times2",
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    6,
+    7,
+    8
+   ],
+   "intro": [
+    "Quick fire 2s!",
+    "Use the picture if you need it."
+   ]
+  },
+  {
+   "type": "practise",
+   "tiers": [
+    2,
+    3
+   ],
+   "gen": "muldiv.countInMultiples",
+   "params": {
+    "tables": [
+     2
+    ]
+   },
+   "levels": [
+    1,
+    2,
+    3
+   ],
+   "items": [
+    4,
+    5,
+    6
+   ],
+   "intro": [
+    "Count in 2s, forwards and back."
+   ]
+  },
+  {
+   "type": "error",
+   "intro": [
+    "{engineer} counted in 2s.",
+    "Can you spot the slip?"
+   ],
+   "lines": [
+    "7 × 2",
+    "Count in 2s: 2, 4, 6, 8",
+    "10, 12, 15",
+    "So 7 × 2 = 15"
+   ],
+   "wrong": 2,
+   "fix": [
+    "After 12 comes 14, not 15.",
+    "7 × 2 = 14.",
+    "What would you tell {engineer}?"
+   ]
+  },
+  {
+   "type": "athome",
+   "title": "Sock pairs",
+   "need": [
+    "A pile of clean socks"
+   ],
+   "steps": [
+    "Match the socks into pairs.",
+    "Count the socks in 2s.",
+    "How many pairs? How many socks?"
+   ],
+   "why": "Pairs are groups of 2. Counting in 2s is the 2 times table."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "What was your favourite part?",
+    "Why are all the answers in the 2 times table even?"
+   ]
+  }
+ ]
+}

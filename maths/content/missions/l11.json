@@ -1,0 +1,316 @@
+{
+  "id": "l11",
+  "sector": "launchpad",
+  "title": "Longer, Heavier, Fuller",
+  "tagline": "Compare and measure length, weight and capacity",
+  "covers": [
+    "Y1-M-1",
+    "Y1-M-2"
+  ],
+  "patch": {
+    "name": "Longer, Heavier, Fuller",
+    "icon": "scales"
+  },
+  "dadNotes": [
+    "Use the pairs of words: longer and shorter, taller and shorter, heavier and lighter, more and less.",
+    "Line things up at one end before comparing lengths. That is what makes it fair.",
+    "In Year 1, mass and weight mean the same thing, and so do capacity and volume."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "A rocket and an astronaut.",
+        "One is much taller."
+      ],
+      "question": "Which is taller? How do you know?",
+      "widget": "measure",
+      "props": {
+        "tool": "compare",
+        "kind": "height",
+        "a": 6,
+        "b": 3,
+        "icons": [
+          "rocket",
+          "astronaut"
+        ]
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you compared longer and shorter at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "How many cubes long is the worm?",
+      "widget": "measure",
+      "props": {
+        "tool": "compare",
+        "kind": "length",
+        "a": 7,
+        "icons": [
+          "worm"
+        ]
+      },
+      "options": [
+        "About 3",
+        "About 7",
+        "About 15"
+      ],
+      "answer": 1,
+      "revealProps": {
+        "cubes": true
+      },
+      "reveal": [
+        "7 cubes long.",
+        "We measured it with cubes."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "measure",
+      "props": {
+        "tool": "compare",
+        "kind": "length",
+        "a": 7,
+        "b": 4,
+        "icons": [
+          "worm",
+          "pencil"
+        ],
+        "cubes": true,
+        "interactive": false
+      },
+      "script": [
+        {
+          "say": [
+            "The worm and the pencil start at the same line."
+          ]
+        },
+        {
+          "say": [
+            "Which is longer?"
+          ],
+          "input": "choice",
+          "options": [
+            "worm",
+            "pencil"
+          ],
+          "answer": "worm",
+          "then": [
+            "The worm is longer.",
+            "The pencil is shorter."
+          ]
+        },
+        {
+          "say": [
+            "How many cubes long is the pencil?"
+          ],
+          "input": "numpad",
+          "answer": 4,
+          "unit": "cubes",
+          "then": [
+            "4 cubes. The worm is 7 cubes."
+          ]
+        },
+        {
+          "say": [
+            "How many cubes longer is the worm?"
+          ],
+          "input": "numpad",
+          "answer": 3,
+          "unit": "cubes",
+          "hint": [
+            "Count on from 4 to 7."
+          ],
+          "then": [
+            "7 is 3 more than 4.",
+            "The worm is 3 cubes longer."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "measure",
+      "props": {
+        "tool": "compare",
+        "kind": "mass",
+        "a": 5,
+        "b": 1,
+        "icons": [
+          "asteroid"
+        ],
+        "cubes": true
+      },
+      "script": [
+        {
+          "say": [
+            "This is a balance.",
+            "The heavier side goes down."
+          ]
+        },
+        {
+          "say": [
+            "Which side is heavier now?"
+          ],
+          "input": "choice",
+          "options": [
+            "the rock",
+            "the cubes"
+          ],
+          "answer": "the rock",
+          "then": [
+            "The rock side is down.",
+            "The rock is heavier than 1 cube."
+          ]
+        },
+        {
+          "say": [
+            "Tap + to add cubes.",
+            "Make the balance level."
+          ],
+          "goal": {
+            "b": 5
+          },
+          "hint": [
+            "Add 1 cube at a time.",
+            "Stop when both sides are level."
+          ],
+          "then": [
+            "Level! The rock weighs the same as {b} cubes."
+          ]
+        },
+        {
+          "say": [
+            "Add 1 more cube."
+          ],
+          "goal": {
+            "b": 6
+          },
+          "then": [
+            "Now the cubes are heavier.",
+            "The rock is lighter."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "look",
+      "lines": [
+        "Tank A is full.",
+        "Tank B is half full."
+      ],
+      "question": "What would an empty tank look like?",
+      "widget": "measure",
+      "props": {
+        "tool": "compare",
+        "kind": "capacity",
+        "a": 10,
+        "b": 5,
+        "max": 10
+      }
+    },
+    {
+      "type": "practise",
+      "gen": "measure.compareY1",
+      "levels": [
+        1,
+        2,
+        2
+      ],
+      "items": [
+        6,
+        6,
+        6
+      ],
+      "intro": [
+        "Your turn. Longer, taller, heavier, fuller."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": "measure.compareY1",
+      "levels": [
+        3,
+        3,
+        3
+      ],
+      "items": [
+        3,
+        4,
+        5
+      ],
+      "intro": [
+        "Now measure with cubes."
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "time.quickerSlower",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        3,
+        4,
+        4
+      ],
+      "intro": [
+        "Time can be compared too.",
+        "Quicker, slower, earlier, later."
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Would you rather...?",
+      "prompt": "Would you rather have the tall thin glass of juice or the short wide one?",
+      "options": [
+        {
+          "label": "Tall and thin",
+          "art": "rocket",
+          "detail": "It looks higher"
+        },
+        {
+          "label": "Short and wide",
+          "art": "ufo",
+          "detail": "It looks fatter"
+        }
+      ],
+      "reveal": [
+        "Some people pick tall because the juice comes up higher.",
+        "Some pick wide because there is more room across.",
+        "To check, pour one into the other glass!"
+      ],
+      "followUp": "What would change your mind?"
+    },
+    {
+      "type": "athome",
+      "title": "Shoe line-up",
+      "need": [
+        "Shoes from the hall",
+        "Lego bricks or spoons"
+      ],
+      "steps": [
+        "Line the shoes up at the heel.",
+        "Which is longest? Which is shortest?",
+        "Measure one shoe in bricks."
+      ],
+      "why": "Starting at the same line makes comparing fair."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How can you tell which is heavier without scales?"
+      ]
+    }
+  ]
+}

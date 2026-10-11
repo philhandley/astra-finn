@@ -1,0 +1,288 @@
+{
+  "id": "m4",
+  "sector": "measure",
+  "title": "Coins and Notes",
+  "tagline": "Pounds and pence, and making amounts",
+  "covers": [
+    "Y1-M-3",
+    "Y2-M-3",
+    "Y2-M-4"
+  ],
+  "patch": {
+    "name": "Coins and Notes",
+    "icon": "coin"
+  },
+  "dadNotes": [
+    "Count the biggest coins first, then count on.",
+    "£ means pounds and p means pence. 100p is the same as £1.",
+    "There is nearly always another way to make an amount. Ask: can you do it with fewer coins?"
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "These are all the UK coins.",
+        "Pence coins and pound coins."
+      ],
+      "question": "Which one is worth the most?",
+      "widget": "coins",
+      "props": {
+        "purse": [
+          "1p",
+          "2p",
+          "5p",
+          "10p",
+          "20p",
+          "50p",
+          "£1",
+          "£2"
+        ]
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you counted money at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "About how much is in the purse?",
+      "widget": "coins",
+      "props": {
+        "purse": [
+          "20p",
+          "20p",
+          "10p",
+          "5p",
+          "2p"
+        ]
+      },
+      "options": [
+        "About 10p",
+        "About 50p",
+        "About £5"
+      ],
+      "answer": 1,
+      "revealProps": {
+        "showTotal": true
+      },
+      "reveal": [
+        "57p.",
+        "20, 40, 50, 55, 57."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "coins",
+      "props": {
+        "tray": [
+          "1p",
+          "2p",
+          "5p",
+          "10p",
+          "20p",
+          "50p",
+          "£1",
+          "£2"
+        ],
+        "purse": [],
+        "showTotal": true
+      },
+      "script": [
+        {
+          "say": [
+            "Make 30p.",
+            "Tap coins to put them in the purse."
+          ],
+          "goal": {
+            "total": 30
+          },
+          "hint": [
+            "Start with a 20p coin.",
+            "Tap a coin in the purse to take it out."
+          ],
+          "then": [
+            "You made 30p with {count} coins."
+          ]
+        },
+        {
+          "set": {
+            "purse": []
+          },
+          "say": [
+            "Now make 30p with exactly 3 coins."
+          ],
+          "goal": {
+            "total": 30,
+            "count": 3
+          },
+          "hint": [
+            "Try 3 coins that are all the same."
+          ],
+          "then": [
+            "{items} make 30p too."
+          ]
+        },
+        {
+          "set": {
+            "purse": []
+          },
+          "say": [
+            "Make 30p with just 2 coins."
+          ],
+          "goal": {
+            "total": 30,
+            "count": 2
+          },
+          "then": [
+            "Same amount, different coins!"
+          ]
+        },
+        {
+          "set": {
+            "purse": [],
+            "showTotal": false
+          },
+          "say": [
+            "Make 75p.",
+            "No total this time. Count carefully."
+          ],
+          "goal": {
+            "total": 75
+          },
+          "hint": [
+            "50p first. Then 20p. Then 5p."
+          ],
+          "then": [
+            "75p! Biggest coins first is quickest."
+          ]
+        },
+        {
+          "set": {
+            "purse": [],
+            "showTotal": true
+          },
+          "say": [
+            "Pounds next. Make £3."
+          ],
+          "goal": {
+            "total": 300
+          },
+          "then": [
+            "£3 is the same as 300p.",
+            "You used {count} coins."
+          ]
+        },
+        {
+          "set": {
+            "tray": [
+              "£1",
+              "£2",
+              "£5",
+              "£10",
+              "£20"
+            ],
+            "purse": []
+          },
+          "say": [
+            "Notes are for bigger amounts.",
+            "Make £15."
+          ],
+          "goal": {
+            "total": 1500
+          },
+          "then": [
+            "£10 and £5 make £15."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Would you rather...?",
+      "prompt": "Would you rather have 5 coins or 2 coins?",
+      "options": [
+        {
+          "label": "5 coins",
+          "detail": "You can't see which ones!"
+        },
+        {
+          "label": "2 coins",
+          "detail": "You can't see which ones!"
+        }
+      ],
+      "reveal": [
+        "It depends which coins!",
+        "5 coins could be just 5p. 2 coins could be £4.",
+        "But 5 coins could be £10, and 2 coins just 2p."
+      ],
+      "followUp": "What is the most 2 coins can be worth? And the least?"
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "money.countCoins",
+        "money.makeAmount",
+        "money.sameAmountDifferentWays"
+      ],
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Count, make and swap."
+      ]
+    },
+    {
+      "type": "practise",
+      "tiers": [
+        2,
+        3
+      ],
+      "gen": [
+        "money.poundsPence",
+        "money.compareAmounts",
+        "money.coinValue"
+      ],
+      "levels": [
+        2,
+        2,
+        3
+      ],
+      "items": [
+        4,
+        4,
+        5
+      ],
+      "intro": [
+        "Pounds and pence. Which is more?"
+      ]
+    },
+    {
+      "type": "athome",
+      "title": "Coin hunt",
+      "need": [
+        "A handful of real coins"
+      ],
+      "steps": [
+        "Sort the coins by colour.",
+        "Count the total, biggest first.",
+        "Make 20p in 3 different ways."
+      ],
+      "why": "Real coins feel different. The shapes and colours stick."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "How many ways can you make 10p?"
+      ]
+    }
+  ]
+}

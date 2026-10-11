@@ -1,0 +1,77 @@
+{
+  "id": "n5",
+  "sector": "number",
+  "title": "Numbers in Words to 100",
+  "tagline": "Read and write numbers to 100",
+  "covers": ["Y2-NPV-5"],
+  "patch": { "name": "Number Words", "icon": "words" },
+  "dadNotes": [
+    "Teen means 1 ten and some ones (fourteen is 14). 'Ty' means tens (forty is 40).",
+    "A hyphen joins the tens and the ones: sixty-four is sixty and four.",
+    "Spelling to watch: forty (no u), eight, eighteen, eighty."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["Sixty-four is 64.", "It is made of sixty and four.", "The little line is a hyphen."],
+      "caption": "64",
+      "big": "sixty-four"
+    },
+    { "type": "ask", "text": "Have you written numbers in words at school?" },
+    {
+      "type": "guess",
+      "prompt": "Which word has more letters: sixty or sixteen?",
+      "options": ["sixty", "sixteen", "The same"],
+      "answer": 1,
+      "reveal": ["Sixteen has 7 letters. Sixty has 5.", "But sixty is the bigger number!"],
+      "art": "rocket"
+    },
+    {
+      "type": "try",
+      "widget": "placevalue",
+      "props": { "tens": 0, "ones": 0, "showDigits": true },
+      "script": [
+        { "caption": "sixty-four", "say": ["Build sixty-four.", "Sixty is how many tens?"], "goal": { "tens": 6 }, "then": ["Sixty is 6 tens."], "hint": ["Count in tens: ten, twenty, thirty..."] },
+        { "say": ["Now add four."], "goal": { "tens": 6, "ones": 4 }, "then": ["Sixty and four make sixty-four.", "We write {value}."] },
+        { "set": { "tens": 0, "ones": 0 }, "caption": "forty", "say": ["Build forty."], "goal": { "value": 40, "tens": 4, "ones": 0 }, "then": ["Forty is 4 tens.", "No extra ones."] },
+        { "set": { "tens": 0, "ones": 0 }, "caption": "fourteen", "say": ["Now build fourteen."], "goal": { "value": 14, "tens": 1, "ones": 4 }, "then": ["Fourteen is 1 ten and 4 ones.", "Forty and fourteen sound alike!"], "hint": ["Teen means 1 ten and some more."] },
+        { "set": { "tens": 0, "ones": 0 }, "caption": "seventy-three", "say": ["Build seventy-three."], "goal": { "value": 73, "tens": 7, "ones": 3 }, "then": ["Seventy-three is {value}."] },
+        { "caption": "", "say": ["Which words say 37?"], "input": "choice", "options": ["seventy-three", "thirty-seven", "seventeen"], "answer": "thirty-seven", "then": ["Thirty-seven: 3 tens and 7 ones."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "number.numberWords",
+      "levels": [2, 3, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn, {commander}.", "Words and digits."]
+    },
+    {
+      "type": "practise",
+      "tiers": [2, 3],
+      "gen": "number.numberWords",
+      "params": { "dir": "toDigits" },
+      "levels": [3, 3, 3],
+      "items": [3, 3, 4],
+      "intro": ["Type the words in digits."]
+    },
+    {
+      "type": "error",
+      "intro": ["{engineer} wrote these numbers in digits.", "Can you spot the slip?"],
+      "lines": ["Words into digits:", "sixty-two = 62", "fourteen = 40", "ninety = 90"],
+      "wrong": 2,
+      "fix": ["Fourteen is 14. Forty is 40.", "What would you tell {engineer}?"]
+    },
+    {
+      "type": "athome",
+      "title": "Number word hunt",
+      "need": ["A book, a comic or some food packets"],
+      "steps": ["Find a number written as a word.", "Write it in digits.", "Find the biggest one."],
+      "why": "Reading number words in real life makes them stick."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "How are fourteen and forty different?"]
+    }
+  ]
+}

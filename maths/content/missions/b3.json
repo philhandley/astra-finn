@@ -1,0 +1,271 @@
+{
+  "id": "b3",
+  "sector": "bonds",
+  "title": "Ones and Tens",
+  "tagline": "Add and subtract ones or tens",
+  "covers": [
+    "Y2-AS-3",
+    "2AS–3"
+  ],
+  "patch": {
+    "name": "Ones and Tens",
+    "icon": "blocks"
+  },
+  "dadNotes": [
+    "Use the one-digit fact: 4 + 3 = 7, so 40 + 30 = 70 and 45 + 30 = 75.",
+    "30 − 3: think 10 − 3 = 7, so 30 − 3 = 27.",
+    "Adding ones changes the ones. Adding tens changes the tens."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "64 and 3 more.",
+        "Gold rods are tens. Blue cubes are ones."
+      ],
+      "question": "Which blocks will change?",
+      "widget": "blocks",
+      "props": {
+        "a": 64,
+        "b": 3,
+        "op": "+",
+        "interactive": false
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you added tens and ones at school?"
+    },
+    {
+      "type": "try",
+      "widget": "blocks",
+      "props": {
+        "a": 64,
+        "b": 3,
+        "op": "+"
+      },
+      "script": [
+        {
+          "caption": "64 + 3 = ?",
+          "say": [
+            "64 + 3.",
+            "Tap Put together."
+          ],
+          "goal": {
+            "combined": true
+          },
+          "then": [
+            "{tens} tens and {ones} ones.",
+            "That is {value}."
+          ]
+        },
+        {
+          "say": [
+            "Which changed: the tens or the ones?"
+          ],
+          "input": "choice",
+          "options": [
+            "The tens",
+            "The ones"
+          ],
+          "answer": "The ones",
+          "then": [
+            "4 + 3 = 7.",
+            "So 64 + 3 = 67."
+          ]
+        },
+        {
+          "set": {
+            "a": 45,
+            "b": 30,
+            "op": "+"
+          },
+          "caption": "45 + 30 = ?",
+          "say": [
+            "Now 45 + 30.",
+            "Put them together."
+          ],
+          "goal": {
+            "combined": true
+          },
+          "then": [
+            "4 tens + 3 tens = 7 tens.",
+            "So 45 + 30 = {value}."
+          ]
+        },
+        {
+          "say": [
+            "4 plus 3 is equal to 7.",
+            "So 4 tens plus 3 tens is equal to 7 tens."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "blocks",
+      "props": {
+        "a": 30,
+        "b": 3,
+        "op": "-"
+      },
+      "script": [
+        {
+          "caption": "30 − 3 = ?",
+          "say": [
+            "30 − 3. There are no ones!",
+            "Swap a ten for 10 ones."
+          ],
+          "goal": {
+            "exchanged": 1
+          },
+          "hint": [
+            "Tap the Swap button."
+          ],
+          "then": [
+            "Now {tens} tens and {ones} ones."
+          ]
+        },
+        {
+          "say": [
+            "Tap 3 ones to subtract them."
+          ],
+          "goal": {
+            "taken": 3
+          },
+          "hint": [
+            "Tap the blue cubes."
+          ],
+          "then": [
+            "{tens} tens and {ones} ones are left.",
+            "30 − 3 = {value}."
+          ]
+        },
+        {
+          "say": [
+            "10 minus 3 is equal to 7.",
+            "So 30 minus 3 is equal to 27."
+          ]
+        },
+        {
+          "set": {
+            "a": 75,
+            "b": 30,
+            "op": "-"
+          },
+          "caption": "75 − 30 = ?",
+          "say": [
+            "75 − 30.",
+            "Subtract 3 tens."
+          ],
+          "goal": {
+            "taken": 30
+          },
+          "hint": [
+            "Tap 3 gold rods."
+          ],
+          "then": [
+            "7 tens − 3 tens = 4 tens.",
+            "75 − 30 = {value}."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "numberline",
+      "props": {
+        "min": 40,
+        "max": 60,
+        "mode": "hop",
+        "start": 47,
+        "hopSize": 1,
+        "labels": "all"
+      },
+      "script": [
+        {
+          "caption": "47 + 5 = ?",
+          "say": [
+            "47 + 5 on the number line.",
+            "Make 5 hops."
+          ],
+          "goal": {
+            "hops": 5
+          },
+          "then": [
+            "47 + 5 = {value}.",
+            "We went past 50."
+          ]
+        },
+        {
+          "set": {
+            "min": 40,
+            "max": 100,
+            "start": 47,
+            "hopSize": 10,
+            "labels": "tens"
+          },
+          "caption": "47 + 30 = ?",
+          "say": [
+            "Now hop on 3 tens.",
+            "Each hop is 10."
+          ],
+          "goal": {
+            "hops": 3
+          },
+          "then": [
+            "47 + 30 = {value}.",
+            "Only the tens changed."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "addsub.addOnesTens",
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Is it ones or tens that change?"
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} worked out 52 + 30.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "52 + 30",
+        "30 is 3 tens.",
+        "52 + 3 = 55",
+        "So 52 + 30 = 55"
+      ],
+      "wrong": 2,
+      "fix": [
+        "30 is 3 tens, not 3 ones.",
+        "52 + 30 = 82.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "When you add tens, what stays the same?"
+      ]
+    }
+  ]
+}

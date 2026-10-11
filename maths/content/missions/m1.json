@@ -1,0 +1,331 @@
+{
+  "id": "m1",
+  "sector": "measure",
+  "title": "Length",
+  "tagline": "Centimetres and metres with a ruler",
+  "covers": [
+    "Y2-M-1",
+    "Y2-M-2"
+  ],
+  "patch": {
+    "name": "Length",
+    "icon": "ruler"
+  },
+  "dadNotes": [
+    "Check the object starts at 0 on the ruler, not at the very end of the ruler.",
+    "cm for small things, m for big things. A metre is about one big stride.",
+    "When it does not start at 0, count the gaps (or take away), not the marks."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "This is a ruler.",
+        "It measures in centimetres. We write cm."
+      ],
+      "question": "Where does the pencil start?",
+      "widget": "measure",
+      "props": {
+        "tool": "ruler",
+        "max": 15,
+        "labels": 1,
+        "value": 9,
+        "object": "pencil"
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you measured with a ruler at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "How long do you think your hand is?",
+      "art": "astronaut",
+      "options": [
+        "About 2 cm",
+        "About 12 cm",
+        "About 2 m"
+      ],
+      "answer": 1,
+      "reveal": [
+        "Most hands are between 10 and 15 cm.",
+        "Measure yours at home to check!"
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "measure",
+      "props": {
+        "tool": "ruler",
+        "unit": "cm",
+        "max": 15,
+        "labels": 1,
+        "value": 2,
+        "object": "pencil"
+      },
+      "script": [
+        {
+          "say": [
+            "Drag the gold handle.",
+            "Make the pencil 8 cm long."
+          ],
+          "goal": {
+            "value": 8
+          },
+          "hint": [
+            "The pencil starts at 0.",
+            "Stop the end on 8."
+          ],
+          "then": [
+            "It starts at 0 and ends at 8.",
+            "It is {value} cm long."
+          ]
+        },
+        {
+          "say": [
+            "Make it 13 cm long."
+          ],
+          "goal": {
+            "value": 13
+          },
+          "then": [
+            "{value} cm. That is longer."
+          ]
+        },
+        {
+          "set": {
+            "object": "worm",
+            "value": 5,
+            "max": 20,
+            "labels": 2
+          },
+          "say": [
+            "A worm on a longer ruler.",
+            "Make it 11 cm."
+          ],
+          "goal": {
+            "value": 11
+          },
+          "hint": [
+            "11 has no number.",
+            "It is the mark between 10 and 12."
+          ],
+          "then": [
+            "11 is between 10 and 12.",
+            "The worm is 11 cm."
+          ]
+        },
+        {
+          "set": {
+            "value": 14,
+            "interactive": false
+          },
+          "say": [
+            "How long is the worm now?"
+          ],
+          "input": "numpad",
+          "answer": 14,
+          "unit": "cm",
+          "then": [
+            "14 cm. It ends on the 14 mark."
+          ]
+        },
+        {
+          "say": [
+            "Which is longer, 11 cm or 14 cm?"
+          ],
+          "input": "choice",
+          "options": [
+            "11 cm",
+            "14 cm"
+          ],
+          "answer": "14 cm",
+          "then": [
+            "14 cm > 11 cm.",
+            "The open side faces the bigger length."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "measure",
+      "props": {
+        "tool": "ruler",
+        "unit": "cm",
+        "max": 20,
+        "labels": 2,
+        "start": 3,
+        "value": 6,
+        "object": "worm",
+        "interactive": false
+      },
+      "script": [
+        {
+          "say": [
+            "This worm starts at 3, not 0.",
+            "How long is it?"
+          ],
+          "input": "numpad",
+          "answer": 6,
+          "unit": "cm",
+          "hint": [
+            "Count the centimetres from 3."
+          ],
+          "then": [
+            "From 3 to 9 is 6 cm.",
+            "Count the gaps, not the marks."
+          ]
+        },
+        {
+          "set": {
+            "start": 5,
+            "value": 9,
+            "object": "crayon"
+          },
+          "say": [
+            "The crayon starts at 5.",
+            "How long is it?"
+          ],
+          "input": "numpad",
+          "answer": 9,
+          "unit": "cm",
+          "then": [
+            "It ends at 14.",
+            "14 − 5 = 9. It is 9 cm."
+          ]
+        },
+        {
+          "set": {
+            "start": 4,
+            "value": 2,
+            "object": "pencil",
+            "interactive": true
+          },
+          "say": [
+            "Make the pencil 7 cm long.",
+            "It starts at 4."
+          ],
+          "goal": {
+            "value": 7
+          },
+          "hint": [
+            "4 + 7 = ?",
+            "Put the end there."
+          ],
+          "then": [
+            "It ends at 11.",
+            "4 + 7 = 11."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "look",
+      "lines": [
+        "Big things are measured in metres.",
+        "We write m. 100 cm make 1 m."
+      ],
+      "question": "How long is the rover?",
+      "widget": "measure",
+      "props": {
+        "tool": "ruler",
+        "unit": "m",
+        "max": 5,
+        "value": 3,
+        "object": "rover"
+      }
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "measure.readRuler",
+        "measure.makeLength"
+      ],
+      "levels": [
+        1,
+        2,
+        3
+      ],
+      "items": [
+        5,
+        6,
+        7
+      ],
+      "intro": [
+        "Your turn. Measure and make lengths."
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} measured the key.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "The key goes from 2 to 9 on the ruler.",
+        "The end of the key is at 9.",
+        "So the key is 9 cm long."
+      ],
+      "wrong": 2,
+      "fix": [
+        "The key starts at 2, not 0.",
+        "9 − 2 = 7. The key is 7 cm.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "measure.compareMeasures",
+        "measure.orderMeasures",
+        "measure.estimate",
+        "measure.chooseUnit"
+      ],
+      "levels": [
+        1,
+        1,
+        2
+      ],
+      "items": [
+        4,
+        5,
+        6
+      ],
+      "params": {
+        "units": [
+          "cm",
+          "m"
+        ],
+        "kind": "length"
+      },
+      "intro": [
+        "Compare, order and estimate lengths."
+      ]
+    },
+    {
+      "type": "athome",
+      "title": "Measure the house",
+      "need": [
+        "A ruler or a tape measure"
+      ],
+      "steps": [
+        "Guess how long a spoon is.",
+        "Measure it. Start at 0!",
+        "Find something about 1 m long."
+      ],
+      "why": "Guess first, then measure. That is how you get good at estimating."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "Would you measure your bed in cm or m?"
+      ]
+    }
+  ]
+}

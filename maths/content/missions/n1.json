@@ -1,0 +1,93 @@
+{
+  "id": "n1",
+  "sector": "number",
+  "title": "Tens and Ones",
+  "tagline": "Build two-digit numbers from tens and ones",
+  "covers": ["Y2-NPV-2", "2NPV–1"],
+  "patch": { "name": "Tens and Ones", "icon": "blocks" },
+  "dadNotes": [
+    "DfE sentence: 'This is the number 42. The 4 shows we have 4 groups of ten. The 2 shows we have 2 extra ones.'",
+    "42 is 42 ones, or 4 tens and 2 ones. Swapping 10 ones for 1 ten changes the pieces, not the number.",
+    "Ask: 'What is the 4 worth?' The answer is 40, not 4."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["This is the number 42.", "The 4 shows we have 4 groups of ten.", "The 2 shows we have 2 extra ones."],
+      "caption": "42",
+      "widget": "placevalue",
+      "props": { "tens": 4, "ones": 2, "showDigits": true, "interactive": false }
+    },
+    { "type": "ask", "text": "Have you used tens and ones at school?" },
+    {
+      "type": "guess",
+      "prompt": "Each rod is 10 cubes. How many cubes in 6 rods?",
+      "options": ["16", "60", "600"],
+      "answer": 1,
+      "reveal": ["60 cubes.", "6 tens is 60."],
+      "widget": "placevalue",
+      "props": { "tens": 6, "ones": 0, "interactive": false },
+      "revealProps": { "showValue": true }
+    },
+    {
+      "type": "try",
+      "widget": "placevalue",
+      "props": { "tens": 0, "ones": 0 },
+      "script": [
+        { "say": ["Let's build 34.", "Tap + under Tens 3 times."], "goal": { "tens": 3 }, "then": ["3 tens. That's 30."], "hint": ["The Tens are gold.", "Use the + under them."] },
+        { "say": ["Now add 4 ones."], "goal": { "tens": 3, "ones": 4 }, "then": ["You put {tens} tens and {ones} ones.", "That's {value}."] },
+        { "say": ["Keep adding ones.", "Stop when you have 10 ones."], "goal": { "ones": 10 }, "then": ["10 ones! That's the same as 1 ten."], "hint": ["Count the cubes.", "Use − if you go past 10."] },
+        { "say": ["Tap the glowing button.", "Swap 10 ones for 1 ten."], "goal": { "tens": 4, "ones": 0 }, "then": ["{tens} tens and {ones} ones.", "Still {value}!"] },
+        { "say": ["How many is that altogether?"], "input": "numpad", "answer": "{value}", "then": ["4 tens is 40."] }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "placevalue",
+      "props": { "tens": 0, "ones": 0, "showDigits": true },
+      "script": [
+        { "say": ["Make 57."], "caption": "57", "goal": { "value": 57, "tens": 5, "ones": 7 }, "then": ["The 5 shows 5 groups of ten.", "The 7 shows 7 extra ones."], "hint": ["57 has 5 tens.", "How many ones?"] },
+        { "say": ["What is the 5 worth?"], "input": "choice", "options": [5, 50, 57], "answer": 50, "then": ["5 tens is 50."] },
+        { "set": { "tens": 0, "ones": 42 }, "caption": "", "say": ["Here are 42 ones.", "Swap them into tens."], "goal": { "tens": 4, "ones": 2 }, "then": ["42 ones is 4 tens and 2 ones.", "Same number, fewer pieces!"], "hint": ["Tap the swap button.", "Keep going while you have 10 ones."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": ["number.readTensOnes", "number.buildNumber"],
+      "levels": [1, 2, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn, {commander}.", "Read the blocks, then build some."]
+    },
+    {
+      "type": "practise",
+      "tiers": [2, 3],
+      "gen": "number.digitValue",
+      "levels": [2, 2, 3],
+      "items": [4, 4, 5],
+      "intro": ["What is each digit worth?"]
+    },
+    {
+      "type": "question",
+      "format": "wyr",
+      "title": "Would you rather?",
+      "prompt": "Would you rather count 34 like this or like this?",
+      "options": [
+        { "label": "34 ones", "widget": "placevalue", "props": { "tens": 0, "ones": 34, "interactive": false } },
+        { "label": "3 tens and 4 ones", "widget": "placevalue", "props": { "tens": 3, "ones": 4, "interactive": false } }
+      ],
+      "reveal": ["Both are 34.", "Tens are quicker to count: 10, 20, 30, 31, 32, 33, 34.", "34 ones lets you see every single one."],
+      "followUp": "What would change your mind?"
+    },
+    {
+      "type": "athome",
+      "title": "Bundles of ten",
+      "need": ["About 40 pasta pieces, pencils or spoons", "Elastic bands or small cups"],
+      "steps": ["Make bundles of 10.", "Count the bundles: 10, 20, 30.", "Count the loose ones on."],
+      "why": "A bundle of 10 is one ten. That is place value."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "Why is 42 the same as 4 tens and 2 ones?"]
+    }
+  ]
+}

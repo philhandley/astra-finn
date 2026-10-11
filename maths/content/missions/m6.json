@@ -1,0 +1,365 @@
+{
+  "id": "m6",
+  "sector": "measure",
+  "title": "Clock Tower",
+  "tagline": "Quarter past, quarter to and five minutes",
+  "covers": [
+    "Y1-M-6",
+    "Y2-M-7"
+  ],
+  "patch": {
+    "name": "Clock Tower",
+    "icon": "clock"
+  },
+  "dadNotes": [
+    "The long hand counts in 5s: the clock face is the 5 times table.",
+    "Past is the right half of the clock, to is the left half.",
+    "Say 'quarter past' and 'quarter to' out loud whenever the time fits."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": [
+        "This is the Clock Tower clock.",
+        "The small numbers count the minutes in 5s."
+      ],
+      "question": "What do you notice about 5, 10, 15, 20?",
+      "widget": "clock",
+      "props": {
+        "h": 3,
+        "m": 15,
+        "minuteLabels": true
+      }
+    },
+    {
+      "type": "ask",
+      "text": "Have you learned quarter past and quarter to at school?"
+    },
+    {
+      "type": "guess",
+      "prompt": "How many minutes for the long hand to go once round?",
+      "widget": "clock",
+      "props": {
+        "h": 12,
+        "m": 0
+      },
+      "options": [
+        "12 minutes",
+        "60 minutes",
+        "100 minutes"
+      ],
+      "answer": 1,
+      "revealProps": {
+        "minuteLabels": true
+      },
+      "reveal": [
+        "60 minutes. That is 1 hour.",
+        "5, 10, 15... all the way to 60."
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "clock",
+      "props": {
+        "h": 2,
+        "m": 0,
+        "snap": 15,
+        "pastTo": true
+      },
+      "script": [
+        {
+          "say": [
+            "The right half is past.",
+            "The left half is to."
+          ]
+        },
+        {
+          "say": [
+            "Drag the long hand to 3.",
+            "That is quarter past."
+          ],
+          "goal": {
+            "m": 15
+          },
+          "then": [
+            "A quarter of the way round.",
+            "It is {words}."
+          ]
+        },
+        {
+          "say": [
+            "Now drag it on to 9.",
+            "That is quarter to."
+          ],
+          "goal": {
+            "m": 45
+          },
+          "then": [
+            "Quarter to means 15 minutes to go.",
+            "It is {words}."
+          ]
+        },
+        {
+          "set": {
+            "h": 12,
+            "m": 0
+          },
+          "say": [
+            "Make it quarter past 7."
+          ],
+          "goal": {
+            "h": 7,
+            "m": 15
+          },
+          "hint": [
+            "Long hand on 3.",
+            "Short hand just past 7."
+          ],
+          "then": [
+            "Short hand just past 7. Long hand on 3."
+          ]
+        },
+        {
+          "set": {
+            "h": 12,
+            "m": 0
+          },
+          "say": [
+            "Make it quarter to 5."
+          ],
+          "goal": {
+            "h": 4,
+            "m": 45
+          },
+          "hint": [
+            "The long hand goes on 9.",
+            "The short hand is nearly at 5."
+          ],
+          "then": [
+            "Quarter to 5.",
+            "The short hand is nearly at 5."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "try",
+      "widget": "clock",
+      "props": {
+        "h": 12,
+        "m": 0,
+        "snap": 5,
+        "minuteLabels": true
+      },
+      "script": [
+        {
+          "say": [
+            "The long hand counts in 5s.",
+            "Drag it to the 4."
+          ],
+          "goal": {
+            "m": 20
+          },
+          "then": [
+            "4 lots of 5 is 20.",
+            "It is {words}."
+          ]
+        },
+        {
+          "say": [
+            "Drag it to the 7."
+          ],
+          "goal": {
+            "m": 35
+          },
+          "then": [
+            "7 lots of 5 is 35.",
+            "After 6 we say to: {words}."
+          ]
+        },
+        {
+          "set": {
+            "h": 12,
+            "m": 0,
+            "minuteLabels": false
+          },
+          "say": [
+            "No helper numbers now.",
+            "Make it 10 past 8."
+          ],
+          "goal": {
+            "h": 8,
+            "m": 10
+          },
+          "hint": [
+            "10 minutes past: the long hand on 2."
+          ],
+          "then": [
+            "10 past 8. We can write 8:10."
+          ]
+        },
+        {
+          "set": {
+            "h": 12,
+            "m": 0
+          },
+          "say": [
+            "Make it 20 to 3."
+          ],
+          "goal": {
+            "h": 2,
+            "m": 40
+          },
+          "hint": [
+            "20 to means 20 minutes before 3.",
+            "The long hand goes on 8."
+          ],
+          "then": [
+            "The long hand is on 8.",
+            "20 to 3 is 2:40."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "look",
+      "lines": [
+        "The clock face is the 5 times table!",
+        "3 × 5 = 15. The long hand on 3 is 15 minutes."
+      ],
+      "question": "Where is the long hand for 30 minutes?",
+      "widget": "clock",
+      "props": {
+        "h": 12,
+        "m": 15,
+        "minuteLabels": true
+      }
+    },
+    {
+      "type": "practise",
+      "gen": [
+        "time.readClock",
+        "time.setClock"
+      ],
+      "levels": [
+        2,
+        3,
+        3
+      ],
+      "items": [
+        6,
+        7,
+        8
+      ],
+      "intro": [
+        "Your turn. Read and set the Clock Tower."
+      ]
+    },
+    {
+      "type": "try",
+      "tiers": [
+        2,
+        3
+      ],
+      "widget": "clock",
+      "props": {
+        "h": 12,
+        "m": 0,
+        "snap": 5,
+        "digital": true
+      },
+      "script": [
+        {
+          "say": [
+            "Clocks with numbers only are digital.",
+            "Make the clock show 7:35."
+          ],
+          "caption": "7:35",
+          "goal": {
+            "h": 7,
+            "m": 35
+          },
+          "hint": [
+            "35 minutes: the long hand on 7.",
+            "The short hand is past 7."
+          ],
+          "then": [
+            "7:35 is 25 to 8."
+          ]
+        },
+        {
+          "say": [
+            "Now show 11:50."
+          ],
+          "caption": "11:50",
+          "goal": {
+            "h": 11,
+            "m": 50
+          },
+          "then": [
+            "11:50 is 10 to 12."
+          ]
+        },
+        {
+          "set": {
+            "h": 4,
+            "m": 25,
+            "digital": false,
+            "interactive": false
+          },
+          "caption": "",
+          "say": [
+            "Write this time in numbers."
+          ],
+          "input": "numpad",
+          "answer": "4:25",
+          "hint": [
+            "Hour first, then the colon, then minutes."
+          ],
+          "then": [
+            "4:25. That is 25 past 4."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "intro": [
+        "{engineer} read the Clock Tower.",
+        "Can you spot the slip?"
+      ],
+      "lines": [
+        "The long hand is on 9. The short hand is nearly at 4.",
+        "The long hand on 9 means quarter to.",
+        "The short hand is nearly at 4.",
+        "So it is quarter to 3."
+      ],
+      "wrong": 3,
+      "fix": [
+        "The short hand is nearly at 4.",
+        "So it is quarter to 4.",
+        "What would you tell {engineer}?"
+      ]
+    },
+    {
+      "type": "athome",
+      "title": "Time detective",
+      "need": [
+        "A clock with hands"
+      ],
+      "steps": [
+        "Each time you pass the clock, read it.",
+        "Say it the clock way: quarter past, 20 to...",
+        "Can you catch it at exactly quarter to?"
+      ],
+      "why": "Reading real clocks often is what makes it stick."
+    },
+    {
+      "type": "finish",
+      "debrief": [
+        "What was your favourite part?",
+        "What time is tea? Say it the clock way."
+      ]
+    }
+  ]
+}

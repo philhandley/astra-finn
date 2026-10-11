@@ -1,0 +1,76 @@
+{
+  "id": "n4",
+  "sector": "number",
+  "title": "Compare and Order",
+  "tagline": "Greater than, less than and equal to",
+  "covers": ["Y2-NPV-4", "Y1-NPV-4"],
+  "patch": { "name": "Compare and Order", "icon": "star" },
+  "dadNotes": [
+    "Compare the tens first, then the ones. 61 > 59 because 6 tens is more than 5 tens.",
+    "Read the signs aloud: '43 is greater than 34', '34 is less than 43', '30 + 4 is equal to 34'.",
+    "The crocodile's mouth opens towards the bigger number."
+  ],
+  "steps": [
+    {
+      "type": "look",
+      "lines": ["This sign means greater than.", "The crocodile mouth eats the bigger number.", "43 is greater than 34."],
+      "big": "43 > 34"
+    },
+    { "type": "ask", "text": "Have you used < and > at school?" },
+    {
+      "type": "guess",
+      "prompt": "Which is more: 5 tens or 48 ones?",
+      "options": ["5 tens", "48 ones", "The same"],
+      "answer": 0,
+      "reveal": ["5 tens is 50.", "50 is greater than 48."],
+      "widget": "placevalue",
+      "props": { "tens": 5, "ones": 0, "interactive": false },
+      "revealProps": { "showValue": true }
+    },
+    {
+      "type": "try",
+      "widget": "numberline",
+      "props": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 43, "label": "43", "colour": "gold" }, { "at": 34, "label": "34", "colour": "cyan" }] },
+      "script": [
+        { "say": ["Look at 43 and 34.", "Which one is further along?"], "input": "choice", "options": [43, 34], "answer": 43, "then": ["43 is greater than 34.", "4 tens is more than 3 tens."] },
+        { "caption": "43 ? 34", "say": ["Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": ">", "then": ["43 > 34.", "The open mouth faces 43."] },
+        { "set": { "min": 60, "max": 70, "labels": "all", "marks": [{ "at": 67, "label": "67", "colour": "gold" }, { "at": 61, "label": "61", "colour": "cyan" }] }, "caption": "61 ? 67", "say": ["Same tens!", "Look at the ones."], "input": "choice", "options": ["<", ">", "="], "answer": "<", "then": ["61 < 67.", "61 is less than 67."] },
+        { "set": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 34, "label": "34", "colour": "gold" }] }, "caption": "30 + 4 ? 34", "say": ["What is 30 + 4?", "Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": "=", "then": ["30 + 4 = 34.", "Both sides are equal."] }
+      ]
+    },
+    {
+      "type": "practise",
+      "gen": "number.compare",
+      "levels": [1, 2, 3],
+      "items": [6, 7, 8],
+      "intro": ["Your turn, {commander}.", "Feed the crocodile!"]
+    },
+    {
+      "type": "practise",
+      "gen": "number.order",
+      "levels": [1, 2, 3],
+      "items": [3, 4, 5],
+      "intro": ["Now put numbers in order.", "Tap them, smallest first."]
+    },
+    {
+      "type": "question",
+      "format": "wodb",
+      "title": "Which one doesn't belong?",
+      "prompt": "Pick one. Then say why.",
+      "options": [{ "label": "34" }, { "label": "43" }, { "label": "30 + 4" }, { "label": "4 tens" }],
+      "reveal": ["Every one can be the odd one out!", "43 is the only one over 40. 4 tens has no ones.", "30 + 4 is the only sum.", "34 is the only plain number under 40."],
+      "followUp": "Which two are equal?"
+    },
+    {
+      "type": "athome",
+      "title": "Card battle",
+      "need": ["Playing cards 1 to 9, or number cards"],
+      "steps": ["Each turn over 2 cards. Make a 2-digit number.", "The greater number wins the cards.", "Say it: '63 is greater than 36'."],
+      "why": "Making and comparing numbers builds place value."
+    },
+    {
+      "type": "finish",
+      "debrief": ["What was your favourite part?", "How do you know 61 is greater than 59?"]
+    }
+  ]
+}
