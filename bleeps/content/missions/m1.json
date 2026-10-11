@@ -1,0 +1,36 @@
+{
+  "id": "m1",
+  "title": "The Silent Game",
+  "steps": [
+    { "type": "game", "eyebrow": "The problem", "intro": "This is Moon Run, our crew's game. Watch it play. Is something missing?", "props": { "silent": true, "demo": true, "seconds": 14, "autostart": true }, "who": "everyone" },
+    { "type": "guess", "eyebrow": "Guess first!", "prompt": "What is missing from Moon Run?",
+      "choices": [ { "label": "Sounds!", "sticker": "nosound" }, { "label": "Colours", "sticker": "flower" }, { "label": "A robot", "sticker": "robot" } ],
+      "answer": 0, "reveal": "Moon Run has no sounds at all. No jump, no bump, no music. Our crew is going to make every one of them!" },
+    { "type": "story", "title": "Games used to bleep!", "text": "Old game machines had a tiny sound chip inside. It could only make a few simple sounds at once. Music made with those chips is called chiptune.",
+      "art": { "img": "assets/img/gameboy.jpg", "credit": "Game Boy. Photo: Evan-Amos, public domain", "alt": "A grey Nintendo Game Boy" },
+      "wow": { "text": "The Game Boy came out in 1989. That's about 37 years ago: more than six times as long as {commander} has been alive.", "source": "https://en.wikipedia.org/wiki/Game_Boy" },
+      "dad": "Ask: did you ever play on one of these?" },
+    { "type": "story", "title": "A band of four", "text": "The NES could play just four main sounds at once. That's like a band with only four players.",
+      "art": { "img": "assets/img/nes.jpg", "credit": "NES. Photo: Evan-Amos, public domain", "alt": "A Nintendo Entertainment System with a controller" },
+      "wow": { "text": "Its four were two beepy square sounds, one soft triangle sound and one hissy noise sound.", "source": "https://www.nesdev.org/wiki/APU" } },
+    { "type": "toy", "toy": "wake", "eyebrow": "Meet the Bleep Bots", "intro": "Our four robots are asleep! {copilot}, tap each one to wake it up.", "who": "copilot" },
+    { "type": "story", "title": "Every bot sounds different", "text": "Bleep is beepy. Hoot is soft. Buzz is buzzy. Fizz is hissy, like the sea.",
+      "art": { "bots": ["bleep", "hoot", "buzz", "fizz"] },
+      "sounds": [
+        { "label": "Bleep", "sound": { "hello": "bleep" }, "col": "#ff4f45" },
+        { "label": "Hoot", "sound": { "hello": "hoot" }, "col": "#3b82f6" },
+        { "label": "Buzz", "sound": { "hello": "buzz" }, "col": "#d99e00" },
+        { "label": "Fizz", "sound": { "hello": "fizz" }, "col": "#8b5cf6" }
+      ] },
+    { "type": "guess", "prompt": "Which robot sounds like a buzzy bee?",
+      "choices": [ { "label": "Bleep", "bot": "bleep", "sound": { "hello": "bleep" } }, { "label": "Hoot", "bot": "hoot", "sound": { "hello": "hoot" } }, { "label": "Buzz", "bot": "buzz", "sound": { "hello": "buzz" } }, { "label": "Fizz", "bot": "fizz", "sound": { "hello": "fizz" } } ],
+      "answer": 2, "reveal": "It's Buzz! Buzz makes a bright, buzzy sound. Its wave looks like the teeth of a saw." },
+    { "type": "guess", "prompt": "Which robot has the softest sound?", "order": ["copilot", "commander", "engineer"],
+      "choices": [ { "label": "Bleep", "bot": "bleep", "sound": { "hello": "bleep" } }, { "label": "Hoot", "bot": "hoot", "sound": { "hello": "hoot" } }, { "label": "Buzz", "bot": "buzz", "sound": { "hello": "buzz" } }, { "label": "Fizz", "bot": "fizz", "sound": { "hello": "fizz" } } ],
+      "answer": 1, "reveal": "Hoot! Hoot's sound is soft and sweet, a bit like a flute." },
+    { "type": "toy", "toy": "closeeyes", "eyebrow": "Listening game", "intro": "Close your eyes! One of you taps a secret robot. The other listens and guesses who sang.", "who": "everyone" },
+    { "type": "make", "toy": "bonk", "intro": "When our robot bumps a rock, somebody should say bonk! Tap each robot to hear its bonk. {commander}, you choose.", "who": "commander" },
+    { "type": "game", "intro": "Try it! Bump into a rock and listen for your bonk.", "props": { "seconds": 25 }, "who": "copilot" },
+    { "type": "finish", "debrief": ["Which robot is your favourite, and why?", "{engineer}, did your games go bleep when you were little?"] }
+  ]
+}

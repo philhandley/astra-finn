@@ -1,0 +1,153 @@
+{
+ "id": "m5",
+ "title": "Make a Tune",
+ "steps": [
+  {
+   "type": "story",
+   "eyebrow": "The problem",
+   "title": "Moon Run needs a winning tune",
+   "text": "When our robot reaches the flag, the game should play a happy tune. We need to make one!",
+   "art": {
+    "sticker": "flag"
+   }
+  },
+  {
+   "type": "story",
+   "title": "A tune goes up and down",
+   "text": "A tune is notes going up and down, long and short. Listen to one you know!",
+   "art": {
+    "bot": "hoot"
+   },
+   "sound": {
+    "song": "demo-twinkle",
+    "pages": 2
+   },
+   "soundLabel": "Play Twinkle Twinkle",
+   "dad": "Sing along, and draw the tune in the air with your finger: up, up, down."
+  },
+  {
+   "type": "guess",
+   "prompt": "At the start of Twinkle Twinkle, do the notes go up or down?",
+   "play": {
+    "notes": [
+     60,
+     60,
+     67,
+     67,
+     69,
+     69,
+     67
+    ],
+    "voice": "hoot",
+    "gap": 0.42,
+    "legato": true
+   },
+   "choices": [
+    {
+     "label": "Up",
+     "sticker": "arrowup"
+    },
+    {
+     "label": "Down",
+     "sticker": "arrowdown"
+    }
+   ],
+   "answer": 0,
+   "reveal": "Up! Twin-kle, twin-kle jumps up high."
+  },
+  {
+   "type": "toy",
+   "toy": "echo",
+   "eyebrow": "The Echo game",
+   "intro": "Bleep sings three notes. Can you copy them? Then Bleep copies you!",
+   "who": "everyone"
+  },
+  {
+   "type": "story",
+   "title": "The five magic notes",
+   "text": "These five notes always sound good together. So in our Song Maker there are no wrong notes!",
+   "art": {
+    "bot": "bleep"
+   },
+   "sound": {
+    "notes": [
+     60,
+     62,
+     64,
+     67,
+     69,
+     67,
+     64,
+     62,
+     60
+    ],
+    "voice": "bleep",
+    "gap": 0.22
+   },
+   "soundLabel": "Hear the magic notes",
+   "dad": "These are the pentatonic notes C, D, E, G and A. Lots of first school songs use them."
+  },
+  {
+   "type": "question",
+   "title": "The Sharing Problem",
+   "art": {
+    "sticker": "turns"
+   },
+   "scenario": "{commander} and {copilot} are making one tune together. It has eight boxes. How should you share it?",
+   "options": [
+    {
+     "label": "Take turns, one box each",
+     "sticker": "turns"
+    },
+    {
+     "label": "One does high notes, one does low notes",
+     "sticker": "highlow"
+    },
+    {
+     "label": "One does the first half, one the second",
+     "sticker": "split"
+    },
+    {
+     "label": "Both tap at the same time!",
+     "sticker": "together"
+    }
+   ],
+   "sets": "sharing",
+   "values": [
+    "turns",
+    "highlow",
+    "halves",
+    "together"
+   ],
+   "setsLabel": "We'll share by",
+   "reveal": "Real bands do all of these. Some take turns, some have different jobs, and some just play together. Whatever you chose, let's try it now!",
+   "followUp": "Is your way fair? What would make it fun for both of you?"
+  },
+  {
+   "type": "make",
+   "toy": "songmaker",
+   "props": {
+    "mode": "tiny",
+    "slot": "win",
+    "sharing": true
+   },
+   "intro": "Make the winning tune! Tap the boxes, press Play, and change it until you love it. Then save it.",
+   "who": "everyone",
+   "compact": true
+  },
+  {
+   "type": "game",
+   "intro": "Run all the way to the flag and hear your winning tune!",
+   "props": {
+    "seconds": 30
+   },
+   "who": "copilot"
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "Hum your tune! What would you change?"
+   ]
+  }
+ ]
+}

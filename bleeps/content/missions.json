@@ -1,0 +1,10 @@
+{ "missions": [
+  { "id": "m1", "title": "The Silent Game", "tagline": "Meet the Bleep Bots", "art": { "bot": "bleep" }, "col": "#ff4f45", "col2": "#ffd6d2", "patch": { "name": "Bleep Crew", "art": "robot" } },
+  { "id": "m2", "title": "Sound Shapes", "tagline": "Square, triangle, saw and noise", "art": { "bot": "crew" }, "col": "#14b8a6", "col2": "#c9f3ee", "patch": { "name": "Wave Makers", "art": "wave" } },
+  { "id": "m3", "title": "High and Low", "tagline": "Squeaky mice and growly bears", "art": { "sticker": "highlow" }, "col": "#7b4fd6", "col2": "#e3d9fb", "patch": { "name": "High Flyers", "art": "bird" } },
+  { "id": "m4", "title": "Beat and Rhythm", "tagline": "Boom, tap, tss", "art": { "sticker": "drum" }, "col": "#f7882f", "col2": "#fde3cc", "patch": { "name": "Beat Keepers", "art": "drum" } },
+  { "id": "m5", "title": "Make a Tune", "tagline": "Notes going up and down", "art": { "sticker": "note" }, "col": "#3b82f6", "col2": "#d6e6ff", "patch": { "name": "Tune Smiths", "art": "note" } },
+  { "id": "m6", "title": "Game Sounds Lab", "tagline": "Jumps, lasers and coins", "art": { "sticker": "bolt" }, "col": "#f5b400", "col2": "#fff0c2", "patch": { "name": "Sound Designers", "art": "bolt" } },
+  { "id": "m7", "title": "Happy and Sad Chords", "tagline": "Sunny and rainy music", "art": { "sticker": "both" }, "col": "#e2459a", "col2": "#fbd5e8", "patch": { "name": "Chord Crew", "art": "both" } },
+  { "id": "m8", "title": "Our Game, Our Song", "tagline": "The big one: write the music", "art": { "sticker": "flag" }, "col": "#1fa35c", "col2": "#fff2b0", "patch": { "name": "Chiptune Composers", "art": "star" }, "gold": true }
+] }

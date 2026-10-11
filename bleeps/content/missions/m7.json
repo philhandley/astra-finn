@@ -1,0 +1,44 @@
+{
+  "id": "m7",
+  "title": "Happy and Sad Chords",
+  "steps": [
+    { "type": "story", "eyebrow": "The problem", "title": "Sunny or rainy?", "text": "Listen to these two sounds. Which one sounds like a sunny day? Which one sounds like a rainy day?",
+      "art": { "stickers": ["sun", "rain"] },
+      "sounds": [
+        { "label": "Sound 1", "sound": { "chord": "home", "style": "up", "len": 1.8 }, "col": "#f7882f" },
+        { "label": "Sound 2", "sound": { "chord": "rainy", "style": "up", "len": 1.8 }, "col": "#3b82f6" }
+      ] },
+    { "type": "guess", "prompt": "Does this one sound happy, or a bit sad?", "order": ["copilot", "commander", "engineer"], "play": { "chord": "home", "style": "up", "len": 1.8 },
+      "choices": [ { "label": "Happy", "sticker": "happy" }, { "label": "A bit sad", "sticker": "sad" } ],
+      "answer": -1, "reveal": "This one is a major chord. Lots of people say it sounds happy, like sunshine." },
+    { "type": "guess", "prompt": "And this one?", "order": ["copilot", "commander", "engineer"], "play": { "chord": "rainy", "style": "up", "len": 1.8 },
+      "choices": [ { "label": "Happy", "sticker": "happy" }, { "label": "A bit sad", "sticker": "sad" } ],
+      "answer": -1, "reveal": "This one is a minor chord. Lots of people say it sounds a bit sad, like rain on the window." },
+    { "type": "story", "title": "A chord is notes together", "text": "A chord is a few notes played together. Old chips could only play a few notes at once. So composers played the notes one after another, super fast: a sparkle!",
+      "art": { "bot": "bleep" },
+      "sounds": [
+        { "label": "Together", "sound": { "chord": "home", "voice": "hoot", "len": 1.6 }, "col": "#3b82f6" },
+        { "label": "Sparkle", "sound": { "chord": "home", "style": "arp", "len": 1.6 }, "col": "#ff4f45" }
+      ],
+      "wow": { "text": "Playing a chord's notes very fast, one after another, is called an arpeggio. Our ears hear it as one chord.", "source": "https://www.ludomusicology.org/2015/07/16/compositional-strategies-for-programmable-sound-generators-with-limited-polyphony/" } },
+    { "type": "move", "toy": "moodmove", "intro": "Sunny music: bounce! Rainy music: sway slowly.", "who": "everyone" },
+    { "type": "toy", "toy": "chords", "eyebrow": "Chord Blocks", "intro": "Put four chord blocks in a row, then press Play. Play the pads on top!", "who": "commander" },
+    { "type": "question", "title": "The Ending", "art": { "sticker": "moon" },
+      "scenario": "At the end of Moon Run, our robot gets home. But it says goodbye to its friend, who stays on the Moon. Should the ending music be happy, a bit sad, or both?",
+      "options": [
+        { "label": "Happy", "sticker": "happy", "sound": { "chords": ["home", "sunny", "ready", "home"] } },
+        { "label": "A bit sad", "sticker": "sad", "sound": { "chords": ["rainy", "dreamy", "cloudy", "rainy"] } },
+        { "label": "Both at once", "sticker": "both", "sound": { "chords": ["home", "rainy", "sunny", "ready"] } }
+      ],
+      "sets": "ending", "values": ["happy", "sad", "both"], "setsLabel": "Our ending will be",
+      "reveal": "Composers often mix happy and sad chords on purpose. Some people call it bittersweet. There's no right answer: it depends how you want players to feel.",
+      "followUp": "Can you think of a time you felt happy and a bit sad at the same time?" },
+    { "type": "make", "toy": "chords", "props": { "slot": "chords" }, "intro": "Make the chords for our game's song: four blocks in a row. Try them, then save them.", "who": "everyone" },
+    { "type": "athome", "title": "A water-glass xylophone", "art": "note",
+      "need": ["Three jars or glasses, all the same", "A jug of water", "A pencil"],
+      "steps": ["Stand the jars a little apart.", "A grown-up pours a little water in one and nearly fills another.", "Tap each one gently with the pencil. Which one sounds higher?"],
+      "why": "The jar with a little water sounds higher. The full jar sounds lower.",
+      "safety": "Glass can break: use plastic cups or jars, and let a grown-up do the pouring." },
+    { "type": "finish", "debrief": ["Which chord feels like you today?"] }
+  ]
+}

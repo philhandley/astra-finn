@@ -1,0 +1,270 @@
+{
+ "id": "m2",
+ "title": "Sound Shapes",
+ "steps": [
+  {
+   "type": "story",
+   "eyebrow": "The problem",
+   "title": "Same note, different sound",
+   "text": "Hoot and Bleep can sing exactly the same note. But they sound different. How can that be?",
+   "art": {
+    "bots": [
+     "hoot",
+     "bleep"
+    ]
+   },
+   "sounds": [
+    {
+     "label": "Hoot sings A",
+     "sound": {
+      "notes": [
+       69
+      ],
+      "voice": "hoot",
+      "gap": 0.9
+     },
+     "col": "#3b82f6"
+    },
+    {
+     "label": "Bleep sings A",
+     "sound": {
+      "notes": [
+       69
+      ],
+      "voice": "bleep",
+      "gap": 0.9
+     },
+     "col": "#ff4f45"
+    }
+   ]
+  },
+  {
+   "type": "story",
+   "eyebrow": "Try it now",
+   "title": "Feel the wiggle",
+   "text": "Put a gentle hand on your throat and hum. Can you feel a buzz? Now stop. Sound is a wiggle that travels through the air.",
+   "art": {
+    "sticker": "ear"
+   },
+   "who": "everyone",
+   "wow": {
+    "text": "Sound is a wiggle in the air that travels all the way to your ears.",
+    "source": "https://en.wikipedia.org/wiki/Speed_of_sound"
+   },
+   "dad": "Hum together, quietly then loudly. Does the buzz stop when the humming stops?"
+  },
+  {
+   "type": "story",
+   "title": "Square wiggles and pointy wiggles",
+   "text": "The robots' screens show their wiggles. Bleep's wiggle is square, like steps. Hoot's wiggle is pointy, like mountains.",
+   "art": {
+    "waves": [
+     {
+      "voice": "bleep",
+      "label": "Bleep"
+     },
+     {
+      "voice": "hoot",
+      "label": "Hoot"
+     }
+    ]
+   },
+   "sounds": [
+    {
+     "label": "Square",
+     "sound": {
+      "notes": [
+       69,
+       72,
+       76
+      ],
+      "voice": "bleep",
+      "gap": 0.35
+     },
+     "col": "#ff4f45"
+    },
+    {
+     "label": "Pointy",
+     "sound": {
+      "notes": [
+       69,
+       72,
+       76
+      ],
+      "voice": "hoot",
+      "gap": 0.35
+     },
+     "col": "#3b82f6"
+    }
+   ],
+   "dad": "Square waves are often called hollow. Triangle waves are softer and sweeter."
+  },
+  {
+   "type": "guess",
+   "prompt": "Listen. Which shape made that sound?",
+   "play": {
+    "notes": [
+     72,
+     76,
+     79
+    ],
+    "voice": "hoot",
+    "gap": 0.4
+   },
+   "choices": [
+    {
+     "label": "Square",
+     "wave": "bleep",
+     "sound": {
+      "notes": [
+       72,
+       76,
+       79
+      ],
+      "voice": "bleep",
+      "gap": 0.4
+     }
+    },
+    {
+     "label": "Pointy triangle",
+     "wave": "hoot",
+     "sound": {
+      "notes": [
+       72,
+       76,
+       79
+      ],
+      "voice": "hoot",
+      "gap": 0.4
+     }
+    }
+   ],
+   "answer": 1,
+   "reveal": "The triangle! Pointy wiggles make a soft, smooth sound."
+  },
+  {
+   "type": "guess",
+   "prompt": "And this one?",
+   "order": [
+    "copilot",
+    "commander",
+    "engineer"
+   ],
+   "play": {
+    "sfx": {
+     "voice": "fizz",
+     "from": 84,
+     "to": 70,
+     "len": 0.8
+    }
+   },
+   "choices": [
+    {
+     "label": "Square",
+     "wave": "bleep",
+     "sound": {
+      "notes": [
+       72
+      ],
+      "voice": "bleep",
+      "gap": 0.6
+     }
+    },
+    {
+     "label": "Saw",
+     "wave": "buzz",
+     "sound": {
+      "notes": [
+       72
+      ],
+      "voice": "buzz",
+      "gap": 0.6
+     }
+    },
+    {
+     "label": "All jumbled",
+     "wave": "fizz",
+     "sound": {
+      "sfx": {
+       "voice": "fizz",
+       "from": 84,
+       "to": 70,
+       "len": 0.8
+      }
+     }
+    }
+   ],
+   "answer": 2,
+   "reveal": "Fizz's wiggles are all jumbled up. That makes a hissy sound. Old games used it for drums."
+  },
+  {
+   "type": "story",
+   "title": "A chip with four shapes",
+   "text": "This little chip made the sounds in an old computer called the Commodore 64. It could make all four of our shapes: triangle, saw, square and noise.",
+   "art": {
+    "img": "assets/img/sid-chip.jpg",
+    "credit": "SID sound chip. Photo: mariom990, public domain",
+    "alt": "A black computer chip with metal legs"
+   },
+   "wow": {
+    "text": "It could play 3 sounds at once: a band of just three robots.",
+    "source": "https://en.wikipedia.org/wiki/MOS_Technology_6581"
+   }
+  },
+  {
+   "type": "toy",
+   "toy": "pulse",
+   "eyebrow": "Skinny and fat",
+   "intro": "Bleep can make its squares skinny or fat. Tap each one. Do they sound different?",
+   "who": "commander"
+  },
+  {
+   "type": "story",
+   "title": "Draw a sound, like a Game Boy",
+   "text": "The Game Boy had one sound you could draw yourself. It was made of 32 little steps. Our Wave Drawer has 32 steps too!",
+   "art": {
+    "img": "assets/img/gameboy.jpg",
+    "credit": "Game Boy. Photo: Evan-Amos, public domain",
+    "alt": "A grey Nintendo Game Boy"
+   },
+   "wow": {
+    "text": "The Game Boy's wave had 32 steps, and each step could be one of 16 heights.",
+    "source": "https://gbdev.io/pandocs/Audio.html"
+   }
+  },
+  {
+   "type": "make",
+   "toy": "wavedraw",
+   "props": {
+    "save": true
+   },
+   "intro": "Draw your own wiggle with your finger, then press the pads. When you love it, give our robot a name and save it!",
+   "who": "everyone"
+  },
+  {
+   "type": "athome",
+   "title": "Make rice dance",
+   "art": "drum",
+   "need": [
+    "A bowl",
+    "Cling film and an elastic band",
+    "A pinch of dry rice",
+    "A pan and a wooden spoon"
+   ],
+   "steps": [
+    "Stretch cling film tight over the bowl. Hold it on with the elastic band.",
+    "Sprinkle a little rice on top.",
+    "A grown-up bangs the pan close to the bowl. Watch the rice jump!"
+   ],
+   "why": "The bang makes the air wiggle. The wiggles shake the cling film, like the eardrum inside your ear, and the rice dances.",
+   "safety": "Rice grains are small: keep them on the table and away from mouths. The grown-up does the banging."
+  },
+  {
+   "type": "finish",
+   "debrief": [
+    "Which sound shape do you like best?",
+    "What does our own robot sound like?"
+   ]
+  }
+ ]
+}
