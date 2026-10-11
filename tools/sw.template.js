@@ -33,7 +33,8 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    for (const key of await caches.keys()) if (key !== VERSION) await caches.delete(key);
+    // Only clear this app's own old caches: the sister apps share this site and keep theirs.
+    for (const key of await caches.keys()) if (key.startsWith('astrafinn-') && key !== VERSION) await caches.delete(key);
     await self.clients.claim();
   })());
 });
