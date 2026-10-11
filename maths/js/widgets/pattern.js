@@ -1,31 +1,33 @@
 // pattern: a row of shapes, colours or turned arrows in a repeating pattern, with a gap to fill or the next items to build.
+// Look (style v2): shapes are flat outlined stickers; the gap is a dashed blue box with a blue "?"; palette tiles are white push buttons.
 // Props: items (array of { shape, colour, rotate } using shapes2d names and colour names, or { art, rotate } using art names),
 //        gap (an index shown as a "?" slot, or 'end' for empty slots after the row), slots (how many 'end' slots, default 1),
 //        interactive (tap a palette tile to fill the next empty slot; tap a filled slot to clear it and the ones after),
 //        palette (array of items to build with), unit (draw a bracket under every `unit` items to show the repeat),
 //        filled (items already placed in the slots, e.g. to reveal an answer), readonly.
 // State: { filled, count, lastShape, lastColour, lastRotate, seq }
-//        filled = items placed so far; lastShape is the shape (or art) name of the last one; seq = keys like "circle-gold" or "arrow-gold-r90".
-// Debug: dev/harness.html?widget=pattern&props={"items":[{"shape":"circle","colour":"gold"},{"shape":"square","colour":"cyan"}],"gap":"end","interactive":true}
+//        filled = items placed so far; lastShape is the shape (or art) name of the last one; seq = keys like "circle-yellow" or "arrow-blue-r90".
+// Debug: dev/harness.html?widget=pattern&props={"items":[{"shape":"circle","colour":"yellow"},{"shape":"square","colour":"blue"}],"gap":"end","interactive":true,"palette":[{"shape":"circle","colour":"yellow"},{"shape":"square","colour":"blue"}]}
 import { S, svgRoot, onTap, injectCSS, clamp } from '../core/dom.js';
 import { artInner } from '../core/art.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
-import { shapePathFit, colourOf, SHAPES2D } from './shapes2d.js';
+import { shapePathFit, colourOf, SHAPES2D, OUTLINE } from './shapes2d.js';
 
 export const meta = {
   title: 'Patterns',
   playground: {
-    items: [{ shape: 'circle', colour: 'gold' }, { shape: 'triangle', colour: 'cyan' }, { shape: 'circle', colour: 'gold' }, { shape: 'triangle', colour: 'cyan' }, { shape: 'circle', colour: 'gold' }],
+    items: [{ shape: 'circle', colour: 'yellow' }, { shape: 'triangle', colour: 'blue' }, { shape: 'circle', colour: 'yellow' }, { shape: 'triangle', colour: 'blue' }, { shape: 'circle', colour: 'yellow' }],
     gap: 'end', slots: 3, interactive: true,
-    palette: [{ shape: 'circle', colour: 'gold' }, { shape: 'triangle', colour: 'cyan' }, { shape: 'square', colour: 'pink' }],
+    palette: [{ shape: 'circle', colour: 'yellow' }, { shape: 'triangle', colour: 'blue' }, { shape: 'square', colour: 'pink' }],
   },
   state: ['filled', 'count', 'lastShape', 'lastColour', 'lastRotate', 'seq'],
 };
 
 const W = 800, H = 500;
 const normRot = r => ((Math.round(+r || 0) % 360) + 360) % 360;
-// A short key for an item: "circle-gold", "arrow-gold-r90", "rocket".
+const f1 = v => Math.round(v * 10) / 10;
+// A short key for an item: "circle-yellow", "arrow-blue-r90", "rocket".
 export function patternKey(it) {
   if (!it) return '';
   const parts = [it.shape || it.art || '?'];
@@ -38,11 +40,12 @@ export function mount(el, props = {}, ctx = {}) {
   injectCSS('w-pattern', `
     .w-pattern { width: 100%; height: 100%; }
     .w-pattern .tile, .w-pattern .slot.full { cursor: pointer; }
-    .w-pattern .tile:active rect { fill: rgba(242,181,68,.3); }
+    .w-pattern .ctl .face { transition: transform .08s ease; }
+    .w-pattern .ctl.down .face { transform: translateY(4px); }
     .w-pattern .deco { pointer-events: none; }
     .w-pattern .pop { animation: w-pattern-pop .25s ease; transform-box: fill-box; transform-origin: center; }
     @keyframes w-pattern-pop { from { transform: scale(.6); opacity: .3; } }
-    @media (prefers-reduced-motion: reduce) { .w-pattern .pop { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .w-pattern .pop { animation: none; } .w-pattern .ctl .face { transition: none; } }
   `);
   let p = { ...props };
   let filled = [];
@@ -66,8 +69,7 @@ export function mount(el, props = {}, ctx = {}) {
       return g;
     }
     const shape = SHAPES2D.includes(it.shape) ? it.shape : 'circle';
-    const c = colourOf(it.colour, COL.ink2);
-    return S('path', { class: 'deco', d: shapePathFit(shape, normRot(it.rotate), cx, cy, size), fill: c, 'fill-opacity': 0.88, stroke: 'rgba(255,255,255,.55)', 'stroke-width': 3, 'stroke-linejoin': 'round', ...extra });
+    return S('path', { class: 'deco', d: shapePathFit(shape, normRot(it.rotate), cx, cy, size), fill: colourOf(it.colour), ...OUTLINE, ...extra });
   }
 
   function changed() { draw(); ctx.onChange && ctx.onChange(api.getState()); }
@@ -101,10 +103,13 @@ export function mount(el, props = {}, ctx = {}) {
       const cx = x0 + (i + 0.5) * cell;
       if (r.it) { root.appendChild(drawItem(r.it, cx, cy, size)); return; }
       const f = filled[r.slot];
+      const next = !f && (r.slot === filled.length || p.gap !== 'end');
       const sg = S('g', { class: 'slot' + (f ? ' full' : '') });
-      sg.appendChild(S('rect', { x: cx - cell * 0.46, y: cy - cell * 0.46, width: cell * 0.92, height: cell * 0.92, rx: 14, fill: f ? 'rgba(242,181,68,.10)' : 'rgba(255,255,255,.04)', stroke: f ? COL.tens : COL.ink3, 'stroke-width': 3, 'stroke-dasharray': f ? null : '10 7' }));
+      // The gap to fill: dashed blue with a blue "?". Filled: solid blue edge (selected). Later empty slots: faint dashes.
+      sg.appendChild(S('rect', { x: cx - cell * 0.46, y: cy - cell * 0.46, width: cell * 0.92, height: cell * 0.92, rx: 14,
+        fill: f || next ? COL.focusSoft : COL.surface, stroke: f || next ? COL.focus : COL.lineStrong, 'stroke-width': 3.5, 'stroke-dasharray': f ? null : '10 7' }));
       if (f) sg.appendChild(drawItem(f, cx, cy, size, r.slot === justPlaced ? { class: 'deco pop' } : {}));
-      else if (r.slot === filled.length || p.gap !== 'end') sg.appendChild(S('text', { class: 'deco', x: cx, y: cy + Math.min(18, cell * 0.2), 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': Math.min(52, cell * 0.55), fill: COL.ink2 }, ['?']));
+      else if (next) sg.appendChild(S('text', { class: 'deco', x: cx, y: cy + Math.min(18, cell * 0.2), 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': Math.min(52, cell * 0.55), fill: COL.focus }, ['?']));
       if (f && inter) {
         unbinds.push(onTap(sg, () => { filled = filled.slice(0, r.slot); justPlaced = -1; sfx('click'); changed(); }));
       }
@@ -115,22 +120,35 @@ export function mount(el, props = {}, ctx = {}) {
     if (u >= 1 && u < n) {
       for (let s = 0; s + u <= n; s += u) {
         const xa = x0 + s * cell + 8, xb = x0 + (s + u) * cell - 8, yb = cy + cell * 0.55;
-        root.appendChild(S('path', { class: 'deco', d: `M${xa} ${yb}v12H${xb}v-12`, fill: 'none', stroke: COL.tens, 'stroke-width': 4, 'stroke-linejoin': 'round' }));
+        root.appendChild(S('path', { class: 'deco', d: `M${xa} ${yb}v12H${xb}v-12`, fill: 'none', stroke: COL.ink2, 'stroke-width': 4, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
       }
     }
+    // Read-only rows: fit the view to the row so it fills small option tiles (with a minimum size in big spaces).
+    if (!inter) {
+      const pad = 18 + cell * 0.55;
+      const cw = cell * n + 16, ch = pad * 2;
+      const small = el.clientWidth > 0 && el.clientWidth < 420;
+      const vw = Math.max(cw, small ? 0 : 700), vh = Math.max(ch, small ? 0 : 300);
+      root.setAttribute('viewBox', `${f1(x0 - 8 - (vw - cw) / 2)} ${f1(cy - vh / 2)} ${f1(vw)} ${f1(vh)}`);
+    } else root.setAttribute('viewBox', `0 0 ${W} ${H}`);
     // Palette.
     if (inter) {
       const pal = palette();
       const ts = Math.min(104, (W - 40) / pal.length - 14);
       const total = pal.length * ts + (pal.length - 1) * 14;
       const px = (W - total) / 2, py = 330;
-      root.appendChild(S('line', { class: 'deco', x1: 30, y1: 300, x2: W - 30, y2: 300, stroke: COL.line, 'stroke-width': 2 }));
+      root.appendChild(S('line', { class: 'deco', x1: 30, y1: 300, x2: W - 30, y2: 300, stroke: COL.line, 'stroke-width': 3 }));
       pal.forEach((it, i) => {
         const x = px + i * (ts + 14);
-        const tile = S('g', { class: 'tile', role: 'button', 'aria-label': patternKey(it) }, [
-          S('rect', { x, y: py, width: ts, height: ts, rx: 18, fill: 'rgba(255,255,255,.05)', stroke: COL.ink3, 'stroke-width': 2.5 }),
+        // White push button (light border, solid bottom edge) holding the shape.
+        const face = S('g', { class: 'face' }, [S('rect', { x, y: py, width: ts, height: ts, rx: 18, fill: COL.surface, stroke: COL.line, 'stroke-width': 3 })]);
+        face.appendChild(drawItem(it, x + ts / 2, py + ts / 2, ts * 0.64));
+        const tile = S('g', { class: 'ctl tile', role: 'button', 'aria-label': patternKey(it) }, [
+          S('rect', { x, y: py + 5, width: ts, height: ts, rx: 18, fill: COL.line }), face,
         ]);
-        tile.appendChild(drawItem(it, x + ts / 2, py + ts / 2, ts * 0.68));
+        const up = () => tile.classList.remove('down');
+        tile.addEventListener('pointerdown', () => tile.classList.add('down'));
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => tile.addEventListener(t, up));
         unbinds.push(onTap(tile, () => place(it)));
         root.appendChild(tile);
       });

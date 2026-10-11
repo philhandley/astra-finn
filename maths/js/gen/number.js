@@ -613,7 +613,7 @@ export const numberLineRead = {
       if (n % 5 === 0) n += R.pick([1, 2, -1]);
       return {
         lines: ['What number is the dot on?'],
-        widget: 'numberline', props: { min: 0, max: 20, labels: 'fives', minor: 1, marks: [{ at: n, label: '?', colour: 'gold' }] },
+        widget: 'numberline', props: { min: 0, max: 20, labels: 'fives', minor: 1, marks: [{ at: n, label: '?', colour: 'orange' }] },
         input: 'numpad', answer: n,
         hint: ['Find the nearest number you can see.', 'Count the little marks from there.'],
         explain: [nearTenLine(n)],
@@ -626,7 +626,7 @@ export const numberLineRead = {
       const n = T + o;
       return {
         lines: ['What number is the dot on?', `The middle is ${T + 5}.`],
-        widget: 'numberline', props: { min: T, max: T + 10, labels: [T, T + 5, T + 10], minor: 1, marks: [{ at: n, label: '?', colour: 'gold' }] },
+        widget: 'numberline', props: { min: T, max: T + 10, labels: [T, T + 5, T + 10], minor: 1, marks: [{ at: n, label: '?', colour: 'orange' }] },
         input: 'numpad', answer: n,
         hint: [o < 5 ? `Count on from ${T}.` : `Count on from ${T + 5}, or back from ${T + 10}.`],
         explain: [o === 4 || o === 6 ? `It is 1 ${o === 6 ? 'more' : 'less'} than the midpoint, ${T + 5}.` : nearTenLine(n), `So the dot is on ${n}.`],
@@ -636,7 +636,7 @@ export const numberLineRead = {
     const n = R.pick([10, 15, 20, 25, 30, 35, 40, 45, 55, 60, 65, 70, 75, 80, 85, 90]);
     return {
       lines: ['What number is the dot on?', 'The long marks are tens.'],
-      widget: 'numberline', props: { min: 0, max: 100, labels: [0, 50, 100], step: 10, minor: 5, marks: [{ at: n, label: '?', colour: 'gold' }] },
+      widget: 'numberline', props: { min: 0, max: 100, labels: [0, 50, 100], step: 10, minor: 5, marks: [{ at: n, label: '?', colour: 'orange' }] },
       input: 'numpad', answer: n,
       hint: [n > 50 ? 'Count on in tens from 50.' : 'Count on in tens from 0.', 'A short mark is halfway: a 5.'],
       explain: [n % 10 === 5 ? `It is halfway between ${n - 5} and ${n + 5}.` : `Count the tens: it is ${n}.`, `The dot is on ${n}.`],
@@ -658,7 +658,7 @@ export const betweenTens = {
       const pair = (a, b) => `${a} and ${b}`;
       return {
         lines: [`${n} is between two tens.`, 'Which two?'],
-        widget: 'numberline', props: { min: T - 10, max: T + 20, step: 10, minor: 1, labels: 'none', marks: [{ at: n, label: String(n), colour: 'gold' }] },
+        widget: 'numberline', props: { min: T - 10, max: T + 20, step: 10, minor: 1, labels: 'none', marks: [{ at: n, label: String(n), colour: 'orange' }] },
         input: 'choice', answer: pair(T, T + 10),
         options: R.shuffle([pair(T, T + 10), pair(T - 10, T), pair(T + 10, T + 20)]),
         hint: [`${n} has ${T / 10} tens.`, 'So it is just after one ten.'],
@@ -672,7 +672,7 @@ export const betweenTens = {
         lines: [next ? `What is the next ten after ${n}?` : `What ten comes just before ${n}?`],
         input: 'numpad', answer: next ? T + 10 : T,
         hint: [next ? `Count on from ${n} to a ten.` : `Count back from ${n} to a ten.`],
-        hintWidget: { widget: 'numberline', props: { min: T, max: T + 10, labels: 'ends', minor: 1, marks: [{ at: n, label: String(n), colour: 'gold' }] } },
+        hintWidget: { widget: 'numberline', props: { min: T, max: T + 10, labels: 'ends', minor: 1, marks: [{ at: n, label: String(n), colour: 'orange' }] } },
         explain: [`${n} is between ${T} and ${T + 10}.`, next ? `The next ten is ${T + 10}.` : `The ten before is ${T}.`],
         reteach: betweenTens.make(1, R, params),
       };
@@ -684,7 +684,7 @@ export const betweenTens = {
       lines: [`Is ${n} nearer to ${T} or ${T + 10}?`],
       input: 'choice', answer: nearer, options: [T, T + 10],
       hint: [`Halfway is ${T + 5}.`, `Is ${n} before or after ${T + 5}?`],
-      hintWidget: { widget: 'numberline', props: { min: T, max: T + 10, labels: [T, T + 5, T + 10], minor: 1, marks: [{ at: n, label: String(n), colour: 'gold' }] } },
+      hintWidget: { widget: 'numberline', props: { min: T, max: T + 10, labels: [T, T + 5, T + 10], minor: 1, marks: [{ at: n, label: String(n), colour: 'orange' }] } },
       explain: [o < 5 ? `${n} is ${o} more than ${T}.` : `${n} is ${10 - o} less than ${T + 10}.`, `So it is nearer to ${nearer}.`],
       reteach: betweenTens.make(2, R, params),
     };
@@ -726,7 +726,7 @@ export const estimateLine = {
     const labels = L === 1 ? [0, 10, 20] : L === 2 ? [0, 50, 100] : [0, 100];
     return {
       lines: [`Which dot is about ${target}?`],
-      widget: 'numberline', props: { min: 0, max, labels, step: L === 1 ? 10 : L === 2 ? 50 : 100, minor: 0, marks: pts.map((v, i) => ({ at: v, label: letters[i], colour: 'gold' })) },
+      widget: 'numberline', props: { min: 0, max, labels, step: L === 1 ? 10 : L === 2 ? 50 : 100, minor: 0, marks: pts.map((v, i) => ({ at: v, label: letters[i], colour: 'orange' })) },
       input: 'choice', answer: letters[ti], options: letters,
       hint: [`Find the middle first. That is ${max / 2}.`, `Is ${target} more or less than ${max / 2}?`],
       explain: [target > max / 2 ? `${target} is more than half way.` : target < max / 2 ? `${target} is less than half way.` : `${target} is half way.`, `Dot ${letters[ti]} is about ${target}.`],
@@ -749,7 +749,7 @@ export const compare = {
       if (R.chance(0.2)) b = a;
       const s = signOf(a, b);
       return {
-        lines: ['Which sign goes in the gap?', `Has gold got more, fewer or the same?`],
+        lines: ['Which sign goes in the gap?', 'Do the red dots have more, fewer or the same?'],
         caption: `${a}  ?  ${b}`,
         widget: 'objects', props: { n: a + b, icon: 'dot', arrange: 'groups', groups: [a, b], colours: [a, b] },
         input: 'choice', answer: s, options: SIGNS,
@@ -774,8 +774,8 @@ export const compare = {
         input: 'choice', answer: s, options: SIGNS,
         hint: sameT ? ['The tens are the same.', 'So look at the ones.'] : ['Look at the tens first.', 'More tens means a bigger number.'],
         hintWidget: sameT && a !== b
-          ? { widget: 'numberline', props: { min: tenOf(a), max: tenOf(a) + 10, labels: 'all', marks: [{ at: a, colour: 'gold' }, { at: b, colour: 'cyan' }] } }
-          : { widget: 'numberline', props: { min: 0, max: 100, labels: 'tens', marks: [{ at: a, label: String(a), colour: 'gold' }, { at: b, label: a === b ? '' : String(b), colour: 'cyan' }] } },
+          ? { widget: 'numberline', props: { min: tenOf(a), max: tenOf(a) + 10, labels: 'all', marks: [{ at: a, colour: 'orange' }, { at: b, colour: 'purple' }] } }
+          : { widget: 'numberline', props: { min: 0, max: 100, labels: 'tens', marks: [{ at: a, label: String(a), colour: 'orange' }, { at: b, label: a === b ? '' : String(b), colour: 'purple' }] } },
         explain: [`${a} ${signWords(s)} ${b}.`, `${a} ${s} ${b}`],
         reteach: compare.make(1, R, params),
       };
@@ -825,7 +825,7 @@ export const order = {
       lines: ['Put the numbers in order.', desc ? 'Biggest first.' : 'Smallest first.'],
       input: 'order', options: R.shuffle(nums), answer: sorted,
       hint: [desc ? 'Find the biggest number first.' : 'Find the smallest number first.', 'Look at the tens, then the ones.'],
-      hintWidget: { widget: 'numberline', props: L === 1 ? { min: 0, max: 20, labels: 'fives', minor: 1, marks: nums.map(v => ({ at: v, label: String(v), colour: 'gold' })) } : { min: 0, max: 100, labels: 'tens', marks: nums.map(v => ({ at: v, colour: 'gold' })) } },
+      hintWidget: { widget: 'numberline', props: L === 1 ? { min: 0, max: 20, labels: 'fives', minor: 1, marks: nums.map(v => ({ at: v, label: String(v), colour: 'orange' })) } : { min: 0, max: 100, labels: 'tens', marks: nums.map(v => ({ at: v, colour: 'orange' })) } },
       explain: [sorted.join(', ') + '.', desc ? `${hi} is the biggest.` : `${lo} is the smallest.`],
       reteach: L > 1 ? order.make(L - 1, R, params) : undefined,
     };

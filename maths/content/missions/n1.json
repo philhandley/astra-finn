@@ -34,10 +34,10 @@
       "widget": "placevalue",
       "props": { "tens": 0, "ones": 0 },
       "script": [
-        { "say": ["Let's build 34.", "Tap + under Tens 3 times."], "goal": { "tens": 3 }, "then": ["3 tens. That's 30."], "hint": ["The Tens are gold.", "Use the + under them."] },
+        { "say": ["Let's build 34.", "Tap + under Tens 3 times."], "goal": { "tens": 3 }, "then": ["3 tens. That's 30."], "hint": ["The Tens are green.", "Use the + under them."] },
         { "say": ["Now add 4 ones."], "goal": { "tens": 3, "ones": 4 }, "then": ["You put {tens} tens and {ones} ones.", "That's {value}."] },
         { "say": ["Keep adding ones.", "Stop when you have 10 ones."], "goal": { "ones": 10 }, "then": ["10 ones! That's the same as 1 ten."], "hint": ["Count the cubes.", "Use − if you go past 10."] },
-        { "say": ["Tap the glowing button.", "Swap 10 ones for 1 ten."], "goal": { "tens": 4, "ones": 0 }, "then": ["{tens} tens and {ones} ones.", "Still {value}!"] },
+        { "say": ["Tap the blue button.", "Swap 10 ones for 1 ten."], "goal": { "tens": 4, "ones": 0 }, "then": ["{tens} tens and {ones} ones.", "Still {value}!"] },
         { "say": ["How many is that altogether?"], "input": "numpad", "answer": "{value}", "then": ["4 tens is 40."] }
       ]
     },

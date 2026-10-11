@@ -19,8 +19,8 @@
     {
       "type": "look",
       "lines": [
-        "8 gold and 5 blue.",
-        "2 blue counters filled the first frame."
+        "8 red and 5 yellow.",
+        "2 yellow counters filled the first frame."
       ],
       "question": "How many altogether?",
       "widget": "tensframe",
@@ -51,14 +51,14 @@
         {
           "say": [
             "8 + 5.",
-            "Tap blue. Fill the first frame."
+            "Tap yellow. Fill the first frame."
           ],
           "goal": {
             "count": 10,
             "a": 8
           },
           "hint": [
-            "Tap the blue brush first.",
+            "Tap the yellow brush first.",
             "Tap a counter to take it off."
           ],
           "then": [

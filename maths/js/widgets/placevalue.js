@@ -1,22 +1,24 @@
 // placevalue: tens and ones columns with base-10 (Dienes) blocks or place-value counters.
 // Props:
 //   tens, ones, hundreds   starting counts. Ones may be 10 or more (3 tens and 14 ones is 44) until swapped.
-//   showHundreds           add a Hundreds column (magenta flats). Default false.
+//   showHundreds           add a Hundreds column (orange flats). Default false.
 //   interactive            default true: + and − buttons under each column, swap buttons. false = display only.
-//   showDigits             the count under each column, in the column colour.
+//   showDigits             the count under each column, in the column colour (between − and + when interactive).
 //   showValue              the total, big.
 //   showExpanded           "40 + 7" in column colours ("40 + 7 = 47" with showValue too).
 //   max                    largest value the + buttons can reach (default 99, or 999 with showHundreds).
-//   look                   'blocks' (default: gold rods and cyan cubes) or 'counters' (circles marked 10 and 1).
+//   look                   'blocks' (default: green rods and blue cubes) or 'counters' (circles marked 10 and 1).
 //   readonly
-// Interaction: + and − under each column. When there are 10 or more ones a glowing "Swap 10 ones for 1 ten" button
-// appears (tapping the glowing column of ten ones does the same); ten cubes fuse into a rod and fly to the Tens.
+// Style v2 (white surface): each column is a white card with a 3 px border and heading in its place-value colour
+// (hundreds orange, tens green, ones blue); chunky white +/− buttons; the swap button is primary blue.
+// Interaction: + and − under each column. When there are 10 or more ones a blue "Swap 10 ones for 1 ten" button
+// appears (tapping the dashed column of ten ones does the same); ten cubes fuse into a rod and fly to the Tens.
 // Tap a rod to be offered "Swap 1 ten for 10 ones". With hundreds, the same for 10 tens and 1 hundred.
 // State: { hundreds, tens, ones, value }
 // showAnswer(n) (or { tens, ones, hundreds }) animates to the standard partition of n.
 // Debug: dev/harness.html?widget=placevalue&props={"tens":3,"ones":14,"showDigits":true,"showExpanded":true,"showValue":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -30,24 +32,25 @@ const LIM = { hundreds: 9, tens: 19, ones: 99 };
 const PLACE = { hundreds: 100, tens: 10, ones: 1 };
 const NAME = { hundreds: 'Hundreds', tens: 'Tens', ones: 'Ones' };
 const COLR = { hundreds: COL.hundreds, tens: COL.tens, ones: COL.ones };
-const DARK = { hundreds: '#3a0b40', tens: '#3a2706', ones: '#06324a' };
+const DARK = { hundreds: PAL.orangeDark, tens: PAL.greenDark, ones: PAL.blueDark };
 const int = (v, d = 0) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? n : d; };
 
 export function mount(el, props = {}, ctx = {}) {
   injectCSS('w-placevalue', `
     .w-placevalue { width: 100%; height: 100%; }
     .w-placevalue .pv-btn { cursor: pointer; }
-    .w-placevalue .pv-btn.off { opacity: .28; cursor: default; }
-    .w-placevalue .pv-btn:active .pv-face { filter: brightness(1.35); }
+    .w-placevalue .pv-btn.off { opacity: .35; cursor: default; }
+    .w-placevalue .pv-btn .pv-face { transition: transform .08s ease; }
+    .w-placevalue .pv-btn:not(.off):active .pv-face { transform: translateY(4px); }
     .w-placevalue .pv-tap { cursor: pointer; }
     .w-placevalue.ro .pv-tap { cursor: default; }
-    .w-placevalue .pv-swap .pv-face { animation: w-pv-glow 1.4s ease-in-out infinite; }
+    .w-placevalue .pv-halo { animation: w-pv-halo 1.6s ease-in-out infinite; }
     .w-placevalue .pv-pop { animation: w-pv-pop .28s ease-out; transform-box: fill-box; transform-origin: center; }
     .w-placevalue .pv-ready { animation: w-pv-ready 1.4s ease-in-out infinite; }
-    @keyframes w-pv-glow { 0%, 100% { filter: drop-shadow(0 0 2px rgba(242,181,68,.4)); } 50% { filter: drop-shadow(0 0 14px rgba(242,181,68,.95)); } }
+    @keyframes w-pv-halo { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
     @keyframes w-pv-ready { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
     @keyframes w-pv-pop { 0% { transform: scale(.5); opacity: .3; } 70% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) { .w-placevalue .pv-swap .pv-face, .w-placevalue .pv-pop, .w-placevalue .pv-ready { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .w-placevalue .pv-halo, .w-placevalue .pv-pop, .w-placevalue .pv-ready { animation: none; } }
   `);
   let p = {};
   let c = { hundreds: 0, tens: 0, ones: 0 };
@@ -78,22 +81,21 @@ export function mount(el, props = {}, ctx = {}) {
   function layout() {
     const ks = cols();
     const n = ks.length;
-    const margin = 22, gap = 26;
+    const margin = 16, gap = 28;
     const pw = (W - 2 * margin - (n - 1) * gap) / n;
     const inter = !ro();
-    const slot = inter ? 92 : 0;
-    const py = slot + 6;
-    const BH = 300, PH = 60 + BH + 14;
+    const slot = inter ? 104 : 0;     // the swap button lives here
+    const py = slot + 4;
+    const HEAD = 64, BH = 300, PH = HEAD + BH + 18;
     let y = py + PH;
-    const digitsY = p.showDigits ? y + 64 : null;
-    if (p.showDigits) y += 80;
-    const btnY = inter ? y + 54 : null;
-    if (inter) y += 108;
-    const valueY = p.showValue || p.showExpanded ? y + 54 : null;
-    if (valueY) y += 74;
+    let digitsY = null, btnY = null;
+    if (inter) { btnY = y + 20 + 40; y += 20 + 86; }            // − digit + row (digit only with showDigits)
+    else if (p.showDigits) { digitsY = y + 14 + 42; y += 14 + 84; } // digit pill under each card
+    const valueY = p.showValue || p.showExpanded ? y + 18 + 42 : null;
+    if (valueY) y += 18 + 84;
     const VH = y + 6;
     const panels = {};
-    ks.forEach((k, i) => { panels[k] = { x: margin + i * (pw + gap), y: py, w: pw, h: PH, by0: py + 60, by1: py + 60 + BH }; });
+    ks.forEach((k, i) => { panels[k] = { x: margin + i * (pw + gap), y: py, w: pw, h: PH, by0: py + HEAD, by1: py + HEAD + BH }; });
 
     // Unit size for blocks: shrink when there are many rods or many columns of ones.
     let u = 26;
@@ -152,55 +154,67 @@ export function mount(el, props = {}, ctx = {}) {
   }
 
   // ---------- drawing helpers ----------
+  const HI = 'rgba(255,255,255,.28)';   // tiny highlight stripe on blocks
   function drawItem(k, it, i) {
     const g = S('g', { 'data-k': `${k[0]}${i}` });
     if (counters()) {
       const cx = it.x + it.w / 2, cy = it.y + it.h / 2, r = it.r;
-      g.appendChild(S('circle', { cx, cy, r, fill: COLR[k], stroke: 'rgba(0,0,0,.35)', 'stroke-width': 3 }));
-      g.appendChild(S('circle', { cx, cy, r: r * 0.78, fill: 'none', stroke: 'rgba(255,255,255,.45)', 'stroke-width': 2 }));
+      g.appendChild(S('circle', { cx, cy, r, fill: COLR[k], stroke: DARK[k], 'stroke-width': 3 }));
       const label = String(PLACE[k]);
       const fs = r * (label.length === 1 ? 1.05 : label.length === 2 ? 0.86 : 0.62);
-      g.appendChild(S('text', { x: cx, y: cy + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fs, fill: DARK[k] }, [label]));
+      g.appendChild(S('text', { x: cx, y: cy + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fs, fill: '#fff' }, [label]));
       return g;
     }
     if (k === 'hundreds') {
-      g.appendChild(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, rx: 4, fill: COL.hundreds, stroke: 'rgba(0,0,0,.35)', 'stroke-width': 2 }));
+      g.appendChild(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, rx: 4, fill: COL.hundreds, stroke: DARK[k], 'stroke-width': 2.5 }));
       let d = '';
       for (let j = 1; j < 10; j++) {
         const t = (it.w * j) / 10;
         d += `M${it.x + t} ${it.y}v${it.h}M${it.x} ${it.y + t}h${it.w}`;
       }
-      g.appendChild(S('path', { d, stroke: 'rgba(58,11,64,.45)', 'stroke-width': 1.5 }));
+      g.appendChild(S('path', { d, stroke: DARK[k], 'stroke-opacity': 0.45, 'stroke-width': 1.5 }));
       return g;
     }
     if (k === 'tens') {
-      g.appendChild(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, rx: Math.min(5, it.w * 0.2), fill: COL.tens, stroke: 'rgba(0,0,0,.35)', 'stroke-width': 2 }));
+      g.appendChild(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, rx: Math.min(5, it.w * 0.2), fill: COL.tens, stroke: DARK[k], 'stroke-width': 2.5 }));
       let d = '';
       const cellH = (it.h + 3) / 10;
       for (let j = 1; j < 10; j++) d += `M${it.x + 2} ${it.y + j * cellH - 1.5}h${it.w - 4}`;
-      g.appendChild(S('path', { d, stroke: 'rgba(58,39,6,.55)', 'stroke-width': j5(cellH) }));
-      g.appendChild(S('rect', { x: it.x + it.w * 0.18, y: it.y + 3, width: it.w * 0.16, height: it.h - 6, rx: 2, fill: 'rgba(255,255,255,.28)' }));
+      g.appendChild(S('path', { d, stroke: DARK[k], 'stroke-opacity': 0.55, 'stroke-width': j5(cellH) }));
+      g.appendChild(S('rect', { x: it.x + it.w * 0.18, y: it.y + 3, width: it.w * 0.16, height: it.h - 6, rx: 2, fill: HI }));
       return g;
     }
-    g.appendChild(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, rx: Math.min(5, it.w * 0.2), fill: COL.ones, stroke: 'rgba(0,0,0,.35)', 'stroke-width': 2 }));
-    g.appendChild(S('rect', { x: it.x + it.w * 0.18, y: it.y + it.h * 0.15, width: it.w * 0.18, height: it.h * 0.7, rx: 2, fill: 'rgba(255,255,255,.3)' }));
+    g.appendChild(S('rect', { x: it.x, y: it.y, width: it.w, height: it.h, rx: Math.min(5, it.w * 0.2), fill: COL.ones, stroke: DARK[k], 'stroke-width': 2.5 }));
+    g.appendChild(S('rect', { x: it.x + it.w * 0.18, y: it.y + it.h * 0.15, width: it.w * 0.18, height: it.h * 0.7, rx: 2, fill: HI }));
     return g;
   }
   const j5 = cellH => (cellH > 14 ? 2 : 1.2);
 
-  function circleBtn(cx, cy, r, colour, glyph, onPress, off) {
+  // Section 7 control: white rounded rectangle, 3 px COL.line border, solid 5 px bottom edge; the face drops 4 px when pressed.
+  function plusMinusBtn(cx, cy, colour, glyph, onPress, off) {
+    const w = 96, h = 78, rx = 18;
     const g = S('g', { class: 'pv-btn' + (off ? ' off' : ''), transform: `translate(${cx} ${cy})` });
-    g.appendChild(S('circle', { class: 'pv-face', r, fill: 'rgba(255,255,255,.06)', stroke: colour, 'stroke-width': 4 }));
-    const a = r * 0.42;
-    g.appendChild(S('path', { d: glyph === '+' ? `M${-a} 0H${a}M0 ${-a}V${a}` : `M${-a} 0H${a}`, stroke: colour, 'stroke-width': 9, 'stroke-linecap': 'round' }));
+    g.appendChild(S('rect', { x: -w / 2 - 6, y: -h / 2 - 6, width: w + 12, height: h + 18, fill: 'transparent' })); // bigger hit area
+    g.appendChild(S('rect', { x: -w / 2, y: -h / 2 + 5, width: w, height: h, rx, fill: COL.line }));
+    const face = S('g', { class: 'pv-face' });
+    face.appendChild(S('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx, fill: COL.surface, stroke: COL.line, 'stroke-width': 3 }));
+    const a = 17;
+    face.appendChild(S('path', { d: glyph === '+' ? `M${-a} 0H${a}M0 ${-a}V${a}` : `M${-a} 0H${a}`, stroke: colour, 'stroke-width': 9, 'stroke-linecap': 'round' }));
+    g.appendChild(face);
     if (!off) unbinds.push(onTap(g, onPress));
     return g;
   }
 
-  function pillBtn(cx, cy, w, h, label, onPress) {
+  // Primary action: PAL.blue fill, white text, PAL.blueDark bottom edge, with a soft pulsing halo.
+  function swapBtn(cx, cy, w, label, onPress) {
+    const h = 74, rx = 20;
     const g = S('g', { class: 'pv-btn pv-swap', transform: `translate(${cx} ${cy})` });
-    g.appendChild(S('rect', { class: 'pv-face', x: -w / 2, y: -h / 2, width: w, height: h, rx: h / 2, fill: COL.tens, stroke: '#ffe0a0', 'stroke-width': 3 }));
-    g.appendChild(S('text', { y: 11, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 31, fill: '#1a1205' }, [label]));
+    g.appendChild(S('rect', { class: 'pv-halo', x: -w / 2 - 9, y: -h / 2 - 9, width: w + 18, height: h + 23, rx: rx + 8, fill: COL.focusSoft }));
+    g.appendChild(S('rect', { x: -w / 2, y: -h / 2 + 5, width: w, height: h, rx, fill: PAL.blueDark }));
+    const face = S('g', { class: 'pv-face' });
+    face.appendChild(S('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx, fill: PAL.blue }));
+    face.appendChild(S('text', { y: 11, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 31, fill: '#fff' }, [label]));
+    g.appendChild(face);
     unbinds.push(onTap(g, onPress));
     return g;
   }
@@ -217,17 +231,20 @@ export function mount(el, props = {}, ctx = {}) {
     for (const k of L.ks) {
       const P = L.panels[k];
       const panel = S('g', {});
-      panel.appendChild(S('rect', { x: P.x, y: P.y, width: P.w, height: P.h, rx: 18, fill: 'rgba(255,255,255,.035)', stroke: COLR[k], 'stroke-opacity': 0.45, 'stroke-width': 2.5 }));
-      panel.appendChild(S('text', { x: P.x + P.w / 2, y: P.y + 44, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 36, fill: COLR[k], 'letter-spacing': 1 }, [NAME[k]]));
+      // A tall white card with a 3 px border and heading in the column colour.
+      panel.appendChild(S('rect', { x: P.x, y: P.y, width: P.w, height: P.h, rx: 18, fill: COL.surface, stroke: COLR[k], 'stroke-width': 3.5 }));
+      panel.appendChild(S('text', { x: P.x + P.w / 2, y: P.y + 46, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 36, fill: COLR[k] }, [NAME[k]]));
       root.appendChild(panel);
 
-      // A glowing outline round the first full column of ten ones (or ten tens) shows what can be swapped.
+      // A dashed outline round the first full column of ten ones (or ten tens) shows what can be swapped,
+      // in the colour of the place it will become.
       const canFuse = !ro() && ((k === 'ones' && c.ones >= 10 && c.tens < LIM.tens) || (k === 'tens' && p.showHundreds && c.tens >= 10 && c.hundreds < LIM.hundreds));
       if (canFuse && !counters()) {
         const first10 = L.items[k].slice(0, 10);
-        const bx = Math.min(...first10.map(i => i.x)) - 6, by = Math.min(...first10.map(i => i.y)) - 6;
-        const bw = Math.max(...first10.map(i => i.x + i.w)) - bx + 6, bh = Math.max(...first10.map(i => i.y + i.h)) - by + 6;
-        const ring = S('rect', { class: 'pv-ready pv-tap', x: bx, y: by, width: bw, height: bh, rx: 8, fill: 'rgba(242,181,68,.08)', stroke: COL.tens, 'stroke-width': 3, 'stroke-dasharray': '8 6' });
+        const ringCol = k === 'ones' ? COL.tens : COL.hundreds;
+        const bx = Math.min(...first10.map(i => i.x)) - 7, by = Math.min(...first10.map(i => i.y)) - 7;
+        const bw = Math.max(...first10.map(i => i.x + i.w)) - bx + 7, bh = Math.max(...first10.map(i => i.y + i.h)) - by + 7;
+        const ring = S('rect', { class: 'pv-ready pv-tap', x: bx, y: by, width: bw, height: bh, rx: 9, fill: k === 'ones' ? COL.goodSoft : '#fef3c7', stroke: ringCol, 'stroke-width': 3.5, 'stroke-dasharray': '9 7' });
         unbinds.push(onTap(ring, () => (k === 'ones' ? swapUp('ones') : swapUp('tens'))));
         root.appendChild(ring);
       }
@@ -237,7 +254,9 @@ export function mount(el, props = {}, ctx = {}) {
         const g = drawItem(k, it, i);
         if (pop && pop.key === k && pop.index === i) g.classList.add('pv-pop');
         if (offer && ((offer === 'breakTen' && k === 'tens') || (offer === 'breakHundred' && k === 'hundreds')) && i === L.items[k].length - 1) {
-          g.appendChild(S('rect', { x: it.x - 5, y: it.y - 5, width: it.w + 10, height: it.h + 10, rx: 8, fill: 'none', stroke: '#fff', 'stroke-width': 3 }));
+          // Selected: blue outline on a soft blue well.
+          g.insertBefore(S('rect', { x: it.x - 7, y: it.y - 7, width: it.w + 14, height: it.h + 14, rx: 10, fill: COL.focusSoft }), g.firstChild);
+          g.appendChild(S('rect', { x: it.x - 7, y: it.y - 7, width: it.w + 14, height: it.h + 14, rx: 10, fill: 'none', stroke: COL.focus, 'stroke-width': 4 }));
         }
         if (!ro() && (k === 'tens' || k === 'hundreds')) {
           g.classList.add('pv-tap');
@@ -253,35 +272,44 @@ export function mount(el, props = {}, ctx = {}) {
       root.appendChild(layer);
 
       if (L.digitsY) {
-        root.appendChild(S('text', { x: P.x + P.w / 2, y: L.digitsY, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 66, fill: COLR[k] }, [String(c[k])]));
+        // Display only: the digit in a soft pill under the card.
+        root.appendChild(S('rect', { x: P.x + 6, y: L.digitsY - 42, width: P.w - 12, height: 84, rx: 16, fill: COL.surface2 }));
+        root.appendChild(S('text', { x: P.x + P.w / 2, y: L.digitsY + 23, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 64, fill: COLR[k] }, [String(c[k])]));
       }
       if (L.btnY) {
         const v = value(), mx = maxV();
-        const cx = P.x + P.w / 2, r = 44;
-        const sep = Math.min(78, P.w / 2 - r - 4);
-        root.appendChild(circleBtn(cx - sep, L.btnY, r, COLR[k], '−', () => change(k, -1), c[k] <= 0));
-        root.appendChild(circleBtn(cx + sep, L.btnY, r, COLR[k], '+', () => change(k, +1), c[k] >= LIM[k] || v + PLACE[k] > mx));
+        const cx = P.x + P.w / 2;
+        const sep = Math.min(p.showDigits ? 116 : 84, P.w / 2 - 54);
+        root.appendChild(plusMinusBtn(cx - sep, L.btnY, COLR[k], '−', () => change(k, -1), c[k] <= 0));
+        root.appendChild(plusMinusBtn(cx + sep, L.btnY, COLR[k], '+', () => change(k, +1), c[k] >= LIM[k] || v + PLACE[k] > mx));
+        if (p.showDigits) {
+          // The digit sits between − and +, in the column colour.
+          const txt = String(c[k]);
+          root.appendChild(S('text', { x: cx, y: L.btnY + 22, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': txt.length > 1 && sep < 110 ? 52 : 64, fill: COLR[k] }, [txt]));
+        }
       }
     }
 
     if (L.valueY) {
-      const t = S('text', { x: W / 2, y: L.valueY, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 54 });
-      const add = (txt, fill) => { const s = S('tspan', { fill }); s.textContent = txt; t.appendChild(s); };
+      // Expanded form and total in one soft pill: "40 + 7 = 47", values in their column colours, the total in ink.
+      root.appendChild(S('rect', { x: 22, y: L.valueY - 42, width: W - 44, height: 84, rx: 18, fill: COL.surface2 }));
+      const t = S('text', { x: W / 2, y: L.valueY + 19, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 54 });
+      const add = (txt, fill, weight) => { const s = S('tspan', { fill }); if (weight) s.setAttribute('font-weight', weight); s.textContent = txt; t.appendChild(s); };
       if (p.showExpanded) {
-        L.ks.forEach((k, i) => { if (i) add(' + ', COL.ink2); add(String(c[k] * PLACE[k]), COLR[k]); });
-        if (p.showValue) { add(' = ', COL.ink2); add(String(value()), COL.ink); }
+        L.ks.forEach((k, i) => { if (i) add(' + ', COL.ink2, 600); add(String(c[k] * PLACE[k]), COLR[k]); });
+        if (p.showValue) { add(' = ', COL.ink2, 600); add(String(value()), COL.ink); }
       } else add(String(value()), COL.ink);
       root.appendChild(t);
     }
 
     // Swap buttons in the top slot.
     if (!ro()) {
-      const sy = L.slot / 2;
+      const sy = L.slot / 2 - 4;
       let btn = null;
-      if (offer === 'breakTen' && c.tens > 0 && c.ones + 10 <= LIM.ones) btn = pillBtn(W / 2, sy, 470, 74, 'Swap 1 ten for 10 ones', () => swapDown('tens'));
-      else if (offer === 'breakHundred' && c.hundreds > 0 && c.tens + 10 <= LIM.tens) btn = pillBtn(W / 2, sy, 540, 74, 'Swap 1 hundred for 10 tens', () => swapDown('hundreds'));
-      else if (c.ones >= 10 && c.tens < LIM.tens) btn = pillBtn(W / 2, sy, 470, 74, 'Swap 10 ones for 1 ten', () => swapUp('ones'));
-      else if (p.showHundreds && c.tens >= 10 && c.hundreds < LIM.hundreds) btn = pillBtn(W / 2, sy, 540, 74, 'Swap 10 tens for 1 hundred', () => swapUp('tens'));
+      if (offer === 'breakTen' && c.tens > 0 && c.ones + 10 <= LIM.ones) btn = swapBtn(W / 2, sy, 470, 'Swap 1 ten for 10 ones', () => swapDown('tens'));
+      else if (offer === 'breakHundred' && c.hundreds > 0 && c.tens + 10 <= LIM.tens) btn = swapBtn(W / 2, sy, 540, 'Swap 1 hundred for 10 tens', () => swapDown('hundreds'));
+      else if (c.ones >= 10 && c.tens < LIM.tens) btn = swapBtn(W / 2, sy, 470, 'Swap 10 ones for 1 ten', () => swapUp('ones'));
+      else if (p.showHundreds && c.tens >= 10 && c.hundreds < LIM.hundreds) btn = swapBtn(W / 2, sy, 540, 'Swap 10 tens for 1 hundred', () => swapUp('tens'));
       if (btn) root.appendChild(btn);
     }
     pop = null;

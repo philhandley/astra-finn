@@ -422,9 +422,9 @@ export const makeTen = {
     const reteach = { lines: [`What goes with ${big} to make 10?`], caption: `${big} + ? = 10`, widget: 'tensframe', props: { count: big, frames: 1 }, input: 'numpad', answer: k, hint: ['Count the empty spaces.'], explain: [`${big} and ${k} make 10.`], fact: factKey('+', big, k) };
     if (level === 1) {
       return {
-        lines: [`${big} gold and ${small} blue.`, 'Fill the first 10. Then add the rest.'], caption: `${big} + ${small} = ?`, ...frames,
+        lines: [`${big} red and ${small} yellow.`, 'Fill the first 10. Then add the rest.'], caption: `${big} + ${small} = ?`, ...frames,
         input: 'choice', answer: s, options: choices(R, s, { min: 10, max: 20 }),
-        hint: [`${k} blue counters fill the first frame.`, `${r} are left over.`], explain, fact, reteach,
+        hint: [`${k} yellow counters fill the first frame.`, `${r} are left over.`], explain, fact, reteach,
       };
     }
     if (level === 2) {
@@ -992,11 +992,12 @@ function story(structure, t, a, b, R) {
   const s = a + b;
   switch (structure) {
     case 'aggregation': {
-      const [c1, c2] = R.pick([['gold', 'silver'], ['big', 'small'], ['red', 'blue']]);
+      // Level 1 draws the first group with red rings and the second with yellow, so the words match.
+      const [c1, c2] = R.pick([['red', 'yellow'], ['big', 'small']]);
       return { lines: [`There are ${a} ${c1} ${many(t, a)}.`, `There are ${b} ${c2} ${many(t, b)}.`, `How many ${t.many} altogether?`], op: '+', ans: s, full: [a, '+', b, s], say: `${a} plus ${b} is equal to ${s}` };
     }
     case 'partitioning': {
-      return { lines: [`There are ${s} ${t.many}.`, `${a} ${isAre(a)} gold.`, `How many are not gold?`], op: '-', ans: b, full: [s, '-', a, b], say: `${s} minus ${a} is equal to ${b}` };
+      return { lines: [`There are ${s} ${t.many}.`, `${a} ${isAre(a)} red.`, `How many are not red?`], op: '-', ans: b, full: [s, '-', a, b], say: `${s} minus ${a} is equal to ${b}` };
     }
     case 'augmentation': {
       const where = t.icon === 'rocket' ? 'on the launch pad' : R.pick(['in the hangar', 'at the moon base', 'in the space station']);

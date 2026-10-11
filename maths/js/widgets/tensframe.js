@@ -1,9 +1,9 @@
 // tensframe: one or two tens frames with gold and cyan counters. Reference widget for ENGINE.md.
-// Props: count, frames (1 | 2; default 2 when count or max is over 10), colours ([gold, cyan] counts; overrides count),
+// Props: count, frames (1 | 2; default 2 when count or max is over 10), colours ([red, yellow] counts; overrides count),
 //        twoColour (show the brush toggle), interactive (default true), max (10 or 20), readonly.
 // Counters always fill in order: top row left to right, then the bottom row, then the next frame.
 // Tap anywhere on a frame to add a counter in the next space. Tap a counter to take it away.
-// State: { count, a, b, frames }  (a = gold counters, b = cyan counters)
+// State: { count, a, b, frames }  (a = red counters, b = yellow counters)
 import { S, svgRoot, onTap, injectCSS, clamp } from '../core/dom.js';
 import { COL } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
@@ -59,10 +59,10 @@ export function mount(el, props = {}, ctx = {}) {
     for (let f = 0; f < nF; f++) {
       const fy = oy + f * (fh + GAP);
       const frame = S('g', { class: 'frame' });
-      frame.appendChild(S('rect', { x: ox - 8, y: fy - 8, width: fw + 16, height: fh + 16, rx: 14, fill: 'rgba(255,255,255,.05)', stroke: COL.ink2, 'stroke-width': 4 }));
+      frame.appendChild(S('rect', { x: ox - 8, y: fy - 8, width: fw + 16, height: fh + 16, rx: 16, fill: COL.surface, stroke: COL.ink, 'stroke-width': 5 }));
       for (let k = 0; k < 10; k++) {
         const cx = ox + (k % 5) * CELL, cy = fy + Math.floor(k / 5) * CELL;
-        frame.appendChild(S('rect', { x: cx, y: cy, width: CELL, height: CELL, fill: 'none', stroke: COL.ink3, 'stroke-width': 2.5 }));
+        frame.appendChild(S('rect', { x: cx, y: cy, width: CELL, height: CELL, fill: 'none', stroke: COL.lineStrong, 'stroke-width': 3 }));
       }
       if (!ro()) {
         unbinds.push(onTap(frame, () => {
@@ -77,7 +77,7 @@ export function mount(el, props = {}, ctx = {}) {
         const idx = f * 10 + k;
         if (idx >= cells.length) break;
         const cx = ox + (k % 5) * CELL + CELL / 2, cy = fy + Math.floor(k / 5) * CELL + CELL / 2;
-        const c = S('circle', { class: 'ctr', cx, cy, r: CELL * 0.36, fill: cells[idx] === 'a' ? COL.a : COL.b, stroke: 'rgba(0,0,0,.25)', 'stroke-width': 3 });
+        const c = S('circle', { class: 'ctr', cx, cy, r: CELL * 0.37, fill: cells[idx] === 'a' ? COL.a : COL.b, stroke: cells[idx] === 'a' ? COL.aDark : COL.bDark, 'stroke-width': 4 });
         if (!ro()) {
           unbinds.push(onTap(c, e => {
             e.stopPropagation && e.stopPropagation();
@@ -97,8 +97,8 @@ export function mount(el, props = {}, ctx = {}) {
       ['a', 'b'].forEach((key, i) => {
         const by = H / 2 - 50 + i * 100;
         const g = S('g', { class: 'brush' });
-        g.appendChild(S('circle', { cx: bx, cy: by, r: 40, fill: 'rgba(255,255,255,.06)', stroke: brush === key ? COL.ink : COL.line, 'stroke-width': brush === key ? 5 : 2 }));
-        g.appendChild(S('circle', { cx: bx, cy: by, r: 26, fill: key === 'a' ? COL.a : COL.b }));
+        g.appendChild(S('circle', { cx: bx, cy: by, r: 42, fill: COL.surface, stroke: brush === key ? COL.ink : COL.line, 'stroke-width': brush === key ? 6 : 3 }));
+        g.appendChild(S('circle', { cx: bx, cy: by, r: 27, fill: key === 'a' ? COL.a : COL.b, stroke: key === 'a' ? COL.aDark : COL.bDark, 'stroke-width': 4 }));
         unbinds.push(onTap(g, () => { brush = key; sfx('click'); draw(); }));
         root.appendChild(g);
       });

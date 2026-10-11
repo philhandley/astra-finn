@@ -57,6 +57,10 @@ function pickEach(R, a, b, n, k, extra = []) {
 }
 
 const fr = (props) => ({ widget: 'fractions', props: { readonly: true, ...props } });
+// Share `total` into n groups. The groups widget holds at most 50 things; bigger totals get a still picture of the groups.
+const shareHint = (total, n) => (total <= 50
+  ? { widget: 'groups', props: { total, mode: 'share', bowls: n, icon: 'dot', interactive: true } }
+  : { widget: 'objects', props: { n: total, arrange: 'groups', groups: Array(n).fill(total / n), icon: 'dot' } });
 const pickIdx = (R, n, k) => R.sample(Array.from({ length: n }, (_, i) => i), k).sort((a, b) => a - b);
 
 // ---------- equal parts ----------
@@ -214,7 +218,7 @@ export const fractionOfAmount = {
       caption: `${frac(k, n)} of ${total} = ?`,
       input: 'numpad', answer: ans,
       hint: [`${frac(1, n)} of ${total} is ${total} shared into ${n}.`],
-      hintWidget: { widget: 'groups', props: { total: Math.min(total, 50), mode: 'share', bowls: n, icon: 'dot', interactive: true } },
+      hintWidget: shareHint(total, n),
       explain: [`${frac(1, n)} of ${total} is ${each}.`, `${frac(k, n)} of ${total} is ${ans}.`],
       reteach: fractionOfAmount.make(2, R),
     };

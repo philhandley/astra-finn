@@ -1,16 +1,18 @@
 // shapes3d: a 3-D shape to spin with a finger and tap to count faces, edges or vertices (Three.js 0.170 via the import map).
 // Props: shape ('cube' | 'cuboid' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' (square-based) | 'tri-pyramid' | 'prism' (triangular)),
-//        tap ('faces' | 'edges' | 'vertices' | null): tapping a face paints it gold; tapping near an edge or vertex lights it.
-//            Each counts once only; a gold number shows the order they were tapped.
-//        autoRotate (slow spin until touched), colour (name or #hex),
-//        highlight ('top' | 'base' | 'side' | 'end' | 'curved'): paint that face gold and turn the shape so it shows,
+// Look (style v2): flat-shaded faces in one palette colour (lighter and darker per face) with ink edges on the white surface;
+//        curved solids get an ink outline. Tapped faces turn yellow, tapped edges and vertices blue, with blue number tags.
+//        tap ('faces' | 'edges' | 'vertices' | null): tapping a face paints it yellow; tapping near an edge or vertex lights it blue.
+//            Each counts once only; a blue number shows the order they were tapped.
+//        autoRotate (slow spin until touched), colour (palette name or #hex; default teal; avoid yellow and blue),
+//        highlight ('top' | 'base' | 'side' | 'end' | 'curved'): paint that face yellow and turn the shape so it shows,
 //        svg (true: draw the simple SVG picture instead of WebGL, for small option tiles), readonly.
 // Drag to rotate. Renders only when something changes or while spinning; stops when hidden or destroyed.
 // Without WebGL (or before Three.js loads) it shows an SVG drawing of the shape.
 // State: { faces, edges, vertices, shape }  (counts tapped so far)
 // Debug: dev/harness.html?widget=shapes3d&props={"shape":"cube","tap":"faces"}
 import { S, svgRoot, injectCSS, h } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -38,9 +40,40 @@ export const FACE_SHAPES = {
   prism: ['triangle', 'rectangle'], cylinder: ['circle'], cone: ['circle'], sphere: [],
 };
 
-const DEFAULT_COL = '#6f8dff';
-const NAMED = { gold: '#f2b544', cyan: '#5fd4ff', pink: '#ff8fb1', green: '#6fe3a5', purple: '#b48cff', orange: '#ff9a52', red: '#ff6b57', blue: '#4f9dff', white: '#f3efe6', grey: '#9aa3b2' };
+const DEFAULT_COL = PAL.teal;
+const LIT_FACE = PAL.yellow, LIT_LINE = PAL.blue;
+// Palette names (old names kept only so stale content still draws).
+const NAMED = { red: PAL.red, yellow: PAL.yellow, blue: PAL.blue, green: PAL.green, orange: PAL.orange, pink: PAL.pink, purple: PAL.purple, teal: PAL.teal,
+  white: '#f4f6fb', grey: '#c9cfdb', gold: PAL.yellow, cyan: PAL.teal };
 const colourOf = c => NAMED[c] || (typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c) ? c : DEFAULT_COL);
+
+// Flat "sticker" shading: faces towards the light (top left, in front) get lighter, faces turned away get darker.
+// n is the normal in view space (x right, y up, z towards the viewer). Returns [r, g, b] in 0..1 sRGB.
+const LIGHT = [-0.42, 0.74, 0.52];
+const hexRGB = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+function toHSL([r, g, b]) {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  if (!d) return [0, 0, l];
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+function fromHSL([h, s, l]) {
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m0 = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return [r + m0, g + m0, b + m0];
+}
+// Faces towards the light mix towards white; faces turned away lose lightness but keep their saturation,
+// so a yellow face in shade turns golden, not olive.
+function shadeRGB(rgb, n) {
+  const l = Math.hypot(...LIGHT);
+  const d = (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]) / l;
+  const s = 0.8 + 0.34 * d; // about 0.46 (facing away) to 1.14 (facing the light)
+  if (s >= 1) { const k = Math.min(0.5, (s - 1) * 1.9); return rgb.map(c => c + (1 - c) * k); }
+  const [h, sat, lig] = toHSL(rgb);
+  return fromHSL([h, sat, lig * Math.max(0.66, s)]);
+}
+const cssRGB = c => `rgb(${c.map(v => Math.round(v * 255)).join(',')})`;
 
 // ---------- small vector and quaternion helpers ----------
 const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -219,8 +252,9 @@ export function mount(el, props = {}, ctx = {}) {
     .w-shapes3d.ro canvas, .w-shapes3d.ro svg { cursor: default; }
     .w-shapes3d svg { position: absolute; inset: 0; }
     .w-shapes3d .b3 { position: absolute; inset: 0; pointer-events: none; }
-    .w-shapes3d .b3 div { position: absolute; left: 0; top: 0; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
-      background: ${COL.tens}; color: #1a1205; font: 700 24px/40px ${FONT.display}; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.5); transition: opacity .15s; }
+    .w-shapes3d .b3 div { position: absolute; left: 0; top: 0; width: 42px; height: 42px; margin: -21px 0 0 -21px; border-radius: 50%; box-sizing: border-box;
+      background: ${LIT_LINE}; color: #fff; border: 3px solid #fff; font: 700 23px/36px ${FONT.display}; text-align: center;
+      box-shadow: 0 2px 6px rgba(27,30,46,.28); transition: opacity .15s; }
   `);
   let p = { ...props };
   let alive = true;
@@ -252,19 +286,17 @@ export function mount(el, props = {}, ctx = {}) {
     svg.replaceChildren();
     const k = 150, cx = 400, cy = 250;
     const P = v => { const r = qRot(q, v); return [cx + r[0] * k, cy - r[1] * k, r[2]]; };
-    const L = norm([-0.45, 0.7, 0.55]);
-    const base = colourOf(p.colour);
-    const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
-    const shade = (hex, n) => { const s = 0.38 + 0.62 * Math.max(0, dot(n, L)); return `rgb(${rgb(hex).map(c => Math.round(c * s)).join(',')})`; };
+    const base = hexRGB(colourOf(p.colour)), lit = hexRGB(LIT_FACE);
     const hl = hlFace();
-    const fcol = fi => (litF.includes(fi) || fi === hl ? COL.tens : base);
+    const fcol = fi => (litF.includes(fi) || fi === hl ? lit : base);
+    const pts2 = pts => pts.map(a => `${a[0].toFixed(1)} ${a[1].toFixed(1)}`).join('L');
     const items = [];
     m.faces.forEach((f, fi) => {
       if (!f.poly) return;
       const n = qRot(q, f.normal);
       if (n[2] <= 0.0001) return;
       const pts = f.poly.map(P);
-      items.push({ z: pts.reduce((s, a) => s + a[2], 0) / pts.length, d: 'M' + pts.map(a => `${a[0].toFixed(1)} ${a[1].toFixed(1)}`).join('L') + 'Z', fill: shade(fcol(fi), n) });
+      items.push({ z: pts.reduce((s2, a) => s2 + a[2], 0) / pts.length, d: `M${pts2(pts)}Z`, fill: cssRGB(shadeRGB(fcol(fi), n)) });
     });
     const tris = m.triFace.length;
     for (let t = 0; t < tris; t++) {
@@ -276,15 +308,20 @@ export function mount(el, props = {}, ctx = {}) {
       const gn = qRot(q, norm(cross(sub(vs[1], vs[0]), sub(vs[2], vs[0]))));
       if (gn[2] <= 0.0001) continue;
       const pts = vs.map(P);
-      const c = shade(fcol(fi), n);
-      items.push({ z: (pts[0][2] + pts[1][2] + pts[2][2]) / 3, d: `M${pts.map(a => `${a[0].toFixed(1)} ${a[1].toFixed(1)}`).join('L')}Z`, fill: c, stroke: c });
+      const c = cssRGB(shadeRGB(fcol(fi), n));
+      items.push({ z: (pts[0][2] + pts[1][2] + pts[2][2]) / 3, d: `M${pts2(pts)}Z`, fill: c, stroke: c });
     }
     items.sort((a, b) => a.z - b.z);
-    for (const it of items) svg.appendChild(S('path', { d: it.d, fill: it.fill, stroke: it.stroke || 'none', 'stroke-width': it.stroke ? 1 : 0, 'stroke-linejoin': 'round' }));
+    // Ink outline round the whole silhouette: every visible piece drawn first with a thick ink stroke, then the fills on top.
+    const outline = S('g', { fill: COL.ink, stroke: COL.ink, 'stroke-width': 7.5, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' });
+    for (const it of items) outline.appendChild(S('path', { d: it.d, 'vector-effect': 'non-scaling-stroke' }));
+    svg.appendChild(outline);
+    // Curved surfaces are many small triangles: a thin stroke in the same colour hides the seams between them.
+    for (const it of items) svg.appendChild(S('path', { d: it.d, fill: it.fill, stroke: it.stroke || 'none', 'stroke-width': it.stroke ? 1.6 : 0, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
     const front = fi => { const f = m.faces[fi]; return !f.curved && qRot(q, f.normal)[2] > 0.0001; };
     m.edges.forEach((e, i) => {
-      const lit = litE.includes(i);
-      const attrs = { fill: 'none', stroke: lit ? COL.tens : '#e9edf6', 'stroke-width': lit ? 9 : 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+      const on = litE.includes(i);
+      const attrs = { fill: 'none', stroke: on ? LIT_LINE : COL.ink, 'stroke-width': on ? 9 : 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' };
       if (!e.closed) {
         if (!e.faces.some(front)) return;
         const [a, b] = e.pts.map(P);
@@ -292,15 +329,22 @@ export function mount(el, props = {}, ctx = {}) {
       } else {
         const capFront = front(e.faces[0]);
         let d = '', pen = false;
-        for (let s = 0; s < e.pts.length - 1; s++) {
-          const mid = mul(add(e.pts[s], e.pts[s + 1]), 0.5);
+        for (let s2 = 0; s2 < e.pts.length - 1; s2++) {
+          const mid = mul(add(e.pts[s2], e.pts[s2 + 1]), 0.5);
           const vis = capFront || qRot(q, sub(mid, e.centre))[2] > 0;
-          const a = P(e.pts[s]), b = P(e.pts[s + 1]);
+          const a = P(e.pts[s2]), b = P(e.pts[s2 + 1]);
           if (vis) { d += `${pen ? '' : `M${a[0].toFixed(1)} ${a[1].toFixed(1)}`}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`; pen = true; } else pen = false;
         }
         if (d) svg.appendChild(S('path', { d, ...attrs }));
       }
     });
+    if (tapMode() === 'vertices') {
+      m.verts.forEach((v, i) => {
+        if (qRot(q, v)[2] < -0.05 && !litV.includes(i)) return;
+        const [x, y] = P(v), on = litV.includes(i);
+        svg.appendChild(S('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: on ? 13 : 8, fill: on ? LIT_LINE : COL.ink }));
+      });
+    }
   }
 
   // ---------- Three.js ----------
@@ -317,15 +361,14 @@ export function mount(el, props = {}, ctx = {}) {
     const scene = new T.Scene();
     const camera = new T.PerspectiveCamera(32, 1.6, 0.1, 50);
     camera.position.set(0, 0, 5.2);
-    scene.add(new T.AmbientLight(0xffffff, 0.75));
-    const d1 = new T.DirectionalLight(0xffffff, 2.5); d1.position.set(-2, 3.5, 2.5); scene.add(d1);
-    const d2 = new T.DirectionalLight(0x9fb0ff, 0.55); d2.position.set(3, -1, 2); scene.add(d2);
+    // No lights: faces are coloured directly (see paintFaces), so WebGL and the SVG picture look the same.
     const group = new T.Group(); scene.add(group);
     const decor = new T.Group(); group.add(decor);
-    const mat = new T.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
-    const inkMat = new T.MeshBasicMaterial({ color: 0xe9edf6 });
-    const goldMat = new T.MeshBasicMaterial({ color: new T.Color(COL.tens) });
-    G = { T, renderer, scene, camera, group, decor, mat, inkMat, goldMat, mesh: null, ray: new T.Raycaster(), w: 0, h: 0 };
+    const mat = new T.MeshBasicMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+    const inkMat = new T.MeshBasicMaterial({ color: new T.Color(COL.ink) });
+    const litMat = new T.MeshBasicMaterial({ color: new T.Color(LIT_LINE) });
+    const hullMat = new T.MeshBasicMaterial({ color: new T.Color(COL.ink), side: T.BackSide });
+    G = { T, renderer, scene, camera, group, decor, mat, inkMat, litMat, hullMat, mesh: null, hull: null, ray: new T.Raycaster(), w: 0, h: 0, painted: null };
     const cv = renderer.domElement;
     wrap.insertBefore(cv, badges);
     svg.style.display = 'none';
@@ -345,25 +388,47 @@ export function mount(el, props = {}, ctx = {}) {
     if (!G) return;
     const { T } = G;
     if (G.mesh) { G.group.remove(G.mesh); G.mesh.geometry.dispose(); }
+    if (G.hull) { G.group.remove(G.hull); G.hull = null; }
     const g = new T.BufferGeometry();
     g.setAttribute('position', new T.BufferAttribute(m.pos, 3));
     g.setAttribute('normal', new T.BufferAttribute(m.nor, 3));
     g.setAttribute('color', new T.BufferAttribute(new Float32Array(m.pos.length), 3));
     G.mesh = new T.Mesh(g, G.mat);
     G.group.add(G.mesh);
+    // Curved solids have no straight edges to outline them, so a slightly larger ink "hull" shows round the silhouette.
+    const HULL = { sphere: [1.022, 1.022, 1.022, 0], cylinder: [1.03, 1.026, 1.03, 0], cone: [1.028, 1.028, 1.028, -0.25] }[name];
+    if (HULL) {
+      G.hull = new T.Mesh(g, G.hullMat);
+      G.hull.scale.set(HULL[0], HULL[1], HULL[2]);
+      G.hull.position.y = HULL[3] * (1 - HULL[1]);
+      G.group.add(G.hull);
+    }
+    G.painted = null;
     paintFaces();
   }
 
+  // Colour every vertex: yellow for tapped or highlighted faces, the shape colour otherwise, shaded by how the face is turned now.
   function paintFaces() {
     if (!G || !G.mesh) return;
     const { T } = G;
-    const base = new T.Color(colourOf(p.colour)), gold = new T.Color(COL.tens);
     const hl = hlFace();
+    const key = `${q.map(v => v.toFixed(4)).join(',')}|${litF.join(',')}|${hl}|${p.colour}`;
+    if (G.painted === key) return;
+    G.painted = key;
+    const base = hexRGB(colourOf(p.colour)), lit = hexRGB(LIT_FACE);
     const attr = G.mesh.geometry.getAttribute('color');
-    const a = attr.array;
+    const a = attr.array, nor = m.nor;
+    const c = new T.Color();
+    const flatN = m.faces.map(f => (f.poly ? qRot(q, f.normal) : null));
+    const flatC = m.faces.map((f, fi) => (f.poly ? shadeRGB(litF.includes(fi) || fi === hl ? lit : base, flatN[fi]) : null));
     m.triFace.forEach((fi, t) => {
-      const c = litF.includes(fi) || fi === hl ? gold : base;
-      for (let j = 0; j < 3; j++) { a[t * 9 + j * 3] = c.r; a[t * 9 + j * 3 + 1] = c.g; a[t * 9 + j * 3 + 2] = c.b; }
+      const on = litF.includes(fi) || fi === hl;
+      for (let j = 0; j < 3; j++) {
+        const o = t * 9 + j * 3;
+        const rgb = flatC[fi] || shadeRGB(on ? lit : base, qRot(q, [nor[o], nor[o + 1], nor[o + 2]]));
+        c.setRGB(rgb[0], rgb[1], rgb[2], T.SRGBColorSpace);
+        a[o] = c.r; a[o + 1] = c.g; a[o + 2] = c.b;
+      }
     });
     attr.needsUpdate = true;
   }
@@ -376,24 +441,34 @@ export function mount(el, props = {}, ctx = {}) {
     const up = new T.Vector3(0, 1, 0);
     m.edges.forEach((e, i) => {
       const lit = litE.includes(i);
-      const r = lit ? 0.05 : 0.022;
+      const r = lit ? 0.045 : 0.017;
       let mesh;
       if (!e.closed) {
         const a = new T.Vector3(...e.pts[0]), b = new T.Vector3(...e.pts[1]);
         const dir = b.clone().sub(a);
-        mesh = new T.Mesh(new T.CylinderGeometry(r, r, dir.length(), 8, 1, true), lit ? G.goldMat : G.inkMat);
+        // Slightly longer than the edge, so the ink corners join up cleanly.
+        mesh = new T.Mesh(new T.CylinderGeometry(r, r, dir.length() + r * 0.9, 8, 1, true), lit ? G.litMat : G.inkMat);
         mesh.position.copy(a.clone().add(b).multiplyScalar(0.5));
         mesh.quaternion.setFromUnitVectors(up, dir.normalize());
       } else {
         const curve = new T.CatmullRomCurve3(e.pts.slice(0, -1).map(v => new T.Vector3(...v)), true);
-        mesh = new T.Mesh(new T.TubeGeometry(curve, 72, r, 6, true), lit ? G.goldMat : G.inkMat);
+        mesh = new T.Mesh(new T.TubeGeometry(curve, 72, r, 6, true), lit ? G.litMat : G.inkMat);
       }
       decor.add(mesh);
     });
+    // Round ink joints at the corners of flat-faced solids.
+    if (tapMode() !== 'vertices') {
+      m.verts.forEach(v => {
+        if (m.edges.length < 3) return;
+        const s = new T.Mesh(new T.SphereGeometry(0.018, 10, 8), G.inkMat);
+        s.position.set(...v);
+        decor.add(s);
+      });
+    }
     if (tapMode() === 'vertices') {
       m.verts.forEach((v, i) => {
         const lit = litV.includes(i);
-        const s = new T.Mesh(new T.SphereGeometry(lit ? 0.12 : 0.08, 14, 10), lit ? G.goldMat : G.inkMat);
+        const s = new T.Mesh(new T.SphereGeometry(lit ? 0.12 : 0.075, 14, 10), lit ? G.litMat : G.inkMat);
         s.position.set(...v);
         decor.add(s);
       });
@@ -452,6 +527,7 @@ export function mount(el, props = {}, ctx = {}) {
     if (!alive) return;
     if (G) {
       G.group.quaternion.set(q[0], q[1], q[2], q[3]);
+      paintFaces();
       G.renderer.render(G.scene, G.camera);
     } else drawSVG();
     updateBadges();
@@ -621,7 +697,7 @@ export function mount(el, props = {}, ctx = {}) {
         try {
           G.ro && G.ro.disconnect();
           disposeObj(G.scene);
-          G.mat.dispose(); G.inkMat.dispose(); G.goldMat.dispose();
+          G.mat.dispose(); G.inkMat.dispose(); G.litMat.dispose(); G.hullMat.dispose();
           G.renderer.dispose();
           G.renderer.forceContextLoss();
         } catch (e) { /* ignore */ }

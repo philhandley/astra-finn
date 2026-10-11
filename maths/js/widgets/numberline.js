@@ -5,9 +5,12 @@
 //   minor                      small tick spacing. Default 1 when max - min <= 50, else 5. 0 = none.
 //   labels                     'all' (every step tick, default), 'ends', 'tens', 'fives', 'none',
 //                              or an array of numbers and/or { at, text } objects (e.g. [{ at: 0.5, text: '½' }]).
-//   hide                       numbers whose label shows as a gold "?" box.
+//   hide                       numbers whose label shows as a blue "?" box.
 //   marks                      numbers (a plain dot) or { at, label, colour } (a dot with a label above it).
-//   hops                       arcs drawn above the line: { from, to, label? }; label defaults to "+n" / "−n".
+//                              colour: a palette name (orange, purple, pink, teal, red, yellow, blue, green),
+//                              'tens' / 'ones', or any CSS colour. Default orange. Old names: gold = orange, cyan = blue.
+//   hops                       arcs drawn above the line: { from, to, label?, colour? }; label defaults to "+n" / "−n".
+//                              Hops are blue unless they name a colour.
 //   mode                       'display' | 'hop' | 'place'.
 //   start                      hop mode: where the rocket starts (default min).
 //   hopSize                    hop mode: size of one hop (default 1; negative hops go backwards).
@@ -17,6 +20,8 @@
 //   markerArt                  art name for the marker (default 'rocket').
 //   showValue                  show the marker's number in a bubble above it.
 //   readonly                   no interaction.
+// Style v2 (white surface): a bold ink line, big Lexend labels, blue hops, coloured dots, blue "?" boxes,
+// section 7 buttons (Hop is primary blue, Back is white).
 // Hop mode: the big Hop button (or a tap on the line ahead of the rocket) makes one hop of hopSize with an arc
 // and a count badge; Back undoes the last hop. Place mode: drag the rocket (snaps to whole numbers) or tap the line.
 // State: { value, hops, pos, placed }
@@ -25,7 +30,7 @@
 // Debug: dev/harness.html?widget=numberline&props={"mode":"hop","hopSize":2}
 import { S, svgRoot, svgPoint, onTap, drag, injectCSS, clamp, reducedMotion } from '../core/dom.js';
 import { artInner } from '../core/art.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -49,7 +54,16 @@ const fmtF = v => {
   const g = GLYPH.find(([x]) => Math.abs(x - f) < 1e-3);
   return g ? (v < 0 ? '−' : '') + (w ? String(w) : '') + g[1] : fmt(v);
 };
-const colourOf = c => (c === 'gold' || c === 'a' || c === 'tens' ? COL.tens : c === 'cyan' || c === 'b' || c === 'ones' ? COL.ones : c === 'green' ? COL.good : typeof c === 'string' && c ? c : COL.ones);
+// Colour names for marks and hops. Each resolves to [fill, darker outline / label colour].
+const NAMED = {
+  red: [PAL.red, PAL.redDark], yellow: [PAL.yellow, PAL.yellowDark], blue: [PAL.blue, PAL.blueDark],
+  green: [PAL.green, PAL.greenDark], orange: [PAL.orange, PAL.orangeDark], pink: [PAL.pink, PAL.pinkDark],
+  purple: [PAL.purple, PAL.purpleDark], teal: [PAL.teal, PAL.tealDark],
+  tens: [COL.tens, PAL.greenDark], ones: [COL.ones, PAL.blueDark], hundreds: [COL.hundreds, PAL.orangeDark],
+  a: [COL.a, COL.aDark], b: [COL.b, COL.bDark],
+  gold: [PAL.orange, PAL.orangeDark], cyan: [PAL.blue, PAL.blueDark], // old names (style v1)
+};
+const pairOf = (c, dflt) => (typeof c === 'string' && NAMED[c] ? NAMED[c] : typeof c === 'string' && c ? [c, COL.ink] : NAMED[dflt]);
 
 function multiples(a, b, d) {
   if (!(d > 0)) return [];
@@ -84,7 +98,8 @@ export function mount(el, props = {}, ctx = {}) {
     .w-numberline { width: 100%; height: 100%; }
     .w-numberline .nl-btn { cursor: pointer; }
     .w-numberline .nl-btn.off { opacity: .35; cursor: default; }
-    .w-numberline .nl-btn:active .nl-face { filter: brightness(1.2); }
+    .w-numberline .nl-btn .nl-face { transition: transform .08s ease; }
+    .w-numberline .nl-btn:not(.off):active .nl-face { transform: translateY(4px); }
     .w-numberline .nl-hit { cursor: pointer; }
     .w-numberline .nl-marker { cursor: grab; }
     .w-numberline .nl-marker.dragging { cursor: grabbing; }
@@ -175,7 +190,7 @@ export function mount(el, props = {}, ctx = {}) {
       const chars = Math.max(...list.map(l => l.text.length));
       const gap = (XR - XL) * (Math.abs(list[1].at - list[0].at) / L.range);
       let stride = 1;
-      while (stride < 50 && (gap * stride - 4) / (0.62 * chars) < 22) stride++;
+      while (stride < 50 && (gap * stride - 8) / (0.68 * chars) < 24) stride++;
       if (stride > 1) list = list.filter((l, i) => i % stride === 0 || near(l.at, max) || near(l.at, min));
     }
     return list;
@@ -188,7 +203,7 @@ export function mount(el, props = {}, ctx = {}) {
     for (let i = 1; i < xs.length; i++) gap = Math.min(gap, xs[i] - xs[i - 1]);
     const chars = Math.max(...list.map(l => [...l.text].length), 1);
     if (!Number.isFinite(gap)) gap = 200;
-    return clamp((gap - 4) / (0.62 * chars), 22, 46);
+    return clamp((gap - 8) / (0.68 * chars), 24, 50);  // Lexend 700 digits are about 0.66 em wide
   }
 
   function arcPath(x1, x2, y, hgt) {
@@ -201,7 +216,7 @@ export function mount(el, props = {}, ctx = {}) {
     // Tangent of the quadratic at the end point is (x2 - mx, y - (y - 2h)) direction = (x2 - mx, 2h).
     const mx = (x1 + x2) / 2;
     const ang = Math.atan2(2 * hgt, x2 - mx);
-    const s = 13;
+    const s = 15;
     const a1 = ang + Math.PI - 0.45, a2 = ang + Math.PI + 0.45;
     return S('path', { d: `M${x2} ${y}L${x2 + s * Math.cos(a1)} ${y + s * Math.sin(a1)}L${x2 + s * Math.cos(a2)} ${y + s * Math.sin(a2)}Z`, fill: colour });
   }
@@ -216,17 +231,24 @@ export function mount(el, props = {}, ctx = {}) {
     return g;
   }
 
+  // Section 7 controls: a rounded rectangle with a solid 5 px bottom edge; the face drops 4 px when pressed.
+  // Primary (Hop): PAL.blue with white text. Secondary (Back): white, 3 px COL.line border, ink text.
   function button(x, y, w, hgt, label, sub, onPress, { primary = false, off = false } = {}) {
     const g = S('g', { class: 'nl-btn' + (off ? ' off' : ''), transform: `translate(${x} ${y})` });
-    g.appendChild(S('rect', { class: 'nl-face', x: -w / 2, y: -hgt / 2, width: w, height: hgt, rx: hgt / 2, fill: primary ? COL.tens : 'rgba(255,255,255,.07)', stroke: primary ? '#ffe0a0' : COL.ink3, 'stroke-width': 3 }));
-    const t = S('text', { x: 0, y: 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': primary ? 40 : 30, fill: primary ? '#1a1205' : COL.ink });
+    const rx = 20;
+    g.appendChild(S('rect', { x: -w / 2 - 6, y: -hgt / 2 - 6, width: w + 12, height: hgt + 18, fill: 'transparent' }));
+    g.appendChild(S('rect', { x: -w / 2, y: -hgt / 2 + 5, width: w, height: hgt, rx, fill: primary ? PAL.blueDark : COL.line }));
+    const face = S('g', { class: 'nl-face' });
+    face.appendChild(S('rect', { x: -w / 2, y: -hgt / 2, width: w, height: hgt, rx, fill: primary ? PAL.blue : COL.surface, stroke: primary ? 'none' : COL.line, 'stroke-width': 3 }));
+    const t = S('text', { x: 0, y: 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': primary ? 40 : 32, fill: primary ? '#fff' : COL.ink });
     t.appendChild(document.createTextNode(label));
     if (sub) {
-      const ts = S('tspan', { 'font-weight': 600, 'font-size': primary ? 32 : 26, dx: 10, fill: primary ? '#3a2a08' : COL.ink2 });
+      const ts = S('tspan', { 'font-weight': 800, 'font-size': primary ? 34 : 26, dx: 12, fill: primary ? '#dbeafe' : COL.ink2 });
       ts.textContent = sub;
       t.appendChild(ts);
     }
-    g.appendChild(t);
+    face.appendChild(t);
+    g.appendChild(face);
     if (onPress && !ro() && !off) unbinds.push(onTap(g, onPress));
     return g;
   }
@@ -240,8 +262,8 @@ export function mount(el, props = {}, ctx = {}) {
     const sig = `${Math.round(by)}|${hs}`;
     if (!btnCache || btnCache.sig !== sig) {
       dropButtons();
-      const hop = button(W / 2 + 70, by, 250, 92, 'Hop', (hs > 0 ? '+' : '−') + fmtF(Math.abs(hs)), null, { primary: true });
-      const back = button(W / 2 - 170, by, 170, 76, 'Back', '', null);
+      const hop = button(W / 2 + 80, by, 260, 86, 'Hop', (hs > 0 ? '+' : '−') + fmtF(Math.abs(hs)), null, { primary: true });
+      const back = button(W / 2 - 160, by, 170, 86, 'Back', '', null);
       // Hop at the end of the line still answers with a gentle bump.
       const unb = [onTap(hop, () => requestHop()), onTap(back, () => { if (!back.classList.contains('off')) undo(); })];
       btnCache = { sig, hop, back, unb };
@@ -274,10 +296,10 @@ export function mount(el, props = {}, ctx = {}) {
     }
 
     // The line with arrows at both ends.
-    const ink = COL.ink2;
-    root.appendChild(S('line', { x1: XL - 38, y1: LY, x2: XR + 38, y2: LY, stroke: ink, 'stroke-width': 5, 'stroke-linecap': 'round', 'pointer-events': 'none' }));
-    root.appendChild(S('path', { d: `M${XR + 52} ${LY}l-20 -12v24z`, fill: ink, 'pointer-events': 'none' }));
-    root.appendChild(S('path', { d: `M${XL - 52} ${LY}l20 -12v24z`, fill: ink, 'pointer-events': 'none' }));
+    const ink = COL.ink;
+    root.appendChild(S('line', { x1: XL - 38, y1: LY, x2: XR + 38, y2: LY, stroke: ink, 'stroke-width': 6, 'stroke-linecap': 'round', 'pointer-events': 'none' }));
+    root.appendChild(S('path', { d: `M${XR + 54} ${LY}l-22 -14v28z`, fill: ink, stroke: ink, 'stroke-width': 3, 'stroke-linejoin': 'round', 'pointer-events': 'none' }));
+    root.appendChild(S('path', { d: `M${XL - 54} ${LY}l22 -14v28z`, fill: ink, stroke: ink, 'stroke-width': 3, 'stroke-linejoin': 'round', 'pointer-events': 'none' }));
 
     // Ticks.
     const labels = labelList();
@@ -286,8 +308,8 @@ export function mount(el, props = {}, ctx = {}) {
     const minors = L.minor > 0 ? multiples(min, max, L.minor).filter(v => !majors.some(m => near(m, v))) : [];
     const minorLen = L.minor > 0 && L.range / L.minor > 60 ? 8 : 12;
     const tg = S('g', { 'pointer-events': 'none' });
-    for (const v of minors) tg.appendChild(S('line', { x1: X(v), y1: LY - minorLen, x2: X(v), y2: LY + minorLen, stroke: COL.ink3, 'stroke-width': 2.5 }));
-    for (const v of majors) tg.appendChild(S('line', { x1: X(v), y1: LY - 20, x2: X(v), y2: LY + 20, stroke: COL.ink, 'stroke-width': 4, 'stroke-linecap': 'round' }));
+    for (const v of minors) tg.appendChild(S('line', { x1: X(v), y1: LY - minorLen, x2: X(v), y2: LY + minorLen, stroke: COL.ink2, 'stroke-width': 3, 'stroke-linecap': 'round' }));
+    for (const v of majors) tg.appendChild(S('line', { x1: X(v), y1: LY - 21, x2: X(v), y2: LY + 21, stroke: COL.ink, 'stroke-width': 5, 'stroke-linecap': 'round' }));
     root.appendChild(tg);
 
     // Labels and "?" boxes.
@@ -298,14 +320,21 @@ export function mount(el, props = {}, ctx = {}) {
     for (const l of labels) {
       if (hide.some(hv => near(hv, l.at))) continue;
       const on = here !== null && near(here, l.at) && (L.mode === 'hop' || placed || L.mode === 'place');
-      const t = S('text', { x: X(l.at), y: ly, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': on ? 700 : 600, 'font-size': on ? fs * 1.12 : fs, fill: on ? COL.tens : COL.ink }, [l.text]);
+      const t = S('text', { x: X(l.at), y: ly, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': on ? 800 : 700, 'font-size': on ? fs * 1.12 : fs, fill: on ? COL.focus : COL.ink }, [l.text]);
+      if (on) {
+        // Where the rocket is: the label in blue on a soft blue chip.
+        const cw = Math.max(fs * 1.6, [...l.text].length * fs * 1.12 * 0.66 + fs * 0.7), chH = fs * 1.4;
+        const chip = S('rect', { x: X(l.at) - cw / 2, y: ly - fs * 1.12 * 0.74 - fs * 0.24, width: cw, height: chH, rx: Math.min(14, chH / 3), fill: COL.focusSoft });
+        if (lastPop !== null && near(lastPop, l.at)) chip.classList.add('nl-pop');
+        lg.appendChild(chip);
+      }
       if (on && lastPop !== null && near(lastPop, l.at)) t.classList.add('nl-pop');
       lg.appendChild(t);
     }
     for (const v of hide) {
-      const bw = Math.max(fs * 1.25, 40), bh = fs * 1.25;
-      lg.appendChild(S('rect', { x: X(v) - bw / 2, y: LY + 26, width: bw, height: bh, rx: 10, fill: 'rgba(242,181,68,.16)', stroke: COL.tens, 'stroke-width': 3 }));
-      lg.appendChild(S('text', { x: X(v), y: LY + 26 + bh * 0.76, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fs * 0.95, fill: COL.tens }, ['?']));
+      const bw = Math.max(fs * 1.3, 44), bh = fs * 1.3;
+      lg.appendChild(S('rect', { x: X(v) - bw / 2, y: LY + 28, width: bw, height: bh, rx: 12, fill: COL.focusSoft, stroke: COL.focus, 'stroke-width': 3.5 }));
+      lg.appendChild(S('text', { x: X(v), y: LY + 28 + bh * 0.75, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': fs, fill: COL.focus }, ['?']));
     }
     root.appendChild(lg);
     lastPop = null;
@@ -319,24 +348,24 @@ export function mount(el, props = {}, ctx = {}) {
       if (f === null || t === null || near(f, t)) continue;
       const x1 = X(clamp(f, min, max)), x2 = X(clamp(t, min, max));
       const hh = arcH(x2 - x1);
-      const colour = hp.colour ? colourOf(hp.colour) : COL.tens;
-      hg.appendChild(S('path', { d: arcPath(x1, x2, LY - 6, hh), fill: 'none', stroke: colour, 'stroke-width': 4.5, 'stroke-linecap': 'round' }));
+      const [colour, dark] = pairOf(hp.colour, 'blue');
+      hg.appendChild(S('path', { d: arcPath(x1, x2, LY - 6, hh), fill: 'none', stroke: colour, 'stroke-width': 5, 'stroke-linecap': 'round' }));
       hg.appendChild(arrowHead(x1, x2, LY - 6, hh, colour));
       const lab = hp.label !== undefined && hp.label !== null ? String(hp.label) : (t > f ? '+' : '−') + fmtF(Math.abs(t - f));
-      if (lab) hg.appendChild(S('text', { x: (x1 + x2) / 2, y: LY - 6 - hh - 12, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: colour }, [lab]));
+      if (lab) hg.appendChild(S('text', { x: (x1 + x2) / 2, y: LY - 6 - hh - 14, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 32, fill: colour === PAL.blue ? colour : dark }, [lab]));
     }
     // Hops made in hop mode, each with a count badge.
     hopList.forEach((hp, i) => {
       const x1 = X(hp.from), x2 = X(hp.to);
       const hh = arcH(x2 - x1);
-      const path = S('path', { class: 'nl-arc', d: arcPath(x1, x2, LY - 6, hh), fill: 'none', stroke: COL.tens, 'stroke-width': 5, 'stroke-linecap': 'round' });
+      const path = S('path', { class: 'nl-arc', d: arcPath(x1, x2, LY - 6, hh), fill: 'none', stroke: PAL.blue, 'stroke-width': 5.5, 'stroke-linecap': 'round' });
       hg.appendChild(path);
-      hg.appendChild(arrowHead(x1, x2, LY - 6, hh, COL.tens));
+      hg.appendChild(arrowHead(x1, x2, LY - 6, hh, PAL.blue));
       const bx = (x1 + x2) / 2, by = LY - 6 - hh;
-      const br = Math.min(22, Math.max(15, Math.abs(x2 - x1) * 0.3));
+      const br = Math.min(23, Math.max(16, Math.abs(x2 - x1) * 0.3));
       const badge = S('g', { transform: `translate(${bx} ${by})` });
-      badge.appendChild(S('circle', { r: br, fill: '#1a2546', stroke: COL.tens, 'stroke-width': 3 }));
-      badge.appendChild(S('text', { y: br * 0.38, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': br * 1.1, fill: COL.tens }, [String(i + 1)]));
+      badge.appendChild(S('circle', { r: br, fill: PAL.blue, stroke: COL.surface, 'stroke-width': 4 }));
+      badge.appendChild(S('text', { y: br * 0.38, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': br * 1.1, fill: '#fff' }, [String(i + 1)]));
       hg.appendChild(badge);
     });
     root.appendChild(hg);
@@ -346,10 +375,15 @@ export function mount(el, props = {}, ctx = {}) {
     for (const m of Array.isArray(p.marks) ? p.marks : []) {
       const at = num(m && typeof m === 'object' ? m.at : m, null);
       if (at === null || at < min - EPS || at > max + EPS) continue;
-      const colour = colourOf(m && typeof m === 'object' ? m.colour : null);
-      mg.appendChild(S('circle', { cx: X(at), cy: LY, r: 13, fill: colour, stroke: '#0b1020', 'stroke-width': 3 }));
+      const [colour, dark] = pairOf(m && typeof m === 'object' ? m.colour : null, 'orange');
+      mg.appendChild(S('circle', { cx: X(at), cy: LY, r: 17, fill: colour, stroke: dark, 'stroke-width': 4 }));
       const lab = m && typeof m === 'object' && m.label !== undefined && m.label !== null ? String(m.label) : '';
-      if (lab) mg.appendChild(S('text', { x: X(at), y: LY - 34, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 36, fill: colour }, [lab]));
+      if (lab === '?') {
+        // "What number is this?": the same blue "?" box as hidden labels, above the dot.
+        const bw = 56, bh = 58;
+        mg.appendChild(S('rect', { x: X(at) - bw / 2, y: LY - 34 - bh, width: bw, height: bh, rx: 12, fill: COL.focusSoft, stroke: COL.focus, 'stroke-width': 3.5 }));
+        mg.appendChild(S('text', { x: X(at), y: LY - 34 - bh * 0.25, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 44, fill: COL.focus }, ['?']));
+      } else if (lab) mg.appendChild(S('text', { x: X(at), y: LY - 38, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 44, fill: dark }, [lab]));
     }
     root.appendChild(mg);
 
@@ -372,14 +406,14 @@ export function mount(el, props = {}, ctx = {}) {
   function drawMarker(v, interactive) {
     const { LY } = G;
     const g = S('g', { class: 'nl-marker', transform: `translate(${X(v)} ${LY})` });
-    beam = S('line', { x1: 0, y1: -8, x2: 0, y2: 22, stroke: COL.tens, 'stroke-width': 6, 'stroke-linecap': 'round' });
+    beam = S('line', { x1: 0, y1: -8, x2: 0, y2: 24, stroke: COL.focus, 'stroke-width': 6, 'stroke-linecap': 'round' });
     g.appendChild(beam);
     if (interactive) g.appendChild(S('rect', { x: -66, y: -175, width: 132, height: 215, fill: 'transparent' }));
     g.appendChild(markerArt(0, LY));
     if (p.showValue) {
       bubbleG = S('g', { transform: 'translate(0 -150)' });
-      bubbleG.appendChild(S('rect', { x: -44, y: -30, width: 88, height: 52, rx: 14, fill: '#1a2546', stroke: COL.tens, 'stroke-width': 3 }));
-      bubbleG.appendChild(S('text', { y: 9, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 32, fill: COL.tens }, [fmtF(v)]));
+      bubbleG.appendChild(S('rect', { x: -48, y: -32, width: 96, height: 58, rx: 14, fill: COL.surface, stroke: COL.ink, 'stroke-width': 3.5 }));
+      bubbleG.appendChild(S('text', { y: 10, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 34, fill: COL.ink }, [fmtF(v)]));
       g.appendChild(bubbleG);
     }
     if (interactive) bindDrag(g);
@@ -392,7 +426,7 @@ export function mount(el, props = {}, ctx = {}) {
     const dx = XL + 40, dy = LY - 150;
     const outer = S('g', { transform: `translate(${dx} ${dy})` });
     const g = S('g', { class: 'nl-marker' + (ro() ? '' : ' nl-dock') });
-    g.appendChild(S('ellipse', { cx: 0, cy: 6, rx: 52, ry: 14, fill: 'rgba(95,212,255,.10)', stroke: COL.ones, 'stroke-width': 2.5, 'stroke-dasharray': '8 7' }));
+    g.appendChild(S('ellipse', { cx: 0, cy: 6, rx: 54, ry: 15, fill: COL.focusSoft, stroke: COL.focus, 'stroke-width': 3, 'stroke-dasharray': '9 7' }));
     if (!ro()) g.appendChild(S('rect', { x: -66, y: -120, width: 132, height: 150, fill: 'transparent' }));
     g.appendChild(markerArt(0, 0, { scale: 1.05 }));
     outer.appendChild(g);

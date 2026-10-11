@@ -5,7 +5,7 @@
 // State: { n, tapped }
 import { S, svgRoot, onTap, injectCSS, clamp } from '../core/dom.js';
 import { artInner } from '../core/art.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { makeRand } from '../core/rand.js';
 import { sfx } from '../core/sfx.js';
 
@@ -107,9 +107,9 @@ export function mount(el, props = {}, ctx = {}) {
 
   function colourFor(i) {
     const cs = Array.isArray(p.colours) ? p.colours : null;
-    if (!cs) return COL.b;
+    if (!cs) return PAL.blue;
     let acc = 0;
-    const palette = [COL.a, COL.b, '#6fe3a5', '#ff8fb1'];
+    const palette = [COL.a, COL.b, PAL.blue, PAL.green];
     for (let k = 0; k < cs.length; k++) { acc += cs[k]; if (i < acc) return palette[k % palette.length]; }
     return COL.ink3;
   }
@@ -122,16 +122,16 @@ export function mount(el, props = {}, ctx = {}) {
     const n = pos.length;
     const crossed = clamp(Math.round(p.crossed || 0), 0, n);
     for (const rg of rings) {
-      root.appendChild(S('rect', { x: rg.x, y: rg.y, width: rg.w, height: rg.h, rx: Math.min(rg.w, rg.h) * 0.3, fill: 'rgba(255,255,255,.04)', stroke: COL.ink3, 'stroke-width': 3, 'stroke-dasharray': '10 8' }));
+      root.appendChild(S('rect', { x: rg.x, y: rg.y, width: rg.w, height: rg.h, rx: Math.min(rg.w, rg.h) * 0.3, fill: COL.surface2, stroke: COL.lineStrong, 'stroke-width': 3, 'stroke-dasharray': '10 8' }));
     }
     const icon = p.icon || 'dot';
     pos.forEach((q, i) => {
       const g = S('g', { class: 'it', transform: `translate(${q.x} ${q.y})` });
       const k = tapped.indexOf(i);
       if (k >= 0) g.classList.add('counted');
-      g.appendChild(S('circle', { class: 'halo', r: q.r * 1.15, fill: 'rgba(242,181,68,.18)', stroke: COL.tens, 'stroke-width': 4 }));
+      g.appendChild(S('circle', { class: 'halo', r: q.r * 1.15, fill: COL.focusSoft, stroke: COL.focus, 'stroke-width': 4 }));
       if (icon === 'dot') {
-        g.appendChild(S('circle', { r: q.r * 0.82, fill: colourFor(i) }));
+        g.appendChild(S('circle', { r: q.r * 0.82, fill: colourFor(i), stroke: 'rgba(27,30,46,.18)', 'stroke-width': 3 }));
       } else {
         if (Array.isArray(p.colours)) g.appendChild(S('circle', { r: q.r * 1.02, fill: 'none', stroke: colourFor(i), 'stroke-width': 5 }));
         const s = (q.r * 1.7) / 100;
@@ -144,7 +144,7 @@ export function mount(el, props = {}, ctx = {}) {
         g.appendChild(S('path', { d: `M${-q.r} ${-q.r}L${q.r} ${q.r}`, stroke: COL.ink, 'stroke-width': 6, 'stroke-linecap': 'round' }));
       }
       if (k >= 0) {
-        g.appendChild(S('text', { y: q.r * 1.15 + 34, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 34, fill: COL.tens }, [String(k + 1)]));
+        g.appendChild(S('text', { y: q.r * 1.15 + 34, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 34, fill: COL.focus }, [String(k + 1)]));
       }
       if (p.tappable && !ro()) {
         // Large invisible hit area.

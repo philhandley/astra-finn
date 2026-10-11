@@ -486,62 +486,55 @@ async function renderPractise(el, s, t) {
 
 /* ---------------- Big Question ---------------- */
 async function renderQuestion(el, s, t) {
-  el.className = 'step pad';
+  const { tutor, con } = lessonLayout(el);
+  cleanup.push(() => { tutor.destroy(); con.destroy(); });
   const c = crew();
   const opts = s.options || [];
   const scope = crewScope();
   const fmtTitle = s.format === 'wodb' ? "Which one doesn't belong?" : s.format === 'wyr' ? 'Would you rather...?' : 'Big Question';
-  el.innerHTML = `<div class="ask">
-    <div class="headrow"><div><div class="eyebrow">${esc(s.title || fmtTitle)} &middot; there's no right answer</div>
-      <div class="prompt" style="font-size:clamp(26px,2.7vw,36px)">${esc(fill(s.prompt || '', scope))}</div></div><span class="sp"></span></div>
-    <div class="choices">${opts.map((o, i) => `<button class="choice" type="button" data-i="${i}" style="align-items:center;text-align:center;justify-content:center;min-height:${o.widget ? 230 : 140}px">
-      <span class="badges"></span>${o.widget ? '<div class="mini" style="position:relative;width:100%;height:150px;pointer-events:none"></div>' : ''}${o.art ? `<span style="display:block;margin:0 auto">${art(o.art, 90)}</span>` : ''}
-      <span style="font-size:${String(o.label).length > 12 ? 24 : 40}px">${esc(fill(o.label, scope))}</span>${o.detail ? `<span class="detail">${esc(o.detail)}</span>` : ''}</button>`).join('')}</div>
-    <div class="turn"></div>
-    <div class="revealslot"></div>
-  </div>`;
-  const btns = [...el.querySelectorAll('.choice')];
-  btns.forEach((b, i) => {
-    const o = opts[i];
+  const prompt = fill(s.prompt || fmtTitle, scope);
+  con.clearWidget();
+  con.wbox.classList.remove('none');
+  const grid = h(`<div class="bq-grid ${opts.length <= 3 ? 'few' : ''} ${opts.length === 3 ? 'three' : ''}"></div>`);
+  // One label size for the whole question, so no option looks more important than another.
+  const longest = Math.max(...opts.map(o => String(fill(o.label, scope)).length));
+  const pictured = opts.some(o => o.widget || o.art);
+  const lblCls = longest > 14 ? 'long' : pictured || longest > 8 ? 'mid' : '';
+  const btns = opts.map(o => {
+    const label = fill(o.label, scope);
+    const b = h(`<button class="bq" type="button"><span class="badges"></span>
+      ${o.widget ? '<div class="mini"></div>' : ''}${o.art ? `<span>${art(o.art, 96)}</span>` : ''}
+      <span class="lbl ${lblCls}">${esc(label)}</span>${o.detail ? `<span class="detail">${esc(o.detail)}</span>` : ''}</button>`);
     if (o.widget) loadWidget(o.widget).then(m => { if (alive(t)) m.mount(b.querySelector('.mini'), { ...(o.props || {}), readonly: true }, { readonly: true }); }).catch(e => console.warn(e));
+    grid.appendChild(b);
+    return b;
   });
-  const turnEl = el.querySelector('.turn');
-  const slot = el.querySelector('.revealslot');
-  const text = sentences(fill(s.prompt || fmtTitle, scope), opts.map(o => fill(o.label, scope)).join(', or '));
-  const sb = speakButton(() => text);
-  el.querySelector('.sp').replaceWith(sb);
-  autoSay(text, sb);
+  con.wbox.appendChild(grid);
+  tutor.lines([`${fmtTitle} There's no right answer.`], { cls: 'soft', speak: false });
+  tutor.add([prompt], { cls: 'q', speak: false });
+  autoSay(sentences(prompt, opts.map(o => fill(o.label, scope)).join(', or ')), tutor.spBtn);
   let cmd = null, eng = null, phase = 'cmd', changing = null;
   const setBadges = () => btns.forEach((b, i) => {
     b.classList.toggle('pick-cmd', i === cmd);
     b.classList.toggle('pick-eng', i === eng);
     b.querySelector('.badges').innerHTML = (i === cmd ? `<span class="badge cmd">${esc(c.commander)}</span>` : '') + (i === eng ? `<span class="badge eng">${esc(c.engineer)}</span>` : '');
   });
+  const turn = (who, text) => h(`<div class="turn"><span class="who ${who}">${esc(who === 'cmd' ? c.commander : c.engineer)}</span><span>${esc(text)}</span></div>`);
   const drawTurn = () => {
-    turnEl.innerHTML = '';
-    if (phase === 'cmd') turnEl.innerHTML = `<span class="who cmd">${esc(c.commander)}</span><span>which do you pick? Tap one.</span>`;
-    else if (phase === 'eng') turnEl.innerHTML = `<span class="who eng">${esc(c.engineer)}</span><span>your turn. Which do you pick?</span>`;
+    if (phase === 'cmd') tutor.actions([turn('cmd', 'pick one!')]);
+    else if (phase === 'eng') tutor.actions([turn('eng', 'your pick?')]);
     else if (phase === 'why') {
-      const box = h(`<div style="display:flex;flex-direction:column;gap:12px;width:100%">
-        <div class="turn"><span class="who cmd">${esc(c.commander)}</span><span>why did you pick that? Tell ${esc(c.engineer)}!</span></div>
-        <div class="whybox"><input class="textin" type="text" maxlength="160" placeholder="${esc(c.engineer)} can write the reason here (optional)"><button class="btn big glow" type="button">What do other people think?</button></div>
-      </div>`);
-      autoSay(`${c.commander}, why did you pick that? Tell ${c.engineer}!`);
-      box.querySelector('.btn').addEventListener('click', () => {
+      const box = h(`<div class="whybox"><input class="textin" type="text" maxlength="160" placeholder="${esc(c.engineer)} can type the reason (optional)"></div>`);
+      const go = tutor.button('What do other people think?', () => {
         const why = box.querySelector('input').value.trim();
-        store.addLog(R.id, `Big Question: ${fill(s.prompt || fmtTitle, scope)} ${c.commander} picked "${fill(opts[cmd]?.label, scope)}"${eng !== null ? `, ${c.engineer} picked "${fill(opts[eng]?.label, scope)}"` : ''}.${why ? ` Because: ${why}` : ''}`);
-        phase = 'reveal'; drawTurn(); showReveal();
-      });
-      turnEl.append(box);
+        store.addLog(R.id, `Big Question: ${prompt} ${c.commander} picked "${fill(opts[cmd]?.label, scope)}"${eng !== null ? `, ${c.engineer} picked "${fill(opts[eng]?.label, scope)}"` : ''}.${why ? ` Because: ${why}` : ''}`);
+        phase = 'reveal'; showReveal();
+      }, { glow: true });
+      tutor.actions([turn('cmd', `why that one? Tell ${c.engineer}!`), box, go]);
+      autoSay(`${c.commander}, why did you pick that? Tell ${c.engineer}!`, tutor.spBtn);
     } else if (phase === 'reveal') {
-      const row = h(`<div class="mindrow"></div>`);
-      const mk = (who, name, col) => {
-        const b = h(`<button class="btn ghost small" type="button" style="border-color:${col}">${icon('star')} ${esc(name)}: I changed my mind</button>`);
-        b.addEventListener('click', () => { changing = who; turnEl.querySelector('.hint')?.remove(); row.after(h(`<span class="hint muted">Tap your new choice, ${esc(name)}.</span>`)); });
-        return b;
-      };
-      row.append(mk('cmd', c.commander, 'var(--gold)'), mk('eng', c.engineer, 'var(--cyan)'));
-      turnEl.append(row);
+      const mk = (who, name) => tutor.button(`${name}: I changed my mind`, () => { changing = who; tutor.add([`Tap your new choice, ${name}.`], { cls: 'soft', speak: false }); }, { ghost: true, iconName: 'star' });
+      tutor.actions([mk('cmd', c.commander), mk('eng', c.engineer)]);
     }
   };
   btns.forEach((b, i) => b.addEventListener('click', () => {
@@ -550,32 +543,27 @@ async function renderQuestion(el, s, t) {
     else if (phase === 'reveal' && changing) {
       const who = changing; changing = null;
       const before = who === 'cmd' ? cmd : eng;
-      if (before === i) { turnEl.querySelector('.hint')?.remove(); return; }
+      if (before === i) return;
       if (who === 'cmd') cmd = i; else eng = i;
       const name = who === 'cmd' ? c.commander : c.engineer;
       store.addStar();
       store.addLog(R.id, `${name} had a rethink and picked "${fill(opts[i]?.label, scope)}". A star for changing your mind!`);
-      toast(`${name} had a rethink. That's what mathematicians do! +1 star`);
-      say(`${name} had a rethink. That's what mathematicians do!`);
-      turnEl.querySelector('.hint')?.remove();
+      toast(`${name} had a rethink. +1 star`);
+      tutor.add([`${name} had a rethink. That's what mathematicians do!`], { cls: 'good' });
+      sfx('chime');
+      setBadges();
+      return;
     } else return;
     sfx('click');
     setBadges(); drawTurn();
   }));
-  function showReveal() {
+  async function showReveal() {
     const lines = [].concat(s.reveal || []).map(l => fill(l, scope));
-    const rv = h(`<div class="reveal noimg"><div class="card">
-      <div class="headrow"><div class="eyebrow">What other people think</div><span class="sp"></span></div>
-      ${lines.map(l => `<p class="lead" style="font-size:23px;margin:0">${esc(l)}</p>`).join('')}
-      ${s.followUp ? `<div class="dadline" style="font-size:21px"><b>Talk about it</b><span>${esc(fill(s.followUp, scope))}</span></div>` : ''}
-    </div></div>`);
-    const txt = sentences(...lines, s.followUp ? fill(s.followUp, scope) : '');
-    const b = speakButton(() => txt);
-    rv.querySelector('.sp').replaceWith(b);
-    slot.replaceChildren(rv);
-    autoSay(txt, b);
+    tutor.lines(lines, { cls: 'then', speak: false });
+    if (s.followUp) tutor.add([fill(s.followUp, scope)], { cls: 'q', speak: false });
+    drawTurn();
     setReady(true);
-    rv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    autoSay(sentences(...lines, s.followUp ? fill(s.followUp, scope) : ''), tutor.spBtn);
   }
   drawTurn();
 }

@@ -19,7 +19,7 @@
       "type": "look",
       "lines": [
         "Two tens frames.",
-        "13 gold counters and 7 blue."
+        "13 red counters and 7 yellow."
       ],
       "question": "Are both frames full?",
       "widget": "tensframe",
@@ -49,15 +49,15 @@
       "script": [
         {
           "say": [
-            "3 gold counters.",
-            "Tap blue, then fill the frame."
+            "3 red counters.",
+            "Tap yellow, then fill the frame."
           ],
           "goal": {
             "count": 10,
             "a": 3
           },
           "hint": [
-            "The blue brush is on the right.",
+            "The yellow brush is on the right.",
             "Tap a counter to take it off."
           ],
           "then": [
@@ -73,15 +73,15 @@
             "frames": 2
           },
           "say": [
-            "Now 13 gold counters.",
-            "Fill both frames with blue."
+            "Now 13 red counters.",
+            "Fill both frames with yellow."
           ],
           "goal": {
             "count": 20,
             "a": 13
           },
           "hint": [
-            "Use the blue brush.",
+            "Use the yellow brush.",
             "Fill every empty space."
           ],
           "then": [
@@ -144,15 +144,15 @@
         {
           "say": [
             "Make double 4.",
-            "4 gold, then 4 blue."
+            "4 red, then 4 yellow."
           ],
           "goal": {
             "a": 4,
             "b": 4
           },
           "hint": [
-            "Tap the frame 4 times with gold.",
-            "Switch to blue and tap 4 more."
+            "Tap the frame 4 times with red.",
+            "Switch to yellow and tap 4 more."
           ],
           "then": [
             "Double 4 is {count}."
@@ -167,15 +167,15 @@
             "frames": 2
           },
           "say": [
-            "6 gold counters.",
-            "Add 6 blue to make double 6."
+            "6 red counters.",
+            "Add 6 yellow to make double 6."
           ],
           "goal": {
             "a": 6,
             "b": 6
           },
           "hint": [
-            "Use the blue brush."
+            "Use the yellow brush."
           ],
           "then": [
             "Double 6 is {count}."
@@ -183,7 +183,7 @@
         },
         {
           "say": [
-            "Now add 1 more blue."
+            "Now add 1 more yellow."
           ],
           "goal": {
             "a": 6,

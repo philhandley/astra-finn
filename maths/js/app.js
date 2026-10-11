@@ -4,6 +4,7 @@ import { icon } from './core/icons.js';
 import { h, esc } from './core/dom.js';
 import { patchSVG } from './core/patch.js';
 import { SECTOR_COL } from './core/theme.js';
+import { cover } from './core/covers.js';
 import { modal, toast, confirmBox, hush } from './core/ui.js';
 import { showMission, leaveMission, TIER_NAME } from './core/runner.js';
 import { FAMILIES, familyStats, shakiest } from './core/fluency.js';
@@ -143,11 +144,11 @@ function renderHome() {
       <div class="home-actions"></div>
     </header>
     <div class="row2">
-      ${firstRun ? `<div class="nextcard"><img src="assets/img/starship-liftoff.jpg" alt="" onerror="this.remove()">
+      ${firstRun ? `<div class="nextcard"><div class="cover">${cover('check')}</div>
         <div class="body"><div class="eyebrow">Start here</div><h1>Cadet Check</h1>
           <p>A few warm-up questions to find the best place to start. No score, just a look around.</p>
           <div class="mindrow"><button class="btn big go-check" type="button">${icon('play')} Start the check</button><button class="btn ghost big go-first" type="button">Skip it</button></div></div></div>`
-        : recM ? `<div class="nextcard" data-go="${esc(rec.id)}"><img src="${esc(recS?.img || '')}" alt="" onerror="this.remove()">
+        : recM ? `<div class="nextcard" data-go="${esc(rec.id)}" style="--accent:${accentOf(recS?.id)[0]}"><div class="cover">${cover(recS?.id)}</div>
         <div class="body"><div class="eyebrow">Next on your path &middot; ${esc(recS?.title || '')}${rec.tier > 1 ? ` &middot; ${'★'.repeat(rec.tier)} ${TIER_NAME[rec.tier]}` : ''}</div>
           <h1>${esc(recM.title)}</h1><p>${esc(recM.tagline || '')}</p>
           <button class="btn big" type="button">${icon('play')} Start mission</button></div></div>`
@@ -169,11 +170,11 @@ function renderHome() {
         const ids = sec.missions.map(m => m.id);
         const done = ids.filter(id => tierOf(id) > 0).length;
         const col = accentOf(sec.id)[0];
+        const status = done === 0 ? 'Not started' : done === ids.length ? 'Complete' : 'In progress';
         return `<div class="sector" data-sector="${esc(sec.id)}" role="button" tabindex="0" style="--accent:${col}">
-          <img src="${esc(sec.img)}" alt="" loading="lazy" onerror="this.remove()">
-          <span class="chip yr" style="background:rgba(5,7,13,.65);color:${col};border-color:${col}55">${esc(sec.year)}</span>
-          ${ring(done, ids.length, col)}
+          <div class="cover">${cover(sec.id)}<span class="status"><i></i>${status}</span><span class="yr">${esc(sec.year)}</span></div>
           <div class="sbody"><h3>${esc(sec.title)}</h3><p>${esc(sec.tagline)}</p>
+            <div class="count">${done} of ${ids.length} patches</div>
             <div class="bar-prog"><i style="width:${(100 * done) / ids.length}%"></i></div></div></div>`;
       }).join('')}</div>
     </div>
@@ -222,9 +223,11 @@ function renderSector(sid) {
   const v = h(`<section class="view sectorview" style="--accent:${col}">
     <div class="headrow" style="justify-content:flex-start;gap:18px">
       <button class="btn ghost round back" type="button" aria-label="Mission Control">${icon('back')}</button>
-      <div><div class="eyebrow">${esc(sec.year)} &middot; ${ids.filter(id => tierOf(id)).length} of ${ids.length} patches</div><h1>${esc(sec.title)}</h1></div>
+      <div class="eyebrow">Star Chart</div>
     </div>
-    <p class="muted" style="font-size:21px;margin:0">${esc(sec.tagline)}</p>
+    <div class="sector-hero"><div class="cover">${cover(sec.id)}</div>
+      <div><div class="eyebrow">${esc(sec.year)} &middot; ${ids.filter(id => tierOf(id)).length} of ${ids.length} patches</div><h1>${esc(sec.title)}</h1>
+      <p class="muted" style="font-size:20px;margin:8px 0 0">${esc(sec.tagline)}</p></div></div>
     <div class="path">${ids.map((id, i) => {
       const m = DATA.missions[id] || DATA.meta[id];
       const t = tierOf(id);
@@ -348,7 +351,7 @@ function openNotes() {
     store.reset(); document.querySelector('.modal-back')?.remove(); route();
   });
   setRow.append(edit, reset);
-  body.append(setRow, h(`<p class="faint" style="font-size:15px;margin-top:12px">Curriculum: National Curriculum in England, mathematics programmes of study (DfE), and DfE Mathematics guidance: key stages 1 and 2 (2020), under the Open Government Licence. Photos: NASA and Wikimedia Commons contributors, see assets/img/CREDITS.md.</p>`));
+  body.append(setRow, h(`<p class="faint" style="font-size:15px;margin-top:12px">Curriculum: National Curriculum in England, mathematics programmes of study (DfE), and DfE Mathematics guidance: key stages 1 and 2 (2020), under the Open Government Licence. Illustrations drawn for this app.</p>`));
   modal("Engineer's notes", body, { wide: true });
 }
 
@@ -381,19 +384,16 @@ function drawStars() {
   cv.width = Math.round(w * dpr); cv.height = Math.round(hgt * dpr);
   const g = cv.getContext('2d');
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const bg = g.createRadialGradient(w * 0.78, hgt * 0.1, 0, w * 0.78, hgt * 0.1, Math.max(w, hgt));
-  bg.addColorStop(0, '#111c3a'); bg.addColorStop(0.42, '#080d1b'); bg.addColorStop(1, '#04060b');
+  const bg = g.createRadialGradient(w * 0.8, hgt * 0.05, 0, w * 0.8, hgt * 0.05, Math.max(w, hgt));
+  bg.addColorStop(0, '#1a1c25'); bg.addColorStop(0.5, '#111217'); bg.addColorStop(1, '#0b0c10');
   g.fillStyle = bg; g.fillRect(0, 0, w, hgt);
-  const neb = g.createRadialGradient(w * 0.12, hgt * 0.9, 0, w * 0.12, hgt * 0.9, w * 0.55);
-  neb.addColorStop(0, 'rgba(95,212,255,0.07)'); neb.addColorStop(1, 'rgba(95,212,255,0)');
-  g.fillStyle = neb; g.fillRect(0, 0, w, hgt);
   let seed = 7654321;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const n = Math.round((w * hgt) / 1800);
   for (let i = 0; i < n; i++) {
     const x = rnd() * w, y = rnd() * hgt, big = rnd() > 0.94;
     const r = big ? 0.9 + rnd() * 1.1 : 0.25 + rnd() * 0.75;
-    const a = big ? 0.6 + rnd() * 0.4 : 0.2 + rnd() * 0.55;
+    const a = (big ? 0.6 + rnd() * 0.4 : 0.2 + rnd() * 0.55) * 0.45;
     const tint = rnd();
     g.fillStyle = tint > 0.9 ? `rgba(255,214,160,${a})` : tint > 0.8 ? `rgba(180,215,255,${a})` : `rgba(255,255,255,${a})`;
     g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();

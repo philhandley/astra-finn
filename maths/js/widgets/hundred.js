@@ -1,23 +1,26 @@
 // hundred: a 100 square (1 to 100, or 0 to 99) that lights up.
 // Props:
 //   start       1 (1 to 100, default) or 0 (0 to 99)
-//   highlight   array of numbers shown gold
-//   highlight2  array of numbers shown cyan
-//   pattern     { every: n, from: k } highlights k, k + n, k + 2n ... in gold (add colour: 'cyan' for cyan).
-//               An array of such objects also works.
-//   hide        array of numbers shown as blank cells with a gold "?"
+//   highlight   array of numbers shown soft yellow
+//   highlight2  array of numbers shown soft blue (fixed: not tappable off)
+//   pattern     { every: n, from: k } highlights k, k + n, k + 2n ... in soft green. Add colour: 'yellow' for yellow,
+//               or 'blue' (old name 'cyan') for fixed soft blue like highlight2. An array of such objects also works.
+//   hide        array of numbers shown as cells with a blue "?"
 //   mode        'display' (default) | 'tap'
 //   rows        show only the first N rows (default 10)
 //   readonly
-// Tap mode: tapping a cell toggles it gold. Highlights from props start gold and can be toggled too.
+// Style v2 (white surface): white cells with COL.line borders and ink numbers; highlights are soft solid fills with a
+// slightly darker border; cells Finn taps turn solid blue with white numbers.
+// Tap mode: tapping a cell turns it on (solid blue). Yellow and green highlights from props start "on" and can be
+// tapped off too (tap again and they come back blue, as Finn's own tap).
 // State: { selected, taps, count }
-//   selected  the last number Finn turned gold that is still gold (null if none)
-//   taps      the numbers Finn turned gold, in tap order (a number turned off again is removed)
-//   count     how many cells are gold now (including gold highlights from props)
+//   selected  the last number Finn turned on that is still on (null if none)
+//   taps      the numbers Finn turned on, in tap order (a number turned off again is removed)
+//   count     how many cells are on now (including yellow and green highlights from props)
 // The grid fills the whole box (cells may be wider than tall) so cells are as big as possible.
 // Debug: dev/harness.html?widget=hundred&props={"mode":"tap","pattern":{"every":10,"from":7}}
 import { S, svgRoot, onTap, injectCSS, clamp } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -27,6 +30,15 @@ export const meta = {
 };
 
 const VW = 1000;
+// Cell looks: [fill, border, number colour, border width].
+const LOOK = {
+  plain: [COL.surface, COL.line, COL.ink, 2.5],
+  yellow: ['#fde68a', '#f5c542', COL.ink, 3],
+  blue: ['#bfdbfe', '#8fbcf8', COL.ink, 3],
+  green: ['#bbf7d0', '#7fdca4', COL.ink, 3],
+  tapped: [PAL.blue, PAL.blueDark, '#ffffff', 3],
+  hidden: [COL.focusSoft, COL.focus, COL.focus, 3.5],
+};
 const numList = a => (Array.isArray(a) ? a : a === undefined || a === null ? [] : [a]).map(Number).filter(Number.isFinite).map(Math.round);
 
 export function mount(el, props = {}, ctx = {}) {
@@ -36,13 +48,13 @@ export function mount(el, props = {}, ctx = {}) {
     .w-hundred.ro .hc { cursor: default; }
     .w-hundred .hc .face { transition: fill .18s, stroke .18s; }
     .w-hundred .hc.pop { animation: w-h-pop .3s ease-out; transform-box: fill-box; transform-origin: center; }
-    .w-hundred .hc.glow .face { stroke: #fff; stroke-width: 4; }
+    .w-hundred .hc.glow .face { stroke: ${COL.good}; stroke-width: 6; }
     @keyframes w-h-pop { 0% { transform: scale(.82); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
     @media (prefers-reduced-motion: reduce) { .w-hundred .hc.pop { animation: none; } }
   `);
   let p = { ...props };
-  let gold = new Set();   // gold cells now
-  let taps = [];          // Finn's gold taps in order
+  let gold = new Set();   // cells that are on now (Finn's taps plus yellow and green highlights)
+  let taps = [];          // Finn's taps in order (drawn solid blue)
   let popN = null;
   const root = svgRoot(VW, 640, 'w-hundred');
   el.appendChild(root);
@@ -54,8 +66,9 @@ export function mount(el, props = {}, ctx = {}) {
   const first = () => (Number(p.start) === 0 ? 0 : 1);
   const rowsN = () => clamp(Math.round(Number(p.rows) || 10), 1, 10);
 
+  // gold = cells that start "on" (green or yellow patterns); cyan = fixed soft blue cells; yellow = yellow patterns.
   function patternNums() {
-    const out = { gold: [], cyan: [] };
+    const out = { gold: [], cyan: [], yellow: [] };
     const pats = Array.isArray(p.pattern) ? p.pattern : p.pattern && typeof p.pattern === 'object' ? [p.pattern] : [];
     const lo = first(), hi = first() + 99;
     for (const pt of pats) {
@@ -63,8 +76,9 @@ export function mount(el, props = {}, ctx = {}) {
       if (!(every >= 1)) continue;
       let k = Math.round(Number(pt.from ?? pt.start ?? every));
       if (!Number.isFinite(k)) continue;
-      const list = pt.colour === 'cyan' || pt.color === 'cyan' ? out.cyan : out.gold;
-      for (let n = k, guard = 0; n <= hi && guard < 200; n += every, guard++) if (n >= lo) list.push(n);
+      const c = pt.colour || pt.color;
+      const list = c === 'cyan' || c === 'blue' ? out.cyan : out.gold;
+      for (let n = k, guard = 0; n <= hi && guard < 200; n += every, guard++) if (n >= lo) { list.push(n); if (c === 'yellow' || c === 'gold') out.yellow.push(n); }
     }
     return out;
   }
@@ -90,7 +104,7 @@ export function mount(el, props = {}, ctx = {}) {
     // viewBox matches the box's shape so the grid can use the full height.
     const VH = clamp((VW * h) / w, 120, 1600);
     root.setAttribute('viewBox', `0 0 ${VW} ${VH}`);
-    const m = 3, g = 4, mid = 9;
+    const m = 4, g = 6, mid = 10;
     const pitchH = (VH - 2 * m - (n > 5 ? mid : 0)) / n;
     let pitchW = (VW - 2 * m - mid) / 10;
     let ph = pitchH;
@@ -99,8 +113,11 @@ export function mount(el, props = {}, ctx = {}) {
     const gridW = pitchW * 10 + mid, gridH = ph * n + (n > 5 ? mid : 0);
     const ox = (VW - gridW) / 2, oy = (VH - gridH) / 2;
     const cw = pitchW - g, ch = ph - g;
-    const fs = Math.min(ch * 0.56, cw * 0.46);
-    const cyan = new Set([...numList(p.highlight2), ...patternNums().cyan]);
+    const fs = Math.min(ch * 0.62, cw * 0.42);
+    const pat = patternNums();
+    const cyan = new Set([...numList(p.highlight2), ...pat.cyan]);
+    const yellow = new Set([...numList(p.highlight), ...pat.yellow]);
+    const tapped = new Set(taps);
     const hide = new Set(numList(p.hide));
     const f0 = first();
     for (let r = 0; r < n; r++) {
@@ -111,12 +128,13 @@ export function mount(el, props = {}, ctx = {}) {
         const cell = S('g', { class: 'hc' + (popN === num ? ' pop' : ''), 'data-n': num });
         // Hit area covers the gap too.
         cell.appendChild(S('rect', { x, y, width: pitchW, height: ph, fill: 'transparent' }));
-        let fill = 'rgba(255,255,255,.05)', stroke = 'rgba(255,255,255,.16)', ink = COL.ink, dash = null;
-        if (isCyan) { fill = COL.ones; stroke = '#c4f0ff'; ink = '#04202b'; }
-        if (isGold) { fill = COL.tens; stroke = isCyan ? COL.ones : '#ffe0a0'; ink = '#1a1205'; }
-        if (isHid && !isGold && !isCyan) { fill = 'rgba(242,181,68,.08)'; stroke = COL.tens; ink = COL.tens; dash = '7 6'; }
-        cell.appendChild(S('rect', { class: 'face', x: x + g / 2, y: y + g / 2, width: cw, height: ch, rx: Math.min(10, ch * 0.18), fill, stroke, 'stroke-width': isGold && isCyan ? 5 : 2, 'stroke-dasharray': dash }));
-        cell.appendChild(S('text', { x: x + pitchW / 2, y: y + ph / 2 + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': isGold || isCyan ? 700 : 600, 'font-size': fs, fill: ink, 'pointer-events': 'none' }, [isHid ? '?' : String(num)]));
+        // On cells: Finn's taps are solid blue; highlights from props are soft yellow or soft green.
+        const look = isGold ? (tapped.has(num) ? LOOK.tapped : yellow.has(num) ? LOOK.yellow : LOOK.green)
+          : isCyan ? LOOK.blue : isHid ? LOOK.hidden : LOOK.plain;
+        let [fill, stroke, ink, sw] = look;
+        if (isGold && isCyan) { stroke = PAL.blue; sw = 5; }
+        cell.appendChild(S('rect', { class: 'face', x: x + g / 2, y: y + g / 2, width: cw, height: ch, rx: Math.min(10, ch * 0.2), fill, stroke, 'stroke-width': sw }));
+        cell.appendChild(S('text', { x: x + pitchW / 2, y: y + ph / 2 + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': isHid && !isGold && !isCyan ? 800 : look === LOOK.plain ? 600 : 700, 'font-size': fs, fill: ink, 'pointer-events': 'none' }, [isHid ? '?' : String(num)]));
         if (p.mode === 'tap' && !ro()) unbinds.push(onTap(cell, () => toggle(num)));
         root.appendChild(cell);
       }

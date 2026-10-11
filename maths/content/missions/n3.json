@@ -15,7 +15,7 @@
       "type": "look",
       "lines": ["A number line from 0 to 100.", "a is 36. It is 1 more than 35.", "b is 79. It is 1 less than 80."],
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "step": 10, "minor": 5, "labels": "tens", "marks": [{ "at": 36, "label": "a", "colour": "gold" }, { "at": 79, "label": "b", "colour": "cyan" }] }
+      "props": { "min": 0, "max": 100, "step": 10, "minor": 5, "labels": "tens", "marks": [{ "at": 36, "label": "a", "colour": "orange" }, { "at": 79, "label": "b", "colour": "purple" }] }
     },
     { "type": "ask", "text": "Have you put numbers on a number line at school?" },
     {
@@ -25,7 +25,7 @@
       "answer": 1,
       "reveal": ["B is about 60.", "60 is just over half way."],
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "step": 100, "minor": 0, "labels": [0, 100], "marks": [{ "at": 30, "label": "A", "colour": "gold" }, { "at": 60, "label": "B", "colour": "gold" }, { "at": 88, "label": "C", "colour": "gold" }] },
+      "props": { "min": 0, "max": 100, "step": 100, "minor": 0, "labels": [0, 100], "marks": [{ "at": 30, "label": "A", "colour": "orange" }, { "at": 60, "label": "B", "colour": "orange" }, { "at": 88, "label": "C", "colour": "orange" }] },
       "revealProps": { "labels": [0, 50, 100], "step": 50 }
     },
     {
@@ -42,11 +42,11 @@
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 40, "max": 50, "labels": "ends", "minor": 1, "marks": [{ "at": 47, "label": "47", "colour": "gold" }] },
+      "props": { "min": 40, "max": 50, "labels": "ends", "minor": 1, "marks": [{ "at": 47, "label": "47", "colour": "orange" }] },
       "script": [
         { "say": ["47 is between two tens.", "What is the next ten?"], "input": "numpad", "answer": 50, "then": ["47 is between 40 and 50."] },
         { "say": ["Is 47 nearer to 40 or 50?"], "input": "choice", "options": [40, 50], "answer": 50, "then": ["47 is 3 less than 50.", "So it is nearer to 50."] },
-        { "set": { "min": 70, "max": 80, "marks": [{ "at": 72, "label": "72", "colour": "gold" }] }, "say": ["What ten comes just before 72?"], "input": "numpad", "answer": 70, "then": ["72 is between 70 and 80.", "It is nearer to 70."] }
+        { "set": { "min": 70, "max": 80, "marks": [{ "at": 72, "label": "72", "colour": "orange" }] }, "say": ["What ten comes just before 72?"], "input": "numpad", "answer": 70, "then": ["72 is between 70 and 80.", "It is nearer to 70."] }
       ]
     },
     {

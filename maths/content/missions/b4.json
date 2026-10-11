@@ -130,7 +130,7 @@
             "takenTens": 2
           },
           "hint": [
-            "Tap the gold rods."
+            "Tap the green rods."
           ],
           "then": [
             "52 − 20 = {value}."

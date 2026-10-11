@@ -1,7 +1,7 @@
 // blaster: the Array Blaster. A dark scene with a glowing perspective grid. Tap the blast zone to fire:
 // a beam shoots from where you tapped and a new row of `size` dots drops in under the previous rows.
 // Props: size (1-10, default 1), rows (start rows, default 0), maxRows (default 10), maxSize (default 10),
-//        lockSize (hide the arrows), highlightRows (gold boxes round each row), groupsView (each blast is a circled group),
+//        lockSize (hide the arrows), highlightRows (yellow boxes round each row), groupsView (each blast is a circled group),
 //        caption (bubble above the array, e.g. "3 × 5 = 15"), flipButton (or flip: show a Flip button), flipped,
 //        bar (false hides the top bar, for small readonly pictures), interactive (default true), readonly.
 // State: { size, rows, total, flipped }
@@ -9,18 +9,20 @@
 //        dev/harness.html?widget=blaster&props={"size":4,"rows":3,"groupsView":true}
 //        dev/harness.html?widget=blaster&props={"size":5,"rows":3,"flipButton":true}
 import { injectCSS, onTap, clamp, reducedMotion } from '../core/dom.js';
-import { FONT } from '../core/theme.js';
+import { FONT, PAL, COL } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
   title: 'Array Blaster',
+  surface: 'dark', // the console turns dark around the Tron scene (style v2 exception, as in Synthesis)
   playground: { size: 3, rows: 0, maxRows: 10, flipButton: true, interactive: true },
   state: ['size', 'rows', 'total', 'flipped'],
 };
 
-const GOLD = '#f7d56b';
-const HL = '#f5d36b';
-const DOT = '#4f9dff';
+const YEL = '#f7d56b';   // preview dots and caption factors (soft yellow, as in Synthesis)
+const BOX = '#f5d36b';   // yellow row boxes and group rings
+const DOT = '#5aa2ff';   // blue array dots
+const DOT_EDGE = '#2f6fe0';
 
 // Ray gun drawn in a 48 x 48 box, pointing right. Shared by the bar icon (SVG) and the canvas (Path2D).
 const GUN = [
@@ -34,36 +36,41 @@ const GUN = [
 const gunSVG = (sz = 34) => `<svg viewBox="0 0 48 48" width="${sz}" height="${sz}" aria-hidden="true">${GUN.map(([d, f]) => `<path d="${d}" fill="${f}"/>`).join('')}<circle cx="45" cy="24" r="2.6" fill="#5fd4ff"/></svg>`;
 
 const CSS = `
-.w-blaster { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; background: #04101c; user-select: none; -webkit-user-select: none; }
+.w-blaster { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; background: #04101c; user-select: none; -webkit-user-select: none; font-family: ${FONT.display}; }
 .w-blaster canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
 .w-blaster.ro canvas { cursor: default; }
-.w-blaster-bar { position: absolute; left: 0; right: 0; top: 0; height: 76px; display: flex; align-items: center; gap: 8px; padding: 0 10px;
-  background: linear-gradient(180deg, rgba(16, 24, 50, .97), rgba(12, 19, 42, .94)); border-bottom: 1px solid rgba(124, 156, 255, .22); z-index: 1; }
-.w-blaster-bar.short { height: 66px; }
-.w-blaster-gun { display: flex; align-items: center; gap: 4px; padding: 0 8px 0 4px; min-width: 76px; color: #f3efe6;
-  font-family: ${FONT.display}; font-weight: 700; font-size: 32px; line-height: 1; }
+.w-blaster-bar { position: absolute; left: 0; right: 0; top: 0; height: 80px; display: flex; align-items: center; gap: 12px; padding: 0 12px 4px;
+  background: #121a33; border-bottom: 2px solid rgba(124, 156, 255, .16); z-index: 1; }
+.w-blaster-bar.short { height: 70px; gap: 8px; }
+.w-blaster-gun { display: flex; align-items: center; gap: 6px; height: 56px; padding: 0 14px 0 8px; border-radius: 28px; background: rgba(255, 255, 255, .06);
+  color: ${COL.darkInk}; font-weight: 800; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.w-blaster-gun b { min-width: 1.25ch; text-align: center; font-weight: 800; }
 .w-blaster-pre { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.w-blaster-pre i { flex: none; border-radius: 50%; background: ${GOLD}; box-shadow: 0 0 10px rgba(247, 213, 107, .45); transition: transform .2s; }
+.w-blaster-pre i { flex: none; border-radius: 50%; background: ${YEL}; box-shadow: inset 0 -3px 0 rgba(183, 121, 31, .35); transition: transform .2s; }
 .w-blaster-pre i.pop { animation: wbl-pop .25s ease; }
 @keyframes wbl-pop { 0% { transform: scale(.3); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
-.w-blaster button { appearance: none; border: 0; margin: 0; padding: 0; cursor: pointer; color: #f3efe6; font-family: ${FONT.display};
-  display: grid; place-items: center; flex: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-.w-blaster-arrow { width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 255, 255, .07); border: 1.5px solid rgba(255, 255, 255, .16) !important; transition: background .15s, opacity .15s, transform .1s; }
-.w-blaster-arrow:active, .w-blaster-reset:active, .w-blaster-flip:active { transform: scale(.94); }
-.w-blaster-arrow[disabled] { opacity: .3; cursor: default; }
-.w-blaster-arrow svg { width: 26px; height: 26px; }
-.w-blaster-reset { width: 58px; height: 58px; border-radius: 50%; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .28) !important; }
+.w-blaster button { appearance: none; border: 0; margin: 0; padding: 0; cursor: pointer; font-family: ${FONT.display};
+  display: grid; place-items: center; flex: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform .08s ease, box-shadow .08s ease, opacity .15s; }
+/* Round tactile controls: white face, ink icon, a solid bottom edge that sinks when pressed (style v2 on a dark bar). */
+.w-blaster-arrow, .w-blaster-reset { width: 60px; height: 60px; border-radius: 50%; background: #ffffff; color: ${COL.ink};
+  box-shadow: 0 5px 0 #8f99b3; margin-bottom: 5px; }
+.w-blaster-bar.short .w-blaster-arrow, .w-blaster-bar.short .w-blaster-reset { width: 56px; height: 56px; }
+.w-blaster-arrow svg { width: 28px; height: 28px; }
 .w-blaster-reset svg { width: 30px; height: 30px; }
-.w-blaster-flip { height: 58px; padding: 0 18px !important; border-radius: 29px; gap: 8px; grid-auto-flow: column; font-size: 23px; font-weight: 600;
-  background: rgba(124, 156, 255, .18); border: 1.5px solid rgba(124, 156, 255, .65) !important; }
+.w-blaster-flip { height: 58px; padding: 0 22px 0 18px !important; border-radius: 29px; gap: 8px; grid-auto-flow: column; font-size: 23px; font-weight: 700;
+  background: ${PAL.blue}; color: #fff; box-shadow: 0 5px 0 ${PAL.blueDark}; margin-bottom: 5px; }
+.w-blaster-bar.short .w-blaster-flip { height: 56px; }
 .w-blaster-flip svg { width: 26px; height: 26px; }
-.w-blaster-flip[disabled] { opacity: .35; cursor: default; }
+.w-blaster-arrow:active:not([disabled]), .w-blaster-reset:active, .w-blaster-flip:active:not([disabled]) { transform: translateY(4px); box-shadow: 0 1px 0 #8f99b3; }
+.w-blaster-flip:active:not([disabled]) { box-shadow: 0 1px 0 ${PAL.blueDark}; }
+.w-blaster-arrow[disabled], .w-blaster-flip[disabled] { opacity: .28; cursor: default; }
 `;
 
-const ARROW_L = '<svg viewBox="0 0 24 24"><path d="M16 4L6 12l10 8z" fill="currentColor"/></svg>';
-const ARROW_R = '<svg viewBox="0 0 24 24"><path d="M8 4l10 8-10 8z" fill="currentColor"/></svg>';
-const RESET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 3.5v4.6h4.6"/></svg>';
-const FLIP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-13.7 5.7"/><path d="M4 12A8 8 0 0 1 17.7 6.3"/><path d="M18 2.5v4h-4M6 21.5v-4h4"/></svg>';
+const ARROW_L = '<svg viewBox="0 0 24 24"><path d="M15.5 5L7 12l8.5 7z" fill="currentColor" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>';
+const ARROW_R = '<svg viewBox="0 0 24 24"><path d="M8.5 5L17 12l-8.5 7z" fill="currentColor" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>';
+const RESET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 3.5v4.6h4.6"/></svg>';
+const FLIP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 0 1-13.7 5.7"/><path d="M4 12A8 8 0 0 1 17.7 6.3"/><path d="M18 2.5v4h-4M6 21.5v-4h4"/></svg>';
 
 const ease = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
 const easeInOut = t => { t = clamp(t, 0, 1); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
@@ -244,13 +251,13 @@ export function mount(el, props = {}, ctx = {}) {
     sprite.width = sz; sprite.height = sz;
     const s = sprite.getContext('2d');
     const c = sz / 2;
-    const glow = s.createRadialGradient(c, c, R * 0.8, c, c, R * 1.7);
-    glow.addColorStop(0, 'rgba(79, 157, 255, .5)'); glow.addColorStop(1, 'rgba(79, 157, 255, 0)');
-    s.fillStyle = glow; s.beginPath(); s.arc(c, c, R * 1.7, 0, Math.PI * 2); s.fill();
-    const body = s.createRadialGradient(c - R * 0.35, c - R * 0.4, R * 0.1, c, c, R);
-    body.addColorStop(0, '#b9dbff'); body.addColorStop(0.45, '#64a8ff'); body.addColorStop(1, '#2f6fe0');
-    s.fillStyle = body; s.beginPath(); s.arc(c, c, R, 0, Math.PI * 2); s.fill();
-    s.strokeStyle = 'rgba(200, 230, 255, .55)'; s.lineWidth = R * 0.07; s.beginPath(); s.arc(c, c, R * 0.96, 0, Math.PI * 2); s.stroke();
+    // A soft halo so the dots read on the dark scene, then a flat blue dot with a darker rim and a small shine.
+    const glow = s.createRadialGradient(c, c, R * 0.85, c, c, R * 1.55);
+    glow.addColorStop(0, 'rgba(90, 162, 255, .32)'); glow.addColorStop(1, 'rgba(90, 162, 255, 0)');
+    s.fillStyle = glow; s.beginPath(); s.arc(c, c, R * 1.55, 0, Math.PI * 2); s.fill();
+    s.fillStyle = DOT; s.beginPath(); s.arc(c, c, R, 0, Math.PI * 2); s.fill();
+    s.strokeStyle = DOT_EDGE; s.lineWidth = R * 0.1; s.beginPath(); s.arc(c, c, R * 0.95, 0, Math.PI * 2); s.stroke();
+    s.fillStyle = 'rgba(255, 255, 255, .3)'; s.beginPath(); s.ellipse(c - R * 0.32, c - R * 0.36, R * 0.3, R * 0.2, -0.6, 0, Math.PI * 2); s.fill();
   }
 
   // ---------- drawing ----------
@@ -291,17 +298,17 @@ export function mount(el, props = {}, ctx = {}) {
     const bw = tw + padX * 2;
     const { x, y } = L.cap;
     g.save();
-    g.shadowColor = 'rgba(247, 213, 107, .35)'; g.shadowBlur = 18;
-    roundRect(x - bw / 2, y - bh / 2, bw, bh, 12);
-    g.fillStyle = 'rgba(9, 16, 36, .92)'; g.fill();
-    g.shadowBlur = 0;
-    g.lineWidth = 2.5; g.strokeStyle = HL; g.stroke();
+    g.shadowColor = 'rgba(0, 0, 0, .45)'; g.shadowBlur = 16; g.shadowOffsetY = 4;
+    roundRect(x - bw / 2, y - bh / 2, bw, bh, 14);
+    g.fillStyle = '#121a33'; g.fill();
+    g.shadowBlur = 0; g.shadowOffsetY = 0;
+    g.lineWidth = 2.5; g.strokeStyle = 'rgba(214, 224, 250, .7)'; g.stroke();
     g.restore();
     g.textBaseline = 'middle';
     let cx = x - tw / 2;
     toks.forEach((t, i) => {
       const isNum = /\d/.test(t);
-      g.fillStyle = !isNum ? '#f3efe6' : (eqAt >= 0 && i > eqAt ? '#8cc2ff' : GOLD);
+      g.fillStyle = !isNum ? '#f3efe6' : (eqAt >= 0 && i > eqAt ? '#8cc2ff' : YEL);
       g.fillText(t, cx, y + 1);
       cx += widths[i];
     });
@@ -327,8 +334,8 @@ export function mount(el, props = {}, ctx = {}) {
           if (a <= 0) return;
           g.globalAlpha = a;
           roundRect(gb.x, gb.y, gb.w, gb.h, Math.min(gb.w, gb.h) * 0.45);
-          g.fillStyle = 'rgba(95, 212, 255, .07)'; g.fill();
-          g.lineWidth = 2.5; g.strokeStyle = 'rgba(95, 212, 255, .6)'; g.setLineDash([8, 6]); g.stroke(); g.setLineDash([]);
+          g.fillStyle = 'rgba(245, 211, 107, .07)'; g.fill();
+          g.lineWidth = 3; g.strokeStyle = BOX; g.stroke();
           g.globalAlpha = 1;
         });
       }
@@ -342,7 +349,7 @@ export function mount(el, props = {}, ctx = {}) {
           g.globalAlpha = a;
           roundRect(a0.x - s * 0.47, a0.y - s * 0.45, a1.x - a0.x + s * 0.94, s * 0.9, s * 0.18);
           g.fillStyle = 'rgba(245, 211, 107, .07)'; g.fill();
-          g.lineWidth = 2.5; g.strokeStyle = HL; g.stroke();
+          g.lineWidth = 3; g.strokeStyle = BOX; g.stroke();
           g.globalAlpha = 1;
         }
       }

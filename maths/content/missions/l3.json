@@ -46,7 +46,7 @@
       "widget": "hundred",
       "props": { "mode": "tap" },
       "script": [
-        { "say": ["Count in 10s on the 100 square.", "Tap each number up to 50."], "goal": { "taps": [10, 20, 30, 40, 50] }, "then": ["10, 20, 30, 40, 50.", "They make a column!"], "hint": ["Start with 10.", "Tap a gold square again to undo it."] },
+        { "say": ["Count in 10s on the 100 square.", "Tap each number up to 50."], "goal": { "taps": [10, 20, 30, 40, 50] }, "then": ["10, 20, 30, 40, 50.", "They make a column!"], "hint": ["Start with 10.", "Tap a blue square again to undo it."] },
         { "set": { "pattern": { "every": 5, "from": 5 } }, "say": ["These are the 5s.", "What pattern can you see?"], "then": ["They all end in 5 or 0.", "Two stripes down the square!"] },
         { "set": { "pattern": { "every": 2, "from": 2 } }, "say": ["These are the 2s.", "Count them: 2, 4, 6..."], "then": ["They end in 2, 4, 6, 8 or 0.", "These are even numbers."] }
       ]

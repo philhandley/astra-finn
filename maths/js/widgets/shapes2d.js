@@ -1,6 +1,8 @@
 // shapes2d: 2-D shapes to name, tap (count sides or vertices) and fold for a vertical line of symmetry.
-// Props: shape (see SHAPES2D), rotate (degrees, clockwise), scale (0.4 to 1), colour (name or #hex),
-//        tap ('sides' | 'vertices' | null): tapping a side lights it gold and numbers it; tapping a vertex drops a numbered dot.
+// Look (style v2): flat palette fills with a 4 px ink outline, like stickers on the white surface.
+// Props: shape (see SHAPES2D), rotate (degrees, clockwise), scale (0.4 to 1),
+//        colour (palette name: red, yellow, blue, green, orange, pink, purple, teal; or #hex; default purple),
+//        tap ('sides' | 'vertices' | null): a tapped side turns thick blue with a blue number tag; a tapped vertex gets a blue numbered dot.
 //            Each side or vertex counts once only (a second tap on it does nothing).
 //        fold (true: dashed vertical line through the middle and a Fold button; the left half folds over the right),
 //        folded (start folded), marks ('right': small squares on right-angle corners),
@@ -14,7 +16,7 @@
 //         symmetric = the true vertical-symmetry property of the shape as rotated now)
 // Debug: dev/harness.html?widget=shapes2d&props={"shape":"kite","tap":"sides","fold":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
-import { COL, FONT, FRAC } from '../core/theme.js';
+import { COL, PAL, FONT, FRAC } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -27,14 +29,35 @@ const W = 800, H = 500;
 let uid = 0;
 
 // Named colours used by shapes2d, pattern and the generators. Goals compare the name, so content uses names.
+// Content uses the palette words; the old names are kept only so stale content still draws sensibly.
 export const COLOURS = {
-  gold: '#f2b544', cyan: '#5fd4ff', pink: '#ff8fb1', green: '#6fe3a5', purple: '#b48cff',
-  orange: '#ff9a52', red: '#ff6b57', blue: '#4f9dff', white: '#f3efe6', grey: '#9aa3b2',
+  red: PAL.red, yellow: PAL.yellow, blue: PAL.blue, green: PAL.green, orange: PAL.orange,
+  pink: PAL.pink, purple: PAL.purple, teal: PAL.teal,
+  white: '#ffffff', grey: '#c9cfdb', gold: PAL.yellow, cyan: PAL.teal,
 };
-export function colourOf(c, fallback = '#b48cff') {
+export const DEFAULT_COLOUR = PAL.purple;
+export function colourOf(c, fallback = DEFAULT_COLOUR) {
   if (c && COLOURS[c]) return COLOURS[c];
   if (typeof c === 'string' && /^#[0-9a-f]{3,8}$/i.test(c)) return c;
   return fallback;
+}
+// Outline drawn at a fixed screen width (about 4 px), so small option tiles look as crisp as the big console.
+export const OUTLINE = { stroke: COL.ink, 'stroke-width': 4.5, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' };
+
+// A Synthesis-style control: white rounded face, light border, solid bottom edge; primary = blue.
+function ctlButton({ x, y, w, h, label, primary = false, fs = 28, aria, cls = '' }) {
+  const face = primary ? PAL.blue : COL.surface, edge = primary ? PAL.blueDark : COL.line;
+  const g = S('g', { class: 'ctl ' + cls, role: 'button', tabindex: 0, 'aria-label': aria || label }, [
+    S('rect', { x, y: y + 5, width: w, height: h, rx: 16, fill: edge }),
+    S('g', { class: 'face' }, [
+      S('rect', { x, y, width: w, height: h, rx: 16, fill: face, stroke: primary ? PAL.blue : COL.line, 'stroke-width': 3 }),
+      S('text', { x: x + w / 2, y: y + h / 2 + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fs, fill: primary ? '#fff' : COL.ink }, [label]),
+    ]),
+  ]);
+  const up = () => g.classList.remove('down');
+  g.addEventListener('pointerdown', () => g.classList.add('down'));
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => g.addEventListener(t, up));
+  return g;
 }
 
 // ---------- geometry (unit coordinates, y down, clockwise rotation for positive degrees) ----------
@@ -221,15 +244,15 @@ export function shapePathFit(name, rotate, cx, cy, size) {
 export function mount(el, props = {}, ctx = {}) {
   injectCSS('w-shapes2d', `
     .w-shapes2d { width: 100%; height: 100%; }
-    .w-shapes2d .hit, .w-shapes2d .foldbtn { cursor: pointer; }
+    .w-shapes2d .hit, .w-shapes2d .ctl { cursor: pointer; }
     .w-shapes2d.ro .hit { cursor: default; }
     .w-shapes2d .badge, .w-shapes2d .deco { pointer-events: none; }
-    .w-shapes2d .glow { filter: drop-shadow(0 0 10px rgba(242,181,68,.9)); }
-    .w-shapes2d .foldbtn rect { transition: fill .15s; }
-    .w-shapes2d .foldbtn:active rect { fill: rgba(242,181,68,.35); }
+    .w-shapes2d .ctl .face { transition: transform .08s ease; }
+    .w-shapes2d .ctl.down .face { transform: translateY(4px); }
+    .w-shapes2d .ctl:focus { outline: none; }
     .w-shapes2d .pulse { animation: w-shapes2d-pulse .3s ease; }
     @keyframes w-shapes2d-pulse { 50% { opacity: .4; } }
-    @media (prefers-reduced-motion: reduce) { .w-shapes2d .pulse { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .w-shapes2d .pulse { animation: none; } .w-shapes2d .ctl .face { transition: none; } }
   `);
   const id = ++uid;
   let p = { ...props };
@@ -259,10 +282,11 @@ export function mount(el, props = {}, ctx = {}) {
     return { sides: r.sides.map(sd => sd.map(T)), verts: r.verts.map(T), cx, cy, top: cy - (b.h * k) / 2, bottom: cy + (b.h * k) / 2 };
   }
 
-  function badge(x, y, n) {
+  // Blue number tag (also used, centred on the corner, as a tapped-vertex dot).
+  function badge(x, y, n, r = 23) {
     return S('g', { class: 'badge', transform: `translate(${fmt(x)} ${fmt(y)})` }, [
-      S('circle', { r: 22, fill: COL.tens, stroke: '#1a1205', 'stroke-width': 2 }),
-      S('text', { 'text-anchor': 'middle', y: 10, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 28, fill: '#1a1205' }, [String(n)]),
+      S('circle', { r, fill: PAL.blue, stroke: COL.surface, 'stroke-width': 4 }),
+      S('text', { 'text-anchor': 'middle', y: r * 0.4, 'font-family': FONT.display, 'font-weight': 700, 'font-size': fmt(r * 1.15), fill: '#fff' }, [String(n)]),
     ]);
   }
   function outward(x, y, cx, cy, d) {
@@ -285,7 +309,7 @@ export function mount(el, props = {}, ctx = {}) {
     const L = layoutSingle();
     const col = colourOf(p.colour);
     const d = pathOf(L.sides);
-    const shapeEl = (c, extra = {}) => S('path', { d, fill: c, 'fill-opacity': 0.3, stroke: c, 'stroke-width': 6, 'stroke-linejoin': 'round', ...extra });
+    const shapeEl = (c, extra = {}) => S('path', { d, fill: c, ...OUTLINE, ...extra });
 
     if (p.fold) {
       const clipL = `w-s2d-${id}-l`, clipR = `w-s2d-${id}-r`;
@@ -295,14 +319,15 @@ export function mount(el, props = {}, ctx = {}) {
       ]));
       const done = folded && foldT >= 1;
       const match = done && symmetric();
-      root.appendChild(S('g', { 'clip-path': `url(#${clipR})`, class: match ? 'glow' : '' }, [shapeEl(match ? COL.tens : col)]));
-      const flapCol = done && !match ? COL.b : (match ? COL.tens : col);
-      const flap = S('g', { class: 'flap' + (match ? ' glow' : ''), transform: flapTransform(L.cx, foldT) }, [
-        S('g', { 'clip-path': `url(#${clipL})` }, [shapeEl(flapCol, done && !match ? { 'stroke-dasharray': '16 10', 'fill-opacity': 0.4 } : {})]),
+      // Folded and matching: both halves turn success green. Not matching: the flap goes see-through with a dashed edge.
+      const halfCol = match ? COL.good : col;
+      root.appendChild(S('g', { 'clip-path': `url(#${clipR})`, class: match ? 'match' : '' }, [shapeEl(halfCol)]));
+      const flap = S('g', { class: 'flap' + (match ? ' match' : ''), transform: flapTransform(L.cx, foldT) }, [
+        S('g', { 'clip-path': `url(#${clipL})` }, [shapeEl(halfCol, done && !match ? { 'stroke-dasharray': '12 9', 'fill-opacity': 0.55 } : {})]),
       ]);
       root.appendChild(flap);
       api._flap = { flap, cx: L.cx };
-      root.appendChild(S('line', { class: 'deco', x1: L.cx, y1: Math.max(8, L.top - 34), x2: L.cx, y2: Math.min(H - 8, L.bottom + 34), stroke: COL.ink, 'stroke-opacity': 0.75, 'stroke-width': 4, 'stroke-dasharray': '14 10' }));
+      root.appendChild(S('line', { class: 'deco', x1: L.cx, y1: Math.max(8, L.top - 34), x2: L.cx, y2: Math.min(H - 8, L.bottom + 34), stroke: COL.ink, 'stroke-width': 4, 'stroke-dasharray': '14 10', 'stroke-linecap': 'round' }));
     } else {
       root.appendChild(shapeEl(col));
     }
@@ -325,11 +350,7 @@ export function mount(el, props = {}, ctx = {}) {
       lit.forEach(i => {
         const sd = L.sides[i];
         if (!sd) return;
-        root.appendChild(S('path', { class: 'deco lit-side', 'data-i': i, d: linePath(sd), fill: 'none', stroke: COL.tens, 'stroke-width': 13, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
-      });
-      litV.forEach(i => {
-        const v = L.verts[i];
-        if (v) root.appendChild(S('circle', { class: 'deco', cx: fmt(v[0]), cy: fmt(v[1]), r: 14, fill: COL.tens, stroke: '#1a1205', 'stroke-width': 3 }));
+        root.appendChild(S('path', { class: 'deco lit-side', 'data-i': i, d: linePath(sd), fill: 'none', stroke: PAL.blue, 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
       });
       // Hit areas (generous).
       const mode = tapMode();
@@ -363,20 +384,17 @@ export function mount(el, props = {}, ctx = {}) {
         const [bx, by] = outward(m[0], m[1], L.cx, L.cy, 38);
         root.appendChild(badge(clamp(bx, 24, W - 24), clamp(by, 24, H - 24), k + 1));
       });
+      // Tapped vertices: a blue numbered dot right on the corner.
       litV.forEach((i, k) => {
         const v = L.verts[i];
         if (!v) return;
-        const [bx, by] = outward(v[0], v[1], L.cx, L.cy, 42);
-        root.appendChild(badge(clamp(bx, 24, W - 24), clamp(by, 24, H - 24), k + 1));
+        root.appendChild(badge(v[0], v[1], k + 1, 21));
       });
     }
 
-    // Fold button.
+    // Fold button (the widget's one primary action).
     if (p.fold && !ro()) {
-      const g = S('g', { class: 'foldbtn', role: 'button', tabindex: 0, 'aria-label': folded ? 'Unfold' : 'Fold' }, [
-        S('rect', { x: W - 172, y: H - 80, width: 160, height: 68, rx: 34, fill: 'rgba(242,181,68,.14)', stroke: COL.tens, 'stroke-width': 3 }),
-        S('text', { x: W - 92, y: H - 36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 28, fill: COL.tens }, [folded ? 'Unfold' : 'Fold']),
-      ]);
+      const g = ctlButton({ x: W - 178, y: H - 84, w: 164, h: 70, label: folded ? 'Unfold' : 'Fold', primary: true, fs: 30, cls: 'foldbtn' });
       unbinds.push(onTap(g, toggleFold));
       root.appendChild(g);
     }
@@ -444,7 +462,7 @@ export function mount(el, props = {}, ctx = {}) {
       }
       const ts = sides.map(sd => sd.map(T));
       const c = colourOf(it.colour, FRAC[i % FRAC.length]);
-      root.appendChild(S('path', { d: pathOf(ts), fill: c, 'fill-opacity': 0.32, stroke: c, 'stroke-width': 5, 'stroke-linejoin': 'round' }));
+      root.appendChild(S('path', { d: pathOf(ts), fill: c, ...OUTLINE }));
       if (it.label) {
         const b2 = bbox(ts);
         const ly = placed ? Math.min(H - 8, b2.y1 + 36) : Math.min(H - 10, (Math.floor(i / cols) + 1) * ch - 14);

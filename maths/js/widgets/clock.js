@@ -8,7 +8,7 @@
 // State: { h, m, minutes, words }  minutes = (h % 12) * 60 + m; words is the UK phrase ("quarter past 3", "25 to 7").
 // Debug: dev/harness.html?widget=clock&props={"h":3,"m":0,"interactive":true,"digital":true,"minuteLabels":true,"pastTo":true}
 import { S, svgRoot, svgPoint, drag, injectCSS, clamp, reducedMotion } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -18,7 +18,9 @@ export const meta = {
 };
 
 const W = 800, H = 500;
-const FACE = '#f3efe6', NAVY = '#0c1430', HOUR = '#e0661f', MIN = '#1f5fd1', MINLAB = '#8fbcff';
+// Style v2 (white surface): a classroom clock. Short hour hand red, long minute hand blue, ink outlines.
+const INK = COL.ink, HOUR = PAL.red, MIN = PAL.blue;
+const PAST_SOFT = '#e3eeff', TO_SOFT = '#fff0d9', TO_INK = '#e8730c';
 
 // UK words for a time.
 export function clockWords(h, m) {
@@ -88,34 +90,35 @@ export function mount(el, props = {}, ctx = {}) {
     root.classList.toggle('ro', ro());
     const { R, cx, cy } = geo();
     const face = S('g', { class: 'grab' });
-    // Outside ring and face.
-    face.appendChild(S('circle', { cx, cy, r: R + 10, fill: '#2a3557', stroke: '#9fb3d9', 'stroke-width': 4 }));
-    face.appendChild(S('circle', { cx, cy, r: R, fill: FACE }));
+    // Soft shelf shadow, thick ink rim, white face.
+    face.appendChild(S('circle', { cx, cy: cy + 7, r: R + 13, fill: COL.surface3 }));
+    face.appendChild(S('circle', { cx, cy, r: R + 8, fill: COL.surface, stroke: INK, 'stroke-width': 12 }));
     if (p.pastTo) {
-      const top = pol(cx, cy, R, 0), bot = pol(cx, cy, R, 180);
-      face.appendChild(S('path', { d: `M${cx} ${cy}L${top.x} ${top.y}A${R} ${R} 0 0 1 ${bot.x} ${bot.y}Z`, fill: 'rgba(31,95,209,.13)' }));
-      face.appendChild(S('path', { d: `M${cx} ${cy}L${bot.x} ${bot.y}A${R} ${R} 0 0 1 ${top.x} ${top.y}Z`, fill: 'rgba(224,102,31,.12)' }));
-      face.appendChild(S('line', { x1: cx, y1: cy - R, x2: cx, y2: cy + R, stroke: 'rgba(12,20,48,.25)', 'stroke-width': 3, 'stroke-dasharray': '8 8' }));
-      face.appendChild(S('text', { x: cx + R * 0.36, y: cy + R * 0.5, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: MIN, opacity: 0.75 }, ['past']));
-      face.appendChild(S('text', { x: cx - R * 0.36, y: cy + R * 0.5, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: HOUR, opacity: 0.8 }, ['to']));
+      const top = pol(cx, cy, R + 2, 0), bot = pol(cx, cy, R + 2, 180);
+      face.appendChild(S('path', { d: `M${cx} ${cy}L${top.x} ${top.y}A${R + 2} ${R + 2} 0 0 1 ${bot.x} ${bot.y}Z`, fill: PAST_SOFT }));
+      face.appendChild(S('path', { d: `M${cx} ${cy}L${bot.x} ${bot.y}A${R + 2} ${R + 2} 0 0 1 ${top.x} ${top.y}Z`, fill: TO_SOFT }));
+      face.appendChild(S('line', { x1: cx, y1: cy - R, x2: cx, y2: cy + R, stroke: COL.lineStrong, 'stroke-width': 3, 'stroke-dasharray': '9 8' }));
+      const fsW = Math.round(R * 0.15);
+      face.appendChild(S('text', { x: cx + R * 0.37, y: cy + R * 0.5, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fsW, fill: PAL.blue }, ['past']));
+      face.appendChild(S('text', { x: cx - R * 0.37, y: cy + R * 0.5, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fsW, fill: TO_INK }, ['to']));
     }
-    // Minute marks.
+    // Minute marks: every minute a fine tick, every 5 minutes a bold one.
     for (let i = 0; i < 60; i++) {
       const five = i % 5 === 0;
-      const a = pol(cx, cy, R * (five ? 0.86 : 0.92), i * 6), b = pol(cx, cy, R * 0.975, i * 6);
-      face.appendChild(S('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: NAVY, 'stroke-width': five ? 5 : 2.2, 'stroke-linecap': 'round', opacity: five ? 0.9 : 0.55 }));
+      const a = pol(cx, cy, R * (five ? 0.85 : 0.915), i * 6), b = pol(cx, cy, R * 0.975, i * 6);
+      face.appendChild(S('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: five ? INK : COL.ink2, 'stroke-width': five ? 6 : 2.5, 'stroke-linecap': 'round' }));
     }
     // Hour numbers.
-    const fs = Math.round(R * 0.2);
+    const fs = Math.round(R * 0.21);
     for (let n = 1; n <= 12; n++) {
-      const q = pol(cx, cy, R * 0.7, n * 30);
-      face.appendChild(S('text', { x: q.x, y: q.y + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fs, fill: NAVY }, [String(n)]));
+      const q = pol(cx, cy, R * 0.68, n * 30);
+      face.appendChild(S('text', { x: q.x, y: q.y + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': fs, fill: INK }, [String(n)]));
     }
-    // Minute labels outside the face.
+    // Minute labels outside the face, in the minute hand's colour.
     if (p.minuteLabels) {
       for (let k = 1; k < 12; k++) {
-        const q = pol(cx, cy, R + 40, k * 30);
-        face.appendChild(S('text', { x: q.x, y: q.y + 10, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 600, 'font-size': 28, fill: MINLAB }, [String(k * 5)]));
+        const q = pol(cx, cy, R + 42, k * 30);
+        face.appendChild(S('text', { x: q.x, y: q.y + 10, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 28, fill: PAL.blue }, [String(k * 5)]));
       }
     }
     // A big transparent target so the whole face (and its rim labels) can be grabbed.
@@ -124,9 +127,11 @@ export function mount(el, props = {}, ctx = {}) {
     handsG = S('g', { 'pointer-events': 'none' });
     root.appendChild(handsG);
     if (p.digital) {
-      const bx = 560, bw = 215, bh = 120, by = cy - bh / 2;
-      root.appendChild(S('rect', { x: bx, y: by, width: bw, height: bh, rx: 22, fill: '#0b1020', stroke: '#9fb3d9', 'stroke-width': 3 }));
-      readout = S('text', { x: bx + bw / 2, y: by + bh / 2 + 24, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 68, fill: COL.good, 'letter-spacing': '2' }, ['']);
+      const bx = 548, bw = 240, bh = 124, by = cy - bh / 2;
+      root.appendChild(S('rect', { x: bx, y: by + 7, width: bw, height: bh, rx: 20, fill: COL.surface3 }));
+      root.appendChild(S('rect', { x: bx, y: by, width: bw, height: bh, rx: 20, fill: COL.surface, stroke: INK, 'stroke-width': 5 }));
+      readout = S('text', { x: bx + bw / 2, y: by + bh / 2 + 25, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 70 });
+      readout.append(S('tspan', { fill: HOUR }), S('tspan', { fill: INK, dx: 3 }, [':']), S('tspan', { fill: MIN, dx: 3 }));
       root.appendChild(readout);
     } else readout = null;
     drawHands(total);
@@ -141,22 +146,27 @@ export function mount(el, props = {}, ctx = {}) {
     const tt = ((t % 720) + 720) % 720;
     const minDeg = (tt % 60) * 6, hourDeg = tt / 2;
     const which = p.hands || 'both';
+    // A hand drawn pointing at 12, then turned: a flat colour bar with a rounded arrow tip and an ink outline.
     const hand = (deg, len, wid, col, knob) => {
-      const tip = pol(cx, cy, len, deg), tail = pol(cx, cy, -len * 0.14, deg);
-      handsG.appendChild(S('line', { x1: tail.x, y1: tail.y, x2: tip.x, y2: tip.y, stroke: col, 'stroke-width': wid, 'stroke-linecap': 'round' }));
-      if (knob) {
-        const k = pol(cx, cy, len * 0.8, deg);
-        handsG.appendChild(S('circle', { cx: k.x, cy: k.y, r: wid * 0.95, fill: col, stroke: FACE, 'stroke-width': 3 }));
-      }
+      const tail = len * 0.18, w = wid / 2, head = w * 1.45, neck = len - head * 1.25;
+      const d = `M${cx - w} ${cy + tail - w}Q${cx - w} ${cy + tail} ${cx} ${cy + tail}Q${cx + w} ${cy + tail} ${cx + w} ${cy + tail - w}`
+        + `L${cx + w} ${cy - neck}L${cx + head} ${cy - neck}L${cx + 2} ${cy - len + 1}Q${cx} ${cy - len - 1} ${cx - 2} ${cy - len + 1}L${cx - head} ${cy - neck}L${cx - w} ${cy - neck}Z`;
+      const g = S('g', { transform: `rotate(${deg.toFixed(2)} ${cx} ${cy})` });
+      g.appendChild(S('path', { d, fill: col, stroke: INK, 'stroke-width': 4.5, 'stroke-linejoin': 'round' }));
+      if (knob) g.appendChild(S('circle', { cx, cy: cy - neck * 0.62, r: w * 0.55 + 3, fill: COL.surface, stroke: INK, 'stroke-width': 3.5 }));
+      handsG.appendChild(g);
     };
     const live = !ro();
-    if (which !== 'minute') hand(hourDeg, R * 0.5, 17, HOUR, live && p.dragHour !== false);
-    if (which !== 'hour') hand(minDeg, R * 0.84, 10, MIN, live);
-    handsG.appendChild(S('circle', { cx, cy, r: 13, fill: NAVY }));
-    handsG.appendChild(S('circle', { cx, cy, r: 5, fill: FACE }));
+    if (which !== 'minute') hand(hourDeg, R * 0.54, 26, HOUR, live && p.dragHour !== false);
+    if (which !== 'hour') hand(minDeg, R * 0.88, 14, MIN, live);
+    handsG.appendChild(S('circle', { cx, cy, r: 15, fill: INK }));
+    handsG.appendChild(S('circle', { cx, cy, r: 5, fill: COL.surface }));
     if (readout) {
       const { h, m } = hm(dragging ? snapped(t) : Math.round(total));
-      readout.textContent = `${h}:${String(m).padStart(2, '0')}`;
+      const [th, , tm] = readout.children;
+      th.textContent = String(h);
+      readout.setAttribute('font-size', h >= 10 ? 62 : 70);
+      tm.textContent = String(m).padStart(2, '0');
     }
   }
 

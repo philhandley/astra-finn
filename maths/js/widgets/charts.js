@@ -1,6 +1,8 @@
 // charts: tally charts, tables, pictograms and block diagrams to read or build.
+// Look (style v2): white tables with light rules and ink text, thick ink tally marks, outlined pictogram icons,
+//        flat coloured blocks with ink outlines on a clean axis, white push buttons for - and +.
 // Props: kind ('tally' | 'pictogram' | 'block' | 'table'),
-//        cats (array of { label, icon (art name), value, colour (name or #hex, shown as a swatch or block colour) }, up to 6),
+//        cats (array of { label, icon (art name), value, colour (palette name or #hex, shown as a swatch or block colour) }, up to 6),
 //        key (pictogram: one icon stands for `key` items; part icons are drawn for the remainder, e.g. half an icon for 1 when key is 2),
 //        interactive (- and + buttons per category: +1 tally / table / block, +key for a pictogram (or +step)),
 //        step (pictogram button step, default key), max (block axis top; tally/table cap), axisStep (block axis labels: 1, 2, 5 or 10),
@@ -8,21 +10,23 @@
 //        given (array of numbers to copy, shown beside each category) with givenAs ('tally' | 'number'),
 //        readonly.
 // State: { values, total }  (values in category order)
-// Debug: dev/harness.html?widget=charts&props={"kind":"block","cats":[{"label":"Red","value":3},{"label":"Blue","value":5}],"interactive":true}
+// Debug: dev/harness.html?widget=charts&props={"kind":"block","cats":[{"label":"Red","colour":"red","value":3},{"label":"Blue","colour":"blue","value":5}],"interactive":true}
 import { S, svgRoot, onTap, injectCSS, clamp } from '../core/dom.js';
 import { artInner } from '../core/art.js';
-import { COL, FONT, FRAC } from '../core/theme.js';
+import { COL, PAL, FONT, FRAC } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
   title: 'Charts',
-  playground: { kind: 'block', interactive: true, cats: [{ label: 'Red', colour: 'red', value: 0 }, { label: 'Blue', colour: 'blue', value: 0 }, { label: 'Green', colour: 'green', value: 0 }, { label: 'Gold', colour: 'gold', value: 0 }] },
+  playground: { kind: 'block', interactive: true, cats: [{ label: 'Red', colour: 'red', value: 0 }, { label: 'Blue', colour: 'blue', value: 0 }, { label: 'Green', colour: 'green', value: 0 }, { label: 'Yellow', colour: 'yellow', value: 0 }] },
   state: ['values', 'total'],
 };
 
 const W = 800, H = 500;
 let uid = 0;
-const NAMED = { gold: '#f2b544', cyan: '#5fd4ff', pink: '#ff8fb1', green: '#6fe3a5', purple: '#b48cff', orange: '#ff9a52', red: '#ff6b57', blue: '#4f9dff', white: '#f3efe6', grey: '#9aa3b2' };
+// Palette names (old names kept only so stale content still draws).
+const NAMED = { red: PAL.red, yellow: PAL.yellow, blue: PAL.blue, green: PAL.green, orange: PAL.orange, pink: PAL.pink, purple: PAL.purple, teal: PAL.teal,
+  white: '#ffffff', grey: '#c9cfdb', gold: PAL.yellow, cyan: PAL.teal };
 const colourOf = (c, i) => NAMED[c] || (typeof c === 'string' && /^#[0-9a-f]{3,8}$/i.test(c) ? c : FRAC[i % FRAC.length]);
 const f1 = v => Math.round(v * 10) / 10;
 
@@ -38,7 +42,7 @@ export function tallyMarks(n, x, y, h, sp, colour = COL.ink) {
     cx += 4 * sp + sp * 1.6;
   }
   for (let i = 0; i < rest; i++) d.push(`M${f1(cx + i * sp)} ${f1(y)}V${f1(y + h)}`);
-  if (d.length) g.appendChild(S('path', { d: d.join(''), stroke: colour, 'stroke-width': Math.max(3, sp * 0.28), 'stroke-linecap': 'round' }));
+  if (d.length) g.appendChild(S('path', { d: d.join(''), stroke: colour, 'stroke-width': Math.max(4, sp * 0.36), 'stroke-linecap': 'round' }));
   return g;
 }
 const tallyWidth = (n, sp) => Math.floor(n / 5) * (5.6 * sp) + (n % 5) * sp;
@@ -46,9 +50,11 @@ const tallyWidth = (n, sp) => Math.floor(n / 5) * (5.6 * sp) + (n % 5) * sp;
 export function mount(el, props = {}, ctx = {}) {
   injectCSS('w-charts', `
     .w-charts { width: 100%; height: 100%; }
-    .w-charts .pm { cursor: pointer; }
-    .w-charts .pm:active rect { fill: rgba(242,181,68,.35); }
+    .w-charts .ctl { cursor: pointer; }
+    .w-charts .ctl .face { transition: transform .08s ease; }
+    .w-charts .ctl.down .face { transform: translateY(4px); }
     .w-charts .deco { pointer-events: none; }
+    @media (prefers-reduced-motion: reduce) { .w-charts .ctl .face { transition: none; } }
   `);
   const id = ++uid;
   let p = {};
@@ -90,11 +96,18 @@ export function mount(el, props = {}, ctx = {}) {
     changed();
   }
 
+  // A Synthesis-style push button (white face, light border, solid bottom edge) with an ink + or -.
   function pmButton(x, y, s, sign, i) {
-    const g = S('g', { class: 'pm', role: 'button', 'aria-label': `${sign > 0 ? 'Add' : 'Take away'} ${cats()[i].label}` }, [
-      S('rect', { x, y, width: s, height: s, rx: 14, fill: 'rgba(242,181,68,.12)', stroke: COL.tens, 'stroke-width': 3 }),
-      S('path', { d: sign > 0 ? `M${x + s / 2} ${y + s * 0.26}V${y + s * 0.74}M${x + s * 0.26} ${y + s / 2}H${x + s * 0.74}` : `M${x + s * 0.26} ${y + s / 2}H${x + s * 0.74}`, stroke: COL.tens, 'stroke-width': 6, 'stroke-linecap': 'round' }),
+    const g = S('g', { class: 'ctl pm', role: 'button', 'aria-label': `${sign > 0 ? 'Add' : 'Take away'} ${cats()[i].label}` }, [
+      S('rect', { x, y: y + 5, width: s, height: s, rx: 14, fill: COL.line }),
+      S('g', { class: 'face' }, [
+        S('rect', { x, y, width: s, height: s, rx: 14, fill: COL.surface, stroke: COL.line, 'stroke-width': 3 }),
+        S('path', { d: sign > 0 ? `M${f1(x + s / 2)} ${f1(y + s * 0.27)}V${f1(y + s * 0.73)}M${f1(x + s * 0.27)} ${f1(y + s / 2)}H${f1(x + s * 0.73)}` : `M${f1(x + s * 0.27)} ${f1(y + s / 2)}H${f1(x + s * 0.73)}`, stroke: COL.ink, 'stroke-width': 6, 'stroke-linecap': 'round' }),
+      ]),
     ]);
+    const up = () => g.classList.remove('down');
+    g.addEventListener('pointerdown', () => g.classList.add('down'));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => g.addEventListener(t, up));
     unbinds.push(onTap(g, () => bump(i, sign)));
     root.appendChild(g);
   }
@@ -115,9 +128,9 @@ export function mount(el, props = {}, ctx = {}) {
     let tx = x;
     const s = Math.min(rowH * 0.7, 52);
     if (c.icon && kind() !== 'pictogram') { drawArt(c.icon, tx, yMid - s / 2, s); tx += s + 10; }
-    if (c.colour) { root.appendChild(S('circle', { class: 'deco', cx: tx + 13, cy: yMid, r: 13, fill: c.col, stroke: 'rgba(0,0,0,.3)', 'stroke-width': 2 })); tx += 34; }
+    if (c.colour) { root.appendChild(S('circle', { class: 'deco', cx: tx + 14, cy: yMid, r: 14, fill: c.col, stroke: COL.ink, 'stroke-width': 3 })); tx += 38; }
     const room = maxW - (tx - x);
-    const fs = clamp(room / Math.max(1, c.label.length * 0.56), 18, 26);
+    const fs = clamp(room / Math.max(1, c.label.length * 0.6), 18, 27);
     root.appendChild(S('text', { class: 'deco', x: tx, y: yMid + fs * 0.36, 'font-family': FONT.display, 'font-weight': 600, 'font-size': f1(fs), fill: COL.ink }, [c.label]));
   }
 
@@ -125,19 +138,20 @@ export function mount(el, props = {}, ctx = {}) {
     unbinds.splice(0).forEach(u => u());
     root.replaceChildren();
     const cs = cats();
-    let top = 12;
-    if (p.title) {
-      root.appendChild(S('text', { class: 'deco', x: W / 2, y: 36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 26, fill: COL.ink2 }, [String(p.title)]));
-      top = 54;
-    }
+    const top = p.title ? 54 : 12;
+    const title = cx => {
+      if (p.title) root.appendChild(S('text', { class: 'deco', x: f1(cx), y: 36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 26, fill: COL.ink }, [String(p.title)]));
+    };
     root.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    if (!cs.length) return;
-    if (kind() === 'block') drawBlock(cs, top);
-    else {
-      // Fit the viewBox to the rows so short charts fill small spaces (option tiles) and big ones.
-      const bottom = drawRows(cs, top);
-      root.setAttribute('viewBox', `0 0 ${W} ${Math.round(Math.max(220, Math.min(H, bottom + 12)))}`);
-    }
+    if (!cs.length || kind() === 'block') { title(W / 2); if (cs.length) drawBlock(cs, top); return; }
+    // Fit the viewBox to the rows (and, when read-only, to their width) so short charts fill small option tiles.
+    // In a big space keep a sensible minimum size so a one-row chart does not become giant.
+    const { bottom, right } = drawRows(cs, top);
+    const rightAll = Math.max(right, p.title ? String(p.title).length * 16 + 40 : 0);
+    title(rightAll / 2);
+    const small = el.clientWidth > 0 && el.clientWidth < 420;
+    const vw = Math.max(rightAll, small ? 0 : 600), vh = Math.min(H, Math.max(bottom + 12, small ? 0 : 200));
+    root.setAttribute('viewBox', `${f1(-(vw - rightAll) / 2)} 0 ${f1(vw)} ${Math.round(vh)}`);
   }
 
   // Tally, table and pictogram: one row per category.
@@ -149,21 +163,34 @@ export function mount(el, props = {}, ctx = {}) {
     const inter = interactive();
     const rowH = Math.min(84, (H - top - 10 - keyH - headH) / n);
     const given = Array.isArray(p.given) ? p.given : null;
-    const labW = 230, givenW = given ? 130 : 0;
+    // Label column as wide as the longest label needs (icon, swatch and word).
+    const sIcon = Math.min(rowH * 0.7, 52);
+    const labNeed = Math.max(...cs.map(c => 14 + (c.icon && k !== 'pictogram' ? sIcon + 10 : 0) + (c.colour ? 38 : 0) + c.label.length * 26 * 0.6 + 10));
+    const labW = clamp(Math.ceil(labNeed), 150, 230), givenW = given ? 130 : 0;
     const x0 = 20, xData = x0 + labW + givenW + 10;
-    const xEnd = inter ? W - 160 : W - 20;
+    // Read-only charts are only as wide as their longest row; interactive ones leave room for the buttons.
+    const maxV = Math.max(1, ...values);
+    const need = k === 'tally' ? 12 + tallyWidth(maxV, 17) + 26 : k === 'table' ? 160 : 14 + Math.ceil(maxV / key()) * (Math.min(rowH * 0.78, 58) + 6);
+    const xEnd = inter ? W - 160 : Math.min(W - 20, xData + Math.max(150, need));
     const y0 = top + headH;
     const tableW = k === 'table' ? Math.min(xEnd, xData + 160) : xEnd;
+    const btnX = Math.min(W - 150, tableW + 24); // - and + sit just right of the table
     // Frame and row lines.
-    root.appendChild(S('rect', { class: 'deco', x: x0 - 8, y: y0 - headH, width: tableW - x0 + 16, height: rowH * n + headH, rx: 10, fill: 'rgba(255,255,255,.03)', stroke: COL.line, 'stroke-width': 2 }));
-    for (let i = 1; i < n; i++) root.appendChild(S('line', { class: 'deco', x1: x0 - 8, y1: y0 + i * rowH, x2: tableW + 8, y2: y0 + i * rowH, stroke: COL.line, 'stroke-width': 2 }));
-    if (headH) root.appendChild(S('line', { class: 'deco', x1: x0 - 8, y1: y0, x2: tableW + 8, y2: y0, stroke: COL.ink3, 'stroke-width': 2 }));
-    root.appendChild(S('line', { class: 'deco', x1: x0 + labW, y1: y0 - headH, x2: x0 + labW, y2: y0 + rowH * n, stroke: COL.line, 'stroke-width': 2 }));
-    if (given) root.appendChild(S('line', { class: 'deco', x1: x0 + labW + givenW, y1: y0 - headH, x2: x0 + labW + givenW, y2: y0 + rowH * n, stroke: COL.line, 'stroke-width': 2 }));
+    const fx = x0 - 8, fw = tableW - x0 + 16, fy = y0 - headH, fh = rowH * n + headH;
+    root.appendChild(S('rect', { class: 'deco', x: fx, y: fy, width: fw, height: fh, rx: 14, fill: COL.surface }));
+    if (headH) {
+      // Heading band: soft grey with rounded top corners.
+      root.appendChild(S('path', { class: 'deco', d: `M${fx} ${y0}V${fy + 14}Q${fx} ${fy} ${fx + 14} ${fy}H${fx + fw - 14}Q${fx + fw} ${fy} ${fx + fw} ${fy + 14}V${y0}Z`, fill: COL.surface2 }));
+    }
+    for (let i = 1; i < n; i++) root.appendChild(S('line', { class: 'deco', x1: fx, y1: y0 + i * rowH, x2: fx + fw, y2: y0 + i * rowH, stroke: COL.line, 'stroke-width': 3 }));
+    if (headH) root.appendChild(S('line', { class: 'deco', x1: fx, y1: y0, x2: fx + fw, y2: y0, stroke: COL.lineStrong, 'stroke-width': 3 }));
+    root.appendChild(S('line', { class: 'deco', x1: x0 + labW, y1: fy, x2: x0 + labW, y2: y0 + rowH * n, stroke: COL.line, 'stroke-width': 3 }));
+    if (given) root.appendChild(S('line', { class: 'deco', x1: x0 + labW + givenW, y1: fy, x2: x0 + labW + givenW, y2: y0 + rowH * n, stroke: COL.line, 'stroke-width': 3 }));
+    root.appendChild(S('rect', { class: 'deco', x: fx, y: fy, width: fw, height: fh, rx: 14, fill: 'none', stroke: COL.lineStrong, 'stroke-width': 3 }));
     if (headH) {
       const [h1 = '', h2 = ''] = p.heads.map(String);
-      root.appendChild(S('text', { class: 'deco', x: x0 + 6, y: y0 - 16, 'font-family': FONT.display, 'font-weight': 600, 'font-size': 22, fill: COL.ink2 }, [h1]));
-      root.appendChild(S('text', { class: 'deco', x: xData + 70, y: y0 - 16, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 600, 'font-size': 22, fill: COL.ink2 }, [h2]));
+      root.appendChild(S('text', { class: 'deco', x: x0 + 6, y: y0 - 16, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 22, fill: COL.ink2 }, [h1]));
+      root.appendChild(S('text', { class: 'deco', x: xData + 70, y: y0 - 16, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 22, fill: COL.ink2 }, [h2]));
     }
     cs.forEach((c, i) => {
       const yMid = y0 + (i + 0.5) * rowH;
@@ -172,8 +199,8 @@ export function mount(el, props = {}, ctx = {}) {
         const gv = Math.max(0, Math.round(+given[i] || 0));
         if (p.givenAs === 'tally') {
           const sp = Math.min(13, (givenW - 20) / Math.max(1, tallyWidth(gv, 1)));
-          root.appendChild(tallyMarks(gv, x0 + labW + 14, yMid - rowH * 0.25, rowH * 0.5, sp, COL.ones));
-        } else root.appendChild(S('text', { class: 'deco', x: x0 + labW + givenW / 2, y: yMid + 11, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 32, fill: COL.ones }, [String(gv)]));
+          root.appendChild(tallyMarks(gv, x0 + labW + 14, yMid - rowH * 0.25, rowH * 0.5, sp, PAL.blue));
+        } else root.appendChild(S('text', { class: 'deco', x: x0 + labW + givenW / 2, y: yMid + 11, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 32, fill: PAL.blue }, [String(gv)]));
       }
       const v = values[i];
       const avail = xEnd - xData - 10;
@@ -192,8 +219,8 @@ export function mount(el, props = {}, ctx = {}) {
       }
       if (inter) {
         const s = clamp(rowH - 10, 56, 64);
-        pmButton(W - 150, yMid - s / 2, s, -1, i);
-        pmButton(W - 150 + s + 10, yMid - s / 2, s, 1, i);
+        pmButton(btnX, yMid - s / 2, s, -1, i);
+        pmButton(btnX + s + 10, yMid - s / 2, s, 1, i);
       }
     });
     if (k === 'pictogram') {
@@ -201,13 +228,13 @@ export function mount(el, props = {}, ctx = {}) {
       const kk = key();
       const icon = p.icon || cs.find(c => c.icon)?.icon || 'star';
       const bx = x0, by = Math.min(H - keyH + 8, y0 + rowH * n + 14), bh = keyH - 16;
-      root.appendChild(S('rect', { class: 'deco', x: bx, y: by, width: 210, height: bh, rx: 12, fill: 'rgba(95,212,255,.08)', stroke: COL.ones, 'stroke-width': 2.5 }));
-      root.appendChild(S('text', { class: 'deco', x: bx + 14, y: by + bh / 2 + 9, 'font-family': FONT.display, 'font-weight': 600, 'font-size': 24, fill: COL.ink2 }, ['Key:']));
+      root.appendChild(S('rect', { class: 'deco', x: bx, y: by, width: 210, height: bh, rx: 14, fill: COL.surface2, stroke: COL.lineStrong, 'stroke-width': 3 }));
+      root.appendChild(S('text', { class: 'deco', x: bx + 14, y: by + bh / 2 + 9, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 24, fill: COL.ink2 }, ['Key:']));
       drawArt(icon, bx + 78, by + (bh - 44) / 2, 44);
       root.appendChild(S('text', { class: 'deco', x: bx + 130, y: by + bh / 2 + 11, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: COL.ink }, [`= ${kk}`]));
-      return by + bh;
+      return { bottom: by + bh, right: inter ? btnX + 150 : Math.max(tableW + 8, bx + 210) + 12 };
     }
-    return y0 + rowH * n;
+    return { bottom: y0 + rowH * n, right: inter ? btnX + 150 : tableW + 20 };
   }
 
   function drawBlock(cs, top) {
@@ -224,10 +251,9 @@ export function mount(el, props = {}, ctx = {}) {
     // Grid lines and axis labels.
     for (let v = 0; v <= max; v += step) {
       const y = yBot - v * unit;
-      root.appendChild(S('line', { class: 'deco', x1: x0, y1: f1(y), x2: x1, y2: f1(y), stroke: v === 0 ? COL.ink2 : COL.line, 'stroke-width': v === 0 ? 3 : 1.5 }));
-      root.appendChild(S('text', { class: 'deco', x: x0 - 12, y: f1(y + 8), 'text-anchor': 'end', 'font-family': FONT.display, 'font-weight': 600, 'font-size': 22, fill: COL.ink2 }, [String(v)]));
+      if (v > 0) root.appendChild(S('line', { class: 'deco', x1: x0, y1: f1(y), x2: x1, y2: f1(y), stroke: COL.line, 'stroke-width': 2 }));
+      root.appendChild(S('text', { class: 'deco', x: x0 - 14, y: f1(y + 8), 'text-anchor': 'end', 'font-family': FONT.display, 'font-weight': 600, 'font-size': 22, fill: COL.ink2 }, [String(v)]));
     }
-    root.appendChild(S('line', { class: 'deco', x1: x0, y1: yTop - 6, x2: x0, y2: yBot, stroke: COL.ink2, 'stroke-width': 3 }));
     const colW = (x1 - x0) / n;
     const bw = Math.min(colW * 0.62, 96);
     cs.forEach((c, i) => {
@@ -236,14 +262,14 @@ export function mount(el, props = {}, ctx = {}) {
       // Blocks: one square-ish block per item.
       const g = S('g', { class: 'deco' });
       for (let b = 0; b < v; b++) {
-        g.appendChild(S('rect', { x: f1(cx - bw / 2), y: f1(yBot - (b + 1) * unit), width: f1(bw), height: f1(unit), fill: c.col, 'fill-opacity': 0.85, stroke: COL.panel, 'stroke-width': Math.min(2.5, unit * 0.12) }));
+        g.appendChild(S('rect', { x: f1(cx - bw / 2), y: f1(yBot - (b + 1) * unit), width: f1(bw), height: f1(unit), fill: c.col, stroke: COL.ink, 'stroke-width': f1(clamp(unit * 0.12, 1.5, 3)), 'stroke-linejoin': 'round' }));
       }
       root.appendChild(g);
       // Label (and icon) under the column.
       const ly = yBot + 34;
       const iconW = c.icon ? 34 : 0;
-      const fs = clamp((colW - 10 - iconW) / Math.max(1, c.label.length * 0.56), 16, 24);
-      const textW = c.label.length * fs * 0.56;
+      const fs = clamp((colW - 10 - iconW) / Math.max(1, c.label.length * 0.6), 16, 24);
+      const textW = c.label.length * fs * 0.6;
       const sx = cx - (iconW + textW) / 2;
       if (c.icon) drawArt(c.icon, sx, ly - 24, 30);
       root.appendChild(S('text', { class: 'deco', x: f1(sx + iconW), y: f1(ly), 'font-family': FONT.display, 'font-weight': 600, 'font-size': f1(fs), fill: COL.ink, textLength: textW > colW - iconW - 6 ? f1(colW - iconW - 6) : null, lengthAdjust: 'spacingAndGlyphs' }, [c.label]));
@@ -252,8 +278,8 @@ export function mount(el, props = {}, ctx = {}) {
         if (p.givenAs === 'tally') {
           const sp = Math.min(11, (colW - 20) / Math.max(1, tallyWidth(gv, 1)));
           const tw = tallyWidth(gv, sp);
-          root.appendChild(tallyMarks(gv, cx - tw / 2 + sp * 0.3, ly + 14, 28, sp, COL.ones));
-        } else root.appendChild(S('text', { class: 'deco', x: f1(cx), y: f1(ly + 40), 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: COL.ones }, [String(gv)]));
+          root.appendChild(tallyMarks(gv, cx - tw / 2 + sp * 0.3, ly + 14, 28, sp, PAL.blue));
+        } else root.appendChild(S('text', { class: 'deco', x: f1(cx), y: f1(ly + 40), 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: PAL.blue }, [String(gv)]));
       }
       if (inter) {
         const s = Math.min(60, (colW - 12) / 2);
@@ -262,6 +288,8 @@ export function mount(el, props = {}, ctx = {}) {
         pmButton(cx + 4, by, s, 1, i);
       }
     });
+    // Axes in ink, on top of the blocks.
+    root.appendChild(S('path', { class: 'deco', d: `M${x0} ${f1(yTop - 6)}V${f1(yBot)}H${x1}`, fill: 'none', stroke: COL.ink, 'stroke-width': 3.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
   }
 
   const api = {

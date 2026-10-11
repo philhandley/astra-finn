@@ -66,7 +66,7 @@
       "script": [
         {
           "say": [
-            "Drag the gold handle.",
+            "Drag the orange handle.",
             "Make the pencil 8 cm long."
           ],
           "goal": {

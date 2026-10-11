@@ -9,6 +9,7 @@ import { lessonLayout, answerMatches, praise, loadWidget } from './lesson.js';
 import { askItem, loadGen, makeItem } from './runner.js';
 import { buildDeck, recordFact, FAMILIES, unlockedFamilies, boxOf } from './fluency.js';
 import { factKey } from './facts.js';
+import { cover } from './covers.js';
 
 let current = null; // { destroy() }
 export function leaveExtras() {
@@ -21,11 +22,15 @@ injectCSS('x-extras', `
   .xview { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
   .xview .xstage { position: relative; min-height: 0; overflow: hidden; }
   .xview .xstage.scroll { overflow-y: auto; }
-  .flashcard { background: #f3efe6; color: #0b1020; border-radius: 22px; padding: 30px 46px; min-width: 340px; text-align: center;
-    font-family: var(--font-display); font-weight: 700; font-size: clamp(60px, 7vw, 96px); line-height: 1.05;
-    box-shadow: 10px 10px 0 rgba(243,239,230,.18), 20px 20px 0 rgba(243,239,230,.08), 0 20px 50px rgba(0,0,0,.5); transform: rotate(-1.5deg); transition: transform .25s; }
-  .flashcard.good { transform: rotate(0) scale(1.03); background: #fff4d6; }
-  .flashcard .q { color: #2346a8; border-bottom: 5px solid #2346a8; padding: 0 .1em; }
+  .flashcard { position: relative; background: #fff; color: #1b1e2e; border: 4px solid #1b1e2e; border-radius: 14px; padding: 34px 56px; min-width: 360px; text-align: center;
+    font-family: var(--font-display); font-weight: 800; font-size: clamp(60px, 7vw, 92px); line-height: 1.05; letter-spacing: -0.02em;
+    box-shadow: 8px 8px 0 #fff, 8px 8px 0 4px #1b1e2e, 16px 16px 0 #fff, 16px 16px 0 4px #1b1e2e; transform: rotate(-2deg); transition: transform .25s, background .25s; }
+  .flashcard::before, .flashcard::after { content: ''; position: absolute; width: 34px; height: 34px; background: #1b1e2e; }
+  .flashcard::before { top: -2px; right: -2px; clip-path: polygon(0 0, 100% 0, 100% 100%); border-top-right-radius: 8px; }
+  .flashcard::after { bottom: -2px; left: -2px; clip-path: polygon(0 0, 0 100%, 100% 100%); border-bottom-left-radius: 8px; }
+  .flashcard.good { transform: rotate(0) scale(1.03); background: #e6f6ee; }
+  .flashcard .q { color: #3b82f6; border-bottom: 6px solid #3b82f6; padding: 0 .1em; }
+  .qf-topo { background-color: #fff; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160'%3E%3Cg fill='none' stroke='%23e4e7ef' stroke-width='2'%3E%3Cpath d='M-10 30 C40 10 80 50 130 30 S220 10 260 40'/%3E%3Cpath d='M-10 60 C40 40 90 80 140 60 S220 40 260 70'/%3E%3Cpath d='M-10 95 C30 75 90 115 150 95 S230 75 260 105'/%3E%3Cpath d='M-10 130 C40 110 100 150 150 128 S220 110 260 140'/%3E%3C/g%3E%3C/svg%3E"); }
   .qf-wrap { display: grid; place-items: center; height: 100%; }
   .chk-list { display: grid; gap: 10px; }
   .chk-list div { display: flex; gap: 12px; align-items: center; font-size: 21px; }
@@ -86,8 +91,7 @@ export function renderQuick(app, env, family = null) {
     con.clearWidget();
     con.caption('');
     con.wbox.classList.remove('none');
-    con.wbox.style.border = '0';
-    con.wbox.style.background = 'transparent';
+    con.el.classList.add('qf-topo');
     con.wbox.innerHTML = `<div class="qf-wrap"><div class="flashcard">${esc(card.text).replace('?', '<span class="q">?</span>')}</div></div>`;
     const fc = con.wbox.querySelector('.flashcard');
     autoSay(card.text.includes('?') ? card.text : `${card.text}?`);
@@ -173,11 +177,11 @@ export function renderArcade(app, env) {
   const v = h(`<section class="view xview">${topbar('Arcade')}<div class="xstage scroll"><div class="mc" style="height:auto">
     <p class="muted" style="font-size:20px;margin:0">Games unlock as you finish missions. Quick Fire is always open.</p>
     <div class="gamelist">
-      <div class="game" data-go="#/quick"><span class="gi">${art('star', 64)}</span><h3>Quick Fire</h3><p>Ten quick facts with the number pad.</p></div>
+      <div class="game" data-go="#/quick"><div class="gcover">${cover('quick')}</div><div class="gbody"><h3>Quick Fire</h3><p>Ten quick facts with the number pad.</p></div></div>
       ${ARCADE.map(g => {
         const open = !g.after || done[g.after];
         const t = env.missions[g.after]?.title || g.after;
-        return `<div class="game ${open ? '' : 'locked'}" data-go="${open ? '#/arcade/' + g.id : ''}"><span class="gi">${art(g.art, 64)}</span><h3>${esc(g.title)}</h3><p>${esc(g.about)}</p>${open ? '' : `<p class="faint">${icon('lock')} Unlocks after ${esc(t)}</p>`}</div>`;
+        return `<div class="game ${open ? '' : 'locked'}" data-go="${open ? '#/arcade/' + g.id : ''}"><div class="gcover">${cover(g.id)}</div><div class="gbody"><h3>${esc(g.title)}</h3><p>${esc(g.about)}</p>${open ? '' : `<p class="faint" style="display:flex;gap:6px;align-items:center">${icon('lock')} Unlocks after ${esc(t)}</p>`}</div></div>`;
       }).join('')}
     </div></div></div></section>`);
   wireBack(v, '#/');
@@ -227,7 +231,8 @@ export async function renderPlaygroundList(app) {
     let meta = null;
     try { meta = (await loadWidget(w)).meta; } catch (e) { continue; }
     if (!meta || !meta.playground) continue;
-    const el = h(`<div class="game"><h3>${esc(meta.title || w)}</h3><p>Free play</p></div>`);
+    const sec = { tensframe: 'bonds', partwhole: 'bonds', bar: 'bonds', balance: 'bonds', blocks: 'number', numberline: 'number', hundred: 'number', placevalue: 'number', blaster: 'blaster', groups: 'blaster', fractions: 'fractions', clock: 'measure', coins: 'measure', measure: 'measure', shapes2d: 'shape', shapes3d: 'shape', rover: 'shape', pattern: 'shape', charts: 'data', objects: 'launchpad' }[w] || 'launchpad';
+    const el = h(`<div class="game"><div class="gcover">${cover(sec)}</div><div class="gbody"><h3>${esc(meta.title || w)}</h3><p>Free play</p></div></div>`);
     el.addEventListener('click', () => { location.hash = `#/play/${w}`; });
     list.appendChild(el);
   }

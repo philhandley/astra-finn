@@ -36,8 +36,8 @@
       "script": [
         { "say": ["Let's count on from 23.", "Tap 23."], "goal": { "selected": 23 }, "then": ["You found {selected}."], "hint": ["23 is in the row that starts 21."] },
         { "say": ["Now tap the number after 23."], "goal": { "selected": 24 }, "then": ["24 comes after 23."] },
-        { "say": ["Keep counting on.", "Tap the next 3 numbers."], "goal": { "taps": [23, 24, 25, 26, 27] }, "then": ["23, 24, 25, 26, 27.", "You counted on!"], "hint": ["Tap a gold square again to turn it off."] },
-        { "set": { "highlight": [] }, "say": ["Start at 37.", "Count on to 42.", "Tap every number."], "goal": { "taps": [37, 38, 39, 40, 41, 42] }, "then": ["After 39 comes 40.", "A new ten starts."], "hint": ["Tap 37 first.", "Tap a gold square again to undo it."] },
+        { "say": ["Keep counting on.", "Tap the next 3 numbers."], "goal": { "taps": [23, 24, 25, 26, 27] }, "then": ["23, 24, 25, 26, 27.", "You counted on!"], "hint": ["Tap a blue square again to turn it off."] },
+        { "set": { "highlight": [] }, "say": ["Start at 37.", "Count on to 42.", "Tap every number."], "goal": { "taps": [37, 38, 39, 40, 41, 42] }, "then": ["After 39 comes 40.", "A new ten starts."], "hint": ["Tap 37 first.", "Tap a blue square again to undo it."] },
         { "set": { "highlight": [] }, "say": ["Now count back from 52.", "Tap 52, then go back 3 more."], "goal": { "taps": [52, 51, 50, 49] }, "then": ["52, 51, 50, 49.", "Back across the ten!"], "hint": ["Back means smaller numbers.", "What comes before 50?"] }
       ]
     },

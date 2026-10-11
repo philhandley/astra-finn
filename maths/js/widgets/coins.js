@@ -9,7 +9,7 @@
 // State: { total (pence), count, items (array of names in purse order) }
 // Debug: dev/harness.html?widget=coins&props={"tray":["1p","2p","5p","10p","20p","50p","£1","£2"],"showTotal":true,"price":45}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -28,9 +28,9 @@ export const COINS = {
   '50p': { v: 50, d: 27.3, shape: 'hept', metal: 'silver' },
   '£1': { v: 100, d: 23.4, shape: 'dodec', metal: 'bi' },
   '£2': { v: 200, d: 28.4, shape: 'round', metal: 'bi' },
-  '£5': { v: 500, note: true, w: 170, h: 90, col: '#3fb3a6', dark: '#1d6f67' },
-  '£10': { v: 1000, note: true, w: 178, h: 94, col: '#e98a3c', dark: '#97501a' },
-  '£20': { v: 2000, note: true, w: 186, h: 98, col: '#8d63d2', dark: '#55358f' },
+  '£5': { v: 500, note: true, w: 170, h: 90, col: PAL.teal, dark: PAL.tealDark },
+  '£10': { v: 1000, note: true, w: 178, h: 94, col: '#f2862e', dark: '#b4561a' },
+  '£20': { v: 2000, note: true, w: 186, h: 98, col: PAL.purple, dark: PAL.purpleDark },
 };
 export const coinNames = Object.keys(COINS);
 const ALIAS = { '100p': '£1', '200p': '£2', '1': '1p', '2': '2p', '5': '5p', '10': '10p', '20': '20p', '50': '50p', '£1.00': '£1', '£2.00': '£2' };
@@ -43,11 +43,13 @@ export function money(pence) {
   return p === 0 ? `£${pounds}` : `£${pounds}.${String(p).padStart(2, '0')}`;
 }
 
+// Style v2: on white, every coin has a darker rim line and a thin "edge" below it so it reads as a solid coin.
 const METAL = {
-  copper: { fill: '#c8794b', rim: '#8a4a26', ring: '#e7a37b', ink: '#3b1a07' },
-  silver: { fill: '#d3d9e1', rim: '#8e98a8', ring: '#f1f4f8', ink: '#1d2638' },
-  gold: { fill: '#e7c15a', rim: '#a5832c', ring: '#f6dd92', ink: '#3a2a04' },
+  copper: { fill: '#c27a3e', rim: '#8a4f22', ring: '#d9965f', ink: '#2e1707' },
+  silver: { fill: '#d9dde4', rim: '#8b93a3', ring: '#eef0f4', ink: COL.ink },
+  gold: { fill: '#efc65b', rim: '#5c4513', ring: '#f7dc8f', ink: COL.ink },
 };
+const EDGE = 4; // coin thickness, in coin units
 
 function polyPath(n, r, rot = -90, bulge = 0) {
   const pts = [];
@@ -61,39 +63,50 @@ function polyPath(n, r, rot = -90, bulge = 0) {
   return d + 'Z';
 }
 
+// The outline of a coin as an SVG element (circle or path), centred on 0,0.
+function coinShape(c, r, attrs) {
+  if (c.shape === 'hept') return S('path', { d: polyPath(7, r, -90, r * 1.75), 'stroke-linejoin': 'round', ...attrs });
+  if (c.shape === 'dodec') return S('path', { d: polyPath(12, r, -90), 'stroke-linejoin': 'round', ...attrs });
+  return S('circle', { r, ...attrs });
+}
+
 // Draw one coin or note centred on 0,0 (unscaled). Returns a <g>.
-export function drawMoney(name, labels = true) {
+// k scales the line widths and edge, so a coin drawn very big or very small keeps a crisp, even outline.
+export function drawMoney(name, labels = true, k = 1) {
   const c = COINS[name];
   const g = S('g', {});
   if (!c) return g;
+  const E = EDGE * k, sw = v => v * k;
+  const txt = (attrs, t) => S('text', { 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, ...attrs }, [t]);
   if (c.note) {
+    // A flat card with an ink outline, a see-through window and a white value label (no portraits).
     const w = c.w, h = c.h;
-    g.appendChild(S('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 9, fill: c.col, stroke: c.dark, 'stroke-width': 3 }));
-    g.appendChild(S('rect', { x: -w / 2 + 7, y: -h / 2 + 7, width: w - 14, height: h - 14, rx: 6, fill: 'none', stroke: 'rgba(255,255,255,.45)', 'stroke-width': 2 }));
-    // A see-through window and a few wavy lines (no portraits).
-    g.appendChild(S('rect', { x: -w / 2 + 16, y: -h / 2 + 16, width: w * 0.2, height: h - 32, rx: 6, fill: 'rgba(255,255,255,.55)' }));
-    g.appendChild(S('circle', { cx: -w / 2 + 16 + w * 0.1, cy: 0, r: Math.min(w * 0.07, 12), fill: c.col, opacity: 0.8 }));
-    for (let k = 0; k < 3; k++) g.appendChild(S('path', { d: `M${-w * 0.2} ${h * (0.18 + k * 0.1)}q${w * 0.1} -10 ${w * 0.2} 0t${w * 0.2} 0`, stroke: 'rgba(255,255,255,.35)', 'stroke-width': 2, fill: 'none' }));
-    if (labels) g.appendChild(S('text', { x: w * 0.16, y: h * 0.06, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 44, fill: '#fff', stroke: c.dark, 'stroke-width': 1.5, 'paint-order': 'stroke' }, [name]));
-    else g.appendChild(S('circle', { cx: w * 0.16, cy: 0, r: 20, fill: 'rgba(255,255,255,.3)' }));
+    g.appendChild(S('rect', { x: -w / 2, y: -h / 2 + E, width: w, height: h, rx: 12, fill: COL.ink }));
+    g.appendChild(S('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 12, fill: c.col, stroke: COL.ink, 'stroke-width': sw(4) }));
+    g.appendChild(S('rect', { x: -w / 2 + 14, y: -h / 2 + 14, width: w * 0.22, height: h - 28, rx: 7, fill: '#fff', opacity: 0.45 }));
+    g.appendChild(S('circle', { cx: -w / 2 + 14 + w * 0.11, cy: 0, r: Math.min(w * 0.06, 11), fill: c.dark, opacity: 0.55 }));
+    for (let k = 0; k < 2; k++) g.appendChild(S('path', { d: `M${-w * 0.16} ${h * (0.3 + k * 0.1)}q${w * 0.08} -8 ${w * 0.16} 0t${w * 0.16} 0t${w * 0.16} 0`, stroke: '#fff', opacity: 0.45, 'stroke-width': 2.5, fill: 'none' }));
+    const lw = w * 0.5, lh = h * 0.5, lx = w * 0.17;
+    g.appendChild(S('rect', { x: lx - lw / 2, y: -h * 0.34, width: lw, height: lh, rx: lh / 2, fill: COL.surface, stroke: COL.ink, 'stroke-width': sw(3) }));
+    if (labels) g.appendChild(txt({ x: lx, y: -h * 0.34 + lh / 2 + 13, 'font-size': 37, fill: COL.ink }, name));
     return g;
   }
   const r = (c.d * K) / 2;
   if (c.metal === 'bi') {
     const G = METAL.gold, Sv = METAL.silver;
-    if (c.shape === 'dodec') g.appendChild(S('path', { d: polyPath(12, r, -90), fill: G.fill, stroke: G.rim, 'stroke-width': 3, 'stroke-linejoin': 'round' }));
-    else g.appendChild(S('circle', { r, fill: G.fill, stroke: G.rim, 'stroke-width': 3 }));
-    g.appendChild(S('circle', { r: r * 0.66, fill: Sv.fill, stroke: '#b0b8c4', 'stroke-width': 2 }));
-    g.appendChild(S('circle', { r: r * 0.86, fill: 'none', stroke: G.ring, 'stroke-width': 1.5, opacity: 0.8 }));
-    if (labels) g.appendChild(S('text', { y: r * 0.2, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': Math.round(r * 0.58), fill: Sv.ink }, [name]));
+    g.appendChild(coinShape(c, r, { transform: `translate(0 ${E})`, fill: G.rim }));
+    g.appendChild(coinShape(c, r, { fill: G.fill, stroke: G.rim, 'stroke-width': sw(3.5) }));
+    g.appendChild(S('circle', { r: r * 0.86, fill: 'none', stroke: G.ring, 'stroke-width': sw(2) }));
+    g.appendChild(S('circle', { r: r * 0.66, fill: Sv.fill, stroke: Sv.rim, 'stroke-width': sw(2.5) }));
+    if (labels) g.appendChild(txt({ y: r * 0.21, 'font-size': Math.round(r * 0.6), fill: Sv.ink }, name));
     return g;
   }
   const M = METAL[c.metal];
-  if (c.shape === 'hept') g.appendChild(S('path', { d: polyPath(7, r, -90, r * 1.75), fill: M.fill, stroke: M.rim, 'stroke-width': 3, 'stroke-linejoin': 'round' }));
-  else g.appendChild(S('circle', { r, fill: M.fill, stroke: M.rim, 'stroke-width': 3 }));
-  g.appendChild(S('circle', { r: r * 0.82, fill: 'none', stroke: M.ring, 'stroke-width': 2, opacity: 0.9 }));
-  if (labels) g.appendChild(S('text', { y: r * 0.24, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': Math.round(Math.max(22, r * 0.68)), fill: M.ink }, [name]));
-  else g.appendChild(S('path', { d: polyPath(5, r * 0.3, -90), fill: M.ring, opacity: 0.7 }));
+  g.appendChild(coinShape(c, r, { transform: `translate(0 ${E})`, fill: M.rim }));
+  g.appendChild(coinShape(c, r, { fill: M.fill, stroke: M.rim, 'stroke-width': sw(3.5) }));
+  g.appendChild(S('circle', { r: r * 0.8, fill: 'none', stroke: M.ring, 'stroke-width': sw(2.5) }));
+  if (labels) g.appendChild(txt({ y: r * 0.24, 'font-size': Math.round(Math.max(22, r * 0.68)), fill: M.ink }, name));
+  else g.appendChild(S('path', { d: polyPath(5, r * 0.3, -90), fill: M.ring }));
   return g;
 }
 
@@ -166,18 +179,21 @@ export function mount(el, props = {}, ctx = {}) {
     const purseBox = hasTray ? { x: 8, y: 8, w: W - 16, h: 362 } : { x: 4, y: 4, w: W - 8, h: H - 8 };
     // The purse.
     if (hasTray || hasTop) {
-      root.appendChild(S('rect', { x: purseBox.x, y: purseBox.y, width: purseBox.w, height: purseBox.h, rx: 26, fill: 'rgba(255,255,255,.035)', stroke: COL.ink3, 'stroke-width': 3, 'stroke-dasharray': '12 10' }));
+      root.appendChild(S('rect', { x: purseBox.x + 1.5, y: purseBox.y + 1.5, width: purseBox.w - 3, height: purseBox.h - 3, rx: 26, fill: COL.surface2, stroke: COL.lineStrong, 'stroke-width': 3, 'stroke-dasharray': '14 10' }));
     }
     const top = hasTop ? 78 : 0;
     if (p.showTotal) {
-      root.appendChild(S('text', { x: purseBox.x + 26, y: purseBox.y + 62, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 54, fill: COL.tens }, [money(total())]));
+      root.appendChild(S('text', { x: purseBox.x + 26, y: purseBox.y + 64, 'font-family': FONT.display, 'font-weight': 800, 'font-size': 56, fill: COL.ink }, [money(total())]));
     }
     if (p.price !== undefined && p.price !== null && Number.isFinite(Number(p.price))) {
       const txt = money(Number(p.price));
-      const tw = 46 + txt.length * 27, tx = purseBox.x + purseBox.w - tw - 18, ty = purseBox.y + 12;
-      root.appendChild(S('path', { d: `M${tx + 26} ${ty}H${tx + tw}V${ty + 64}H${tx + 26}L${tx} ${ty + 32}Z`, fill: '#f6dd92', stroke: '#a5832c', 'stroke-width': 3, 'stroke-linejoin': 'round' }));
-      root.appendChild(S('circle', { cx: tx + 22, cy: ty + 32, r: 6, fill: COL.panel }));
-      root.appendChild(S('text', { x: tx + 30 + (tw - 30) / 2, y: ty + 47, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 44, fill: '#2a1e04' }, [txt]));
+      // A yellow price tag with an ink outline.
+      const tw = 50 + txt.length * 28, tx = purseBox.x + purseBox.w - tw - 18, ty = purseBox.y + 12;
+      const tag = `M${tx + 28} ${ty}H${tx + tw - 10}Q${tx + tw} ${ty} ${tx + tw} ${ty + 10}V${ty + 58}Q${tx + tw} ${ty + 68} ${tx + tw - 10} ${ty + 68}H${tx + 28}L${tx} ${ty + 34}Z`;
+      root.appendChild(S('path', { d: tag, transform: 'translate(0 5)', fill: COL.ink }));
+      root.appendChild(S('path', { d: tag, fill: PAL.yellow, stroke: COL.ink, 'stroke-width': 4, 'stroke-linejoin': 'round' }));
+      root.appendChild(S('circle', { cx: tx + 24, cy: ty + 34, r: 7, fill: COL.surface, stroke: COL.ink, 'stroke-width': 3 }));
+      root.appendChild(S('text', { x: tx + 34 + (tw - 34) / 2, y: ty + 50, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 44, fill: COL.ink }, [txt]));
     }
     const inner = { x: purseBox.x + 14, y: purseBox.y + 10 + top, w: purseBox.w - 28, h: purseBox.h - 20 - top };
     const shown = purse.map((n, i) => ({ n, i }));
@@ -189,7 +205,7 @@ export function mount(el, props = {}, ctx = {}) {
       const idx = shown[k].i;
       const outer = S('g', {});
       const g = S('g', { class: 'tap', 'data-purse': idx, transform: `translate(${q.x} ${q.y}) scale(${q.s})` });
-      g.appendChild(drawMoney(q.n, labels));
+      g.appendChild(drawMoney(q.n, labels, 1 / Math.sqrt(q.s)));
       outer.appendChild(g);
       root.appendChild(outer);
       if (!ro()) {
@@ -204,14 +220,16 @@ export function mount(el, props = {}, ctx = {}) {
     flyFrom = null;
     // The tray: one of each, tap to add.
     if (hasTray) {
-      root.appendChild(S('rect', { x: 8, y: 382, width: W - 16, height: 112, rx: 22, fill: 'rgba(255,255,255,.06)', stroke: COL.line, 'stroke-width': 2 }));
+      // A soft shelf: a pale tray with a solid bottom edge.
+      root.appendChild(S('rect', { x: 9.5, y: 386, width: W - 19, height: 106, rx: 22, fill: COL.line }));
+      root.appendChild(S('rect', { x: 9.5, y: 381.5, width: W - 19, height: 104, rx: 22, fill: COL.surface2, stroke: COL.line, 'stroke-width': 3 }));
       const full = purse.length >= maxItems();
-      const tpos = fit(tr, { x: 18, y: 388, w: W - 36, h: 100 }, 1.0);
+      const tpos = fit(tr, { x: 20, y: 386, w: W - 40, h: 94 }, 1.0);
       tpos.forEach(q => {
         const g = S('g', { class: 'tap', 'data-tray': q.n, transform: `translate(${q.x} ${q.y}) scale(${q.s})`, opacity: full ? 0.45 : 1 });
         const sz = sizeOf(q.n);
         g.appendChild(S('rect', { x: -Math.max(sz.w, 76) / 2, y: -64, width: Math.max(sz.w, 76), height: 128, fill: 'transparent' }));
-        g.appendChild(drawMoney(q.n, labels));
+        g.appendChild(drawMoney(q.n, labels, 1 / Math.sqrt(q.s)));
         root.appendChild(g);
         unbinds.push(onTap(g, () => {
           if (purse.length >= maxItems()) { sfx('clunk'); return; }

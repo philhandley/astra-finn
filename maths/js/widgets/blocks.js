@@ -1,5 +1,7 @@
 // blocks: base-10 workspace for adding and subtracting two-digit numbers. Owner: addsub.
-// Dienes pieces: gold rods are tens, cyan cubes are ones (the app-wide place-value colours).
+// Dienes pieces: green rods are tens, blue cubes are ones (the app-wide place-value colours), on soft grey mats.
+// Style v2: the tens | ones column picture has white cells, green tens digits, blue ones digits and an ink rule;
+// the buttons are primary blue with a darker bottom edge and press down 4 px.
 // Props:
 //   a, b            the two numbers (0 to 99; for '+' a + b is at most 100; for '-' b is at most a).
 //   op              '+' (default) | '-'
@@ -23,7 +25,7 @@
 // Debug: dev/harness.html?widget=blocks&props={"a":36,"b":27,"op":"+","showColumns":true}
 //        dev/harness.html?widget=blocks&props={"a":52,"b":27,"op":"-","showColumns":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -37,7 +39,7 @@ const GEO = {
   '+': { C: 17, CS: 15, RW: 17, RP: 26, CP: 26, TX: 165, OX: 446, bottoms: { a: 198, b: 398, sum: 298 }, right: 492, panelX: 530, btnY: 420 },
   '-': { C: 24, CS: 21, RW: 24, RP: 34, CP: 32, TX: 165, OX: 492, bottoms: { a: 330 }, right: 550, panelX: 572, btnY: 420 },
 };
-const GOLD = COL.tens, CYAN = COL.ones;
+const GREEN = COL.tens, GREEN_DARK = PAL.greenDark, BLUE = COL.ones, BLUE_DARK = PAL.blueDark;
 const int = (v, d = 0) => { const x = Math.round(Number(v)); return Number.isFinite(x) ? x : d; };
 
 export function mount(el, props = {}, ctx = {}) {
@@ -50,10 +52,12 @@ export function mount(el, props = {}, ctx = {}) {
     .w-blocks .piece.taken .x { display: inline; }
     .w-blocks .piece .hit { cursor: pointer; }
     .w-blocks .lab { transition: opacity .3s ease; }
-    .w-blocks .btn { cursor: pointer; }
-    .w-blocks .btn.pulse rect { animation: w-blocks-pulse .5s ease-in-out 3; }
-    @keyframes w-blocks-pulse { 50% { fill: rgba(95,212,255,.45); stroke-width: 7; } }
-    @media (prefers-reduced-motion: reduce) { .w-blocks .piece, .w-blocks .lab { transition: none; } .w-blocks .btn.pulse rect { animation: none; } }
+    .w-blocks .wbtn { cursor: pointer; }
+    .w-blocks .wbtn .face { transition: transform .08s ease; }
+    .w-blocks .wbtn.down .face { transform: translateY(4px); }
+    .w-blocks .wbtn.pulse { animation: w-blocks-pulse .5s ease-in-out 3; transform-box: fill-box; transform-origin: center; }
+    @keyframes w-blocks-pulse { 50% { transform: scale(1.07); } }
+    @media (prefers-reduced-motion: reduce) { .w-blocks .piece, .w-blocks .lab, .w-blocks .wbtn .face { transition: none; } .w-blocks .wbtn.pulse { animation: none; } }
   `);
   let p = {};
   let op = '+', G = GEO['+'];
@@ -76,9 +80,9 @@ export function mount(el, props = {}, ctx = {}) {
     const g = S('g', { class: 'piece rod nt' });
     const h = G.C * 10;
     if (op === '-' && !ro()) g.appendChild(S('rect', { class: 'hit', x: -(G.RP - G.RW) / 2, y: -10, width: G.RP, height: h + 20, fill: 'transparent' }));
-    g.appendChild(S('rect', { class: 'body', x: 0, y: 0, width: G.RW, height: h, rx: 3, fill: GOLD, stroke: 'rgba(0,0,0,.4)', 'stroke-width': 1.5 }));
+    g.appendChild(S('rect', { class: 'body', x: 0, y: 0, width: G.RW, height: h, rx: 4, fill: GREEN, stroke: GREEN_DARK, 'stroke-width': 2 }));
     const lines = S('g', { class: 'body' });
-    for (let k = 1; k < 10; k++) lines.appendChild(S('line', { x1: 1, y1: k * G.C, x2: G.RW - 1, y2: k * G.C, stroke: 'rgba(0,0,0,.3)', 'stroke-width': 1.5 }));
+    for (let k = 1; k < 10; k++) lines.appendChild(S('line', { x1: 1, y1: k * G.C, x2: G.RW - 1, y2: k * G.C, stroke: GREEN_DARK, 'stroke-opacity': 0.7, 'stroke-width': 1.5 }));
     g.appendChild(lines);
     const c = h / 2, s = G.RW * 0.72;
     g.appendChild(S('path', { class: 'x', d: `M${G.RW / 2 - s} ${c - s}L${G.RW / 2 + s} ${c + s}M${G.RW / 2 + s} ${c - s}L${G.RW / 2 - s} ${c + s}`, stroke: COL.ink, 'stroke-width': 4, 'stroke-linecap': 'round' }));
@@ -91,7 +95,7 @@ export function mount(el, props = {}, ctx = {}) {
   function makeCube(owner) {
     const g = S('g', { class: 'piece cube nt' });
     if (op === '-' && !ro()) g.appendChild(S('rect', { class: 'hit', x: -(G.CP - G.CS) / 2, y: -(G.C - G.CS) / 2 - 1, width: G.CP, height: G.C + 2, fill: 'transparent' }));
-    g.appendChild(S('rect', { class: 'body', x: 0, y: 0, width: G.CS, height: G.CS, rx: 3, fill: CYAN, stroke: 'rgba(0,0,0,.4)', 'stroke-width': 1.5 }));
+    g.appendChild(S('rect', { class: 'body', x: 0, y: 0, width: G.CS, height: G.CS, rx: 3.5, fill: BLUE, stroke: BLUE_DARK, 'stroke-width': 2 }));
     const m = 3;
     g.appendChild(S('path', { class: 'x', d: `M${-m} ${-m}L${G.CS + m} ${G.CS + m}M${G.CS + m} ${-m}L${-m} ${G.CS + m}`, stroke: COL.ink, 'stroke-width': 3.5, 'stroke-linecap': 'round' }));
     gPieces.appendChild(g);
@@ -155,7 +159,7 @@ export function mount(el, props = {}, ctx = {}) {
   }
 
   function pulseSwap() {
-    const b = gBtn && gBtn.querySelector('.btn');
+    const b = gBtn && gBtn.querySelector('.wbtn');
     if (!b) return;
     b.classList.remove('pulse');
     void b.getBBox();
@@ -271,59 +275,69 @@ export function mount(el, props = {}, ctx = {}) {
     if (t <= 0) return;
     const g = S('g', { class: 'pill' });
     const x = G.TX, y = 28;
-    g.appendChild(S('rect', { x, y: y - 26, width: 150, height: 52, rx: 26, fill: 'rgba(255,255,255,.06)', stroke: COL.line, 'stroke-width': 2 }));
-    g.appendChild(S('rect', { x: x + 18, y: y - 12, width: 24, height: 24, rx: 3, fill: CYAN, opacity: 0.3 }));
+    g.appendChild(S('rect', { x, y: y - 27, width: 150, height: 54, rx: 27, fill: COL.surface, stroke: COL.line, 'stroke-width': 3 }));
+    g.appendChild(S('rect', { x: x + 18, y: y - 12, width: 24, height: 24, rx: 3.5, fill: BLUE, stroke: BLUE_DARK, 'stroke-width': 2, opacity: 0.3 }));
     g.appendChild(S('path', { d: `M${x + 15} ${y - 15}L${x + 45} ${y + 15}M${x + 45} ${y - 15}L${x + 15} ${y + 15}`, stroke: COL.ink, 'stroke-width': 3.5, 'stroke-linecap': 'round' }));
-    g.appendChild(text(x + 96, y + 1, t, 36, COL.ink));
+    g.appendChild(text(x + 96, y + 1, t, 38, COL.ink, 'middle', 800));
     gLab.appendChild(g);
   }
 
   function drawPanel(c) {
     gPanel.replaceChildren();
     if (!p.showColumns) return;
-    const x0 = G.panelX, x1 = W - 12;
-    const tx = x0 + (x1 - x0) * 0.44, ox = x0 + (x1 - x0) * 0.78, sx = x0 + 34;
-    const rows = op === '+' ? { head: 46, a: 118, b: 194, line: 236, ans: 300 } : { head: 42, a: 136, b: 206, line: 244, ans: 304 };
-    gPanel.appendChild(S('rect', { x: x0, y: 8, width: x1 - x0, height: 350, rx: 18, fill: 'rgba(255,255,255,.035)', stroke: COL.line, 'stroke-width': 2 }));
-    gPanel.appendChild(text(tx, rows.head, 'Tens', 24, GOLD, 'middle', 600));
-    gPanel.appendChild(text(ox, rows.head, 'Ones', 24, CYAN, 'middle', 600));
-    gPanel.appendChild(S('line', { x1: (tx + ox) / 2, y1: rows.head + 22, x2: (tx + ox) / 2, y2: rows.ans + 38, stroke: COL.line, 'stroke-width': 2 }));
+    // The tens | ones column picture (as Synthesis IMG_5004): white cells, green tens, blue ones, an ink rule.
+    const x1 = W - 10;
+    const cw = op === '+' ? 84 : 74, ch = 74, gap = 8;
+    const ox = x1 - cw / 2, tx = ox - cw - gap, sx = tx - cw / 2 - 30;
+    const rows = op === '+' ? { head: 40, a: 116, b: 198, line: 248, ans: 300 } : { head: 54, a: 146, b: 226, line: 274, ans: 324 };
+    const cell = (x, y, empty) => gPanel.appendChild(S('rect', {
+      x: x - cw / 2, y: y - ch / 2, width: cw, height: ch, rx: 12,
+      fill: empty ? COL.surface2 : COL.surface, stroke: empty ? COL.lineStrong : COL.line, 'stroke-width': 3, 'stroke-dasharray': empty ? '9 7' : null,
+    }));
+    gPanel.appendChild(text(tx, rows.head, 'Tens', 26, GREEN, 'middle', 700));
+    gPanel.appendChild(text(ox, rows.head, 'Ones', 26, BLUE, 'middle', 700));
     const at = Math.floor(A / 10), ao = A % 10, bt = Math.floor(B / 10), bo = B % 10;
-    const digit = (x, y, d, col, size = 54) => gPanel.appendChild(text(x, y, d, size, col));
+    const digit = (x, y, d, col, size = 56) => gPanel.appendChild(text(x, y, d, size, col, 'middle', 700));
+    [rows.a, rows.b].forEach(y => { cell(tx, y); cell(ox, y); });
     // Row a, with the exchange marks for subtraction.
     if (op === '-' && exchanged > 0) {
-      const nt = at - exchanged, no = ao + 10 * exchanged;
+      const nt = at - exchanged;
       digit(tx, rows.a, at, COL.ink3);
-      gPanel.appendChild(S('line', { x1: tx - 20, y1: rows.a + 20, x2: tx + 20, y2: rows.a - 20, stroke: COL.warn, 'stroke-width': 4, 'stroke-linecap': 'round' }));
-      digit(tx, rows.a - 50, nt, GOLD, 30);
-      digit(ox, rows.a, ao, CYAN);
-      digit(ox - 30, rows.a - 22, '1', CYAN, 26);
+      gPanel.appendChild(S('line', { x1: tx - 18, y1: rows.a + 20, x2: tx + 18, y2: rows.a - 20, stroke: COL.ink, 'stroke-width': 4, 'stroke-linecap': 'round' }));
+      digit(tx, rows.a - ch / 2 - 15, nt, GREEN, 30);
+      digit(ox, rows.a, ao, BLUE);
+      digit(ox - cw / 2 + 15, rows.a - ch / 2 + 17, '1', BLUE, 24);
     } else {
-      if (at > 0) digit(tx, rows.a, at, GOLD);
-      digit(ox, rows.a, ao, CYAN);
+      if (at > 0) digit(tx, rows.a, at, GREEN);
+      digit(ox, rows.a, ao, BLUE);
     }
-    gPanel.appendChild(text(sx, rows.b, op === '+' ? '+' : '−', 48, COL.ink2));
-    if (bt > 0) digit(tx, rows.b, bt, GOLD);
-    digit(ox, rows.b, bo, CYAN);
-    gPanel.appendChild(S('line', { x1: x0 + 18, y1: rows.line, x2: x1 - 18, y2: rows.line, stroke: COL.ink2, 'stroke-width': 4, 'stroke-linecap': 'round' }));
+    gPanel.appendChild(text(sx, rows.b, op === '+' ? '+' : '\u2212', 52, COL.ink, 'middle', 700));
+    if (bt > 0) digit(tx, rows.b, bt, GREEN);
+    digit(ox, rows.b, bo, BLUE);
+    gPanel.appendChild(S('line', { x1: sx - 22, y1: rows.line, x2: x1 - 2, y2: rows.line, stroke: COL.ink, 'stroke-width': 4, 'stroke-linecap': 'round' }));
     // Answer row: filled in only when the calculation is finished.
     const done = op === '+' ? combined : (B > 0 && taken() === B);
-    if (!done) {
-      [tx, ox].forEach(x => gPanel.appendChild(S('rect', { x: x - 30, y: rows.ans - 34, width: 60, height: 68, rx: 10, fill: 'none', stroke: COL.ink3, 'stroke-width': 2.5, 'stroke-dasharray': '8 7' })));
-      return;
-    }
-    if (c.tens > 0 || op === '-') digit(tx, rows.ans, c.tens, GOLD);
-    if (c.ones >= 10) {
-      // 13 ones before the swap: show it so the swap has a reason.
-      digit(ox, rows.ans, c.ones, CYAN, 40);
-    } else digit(ox, rows.ans, c.ones, CYAN);
-    if (op === '+' && exchanged > 0) digit(tx - 30, rows.line + 20, '1', GOLD, 24);
+    if (!done) { cell(tx, rows.ans, true); cell(ox, rows.ans, true); return; }
+    cell(tx, rows.ans); cell(ox, rows.ans);
+    if (c.tens > 0 || op === '-') digit(tx, rows.ans, c.tens, GREEN);
+    // 13 ones before the swap: show it so the swap has a reason.
+    digit(ox, rows.ans, c.ones, BLUE, c.ones >= 10 ? 42 : 56);
+    // The exchanged ten is written small under the tens column (UK column addition).
+    if (op === '+' && exchanged > 0) digit(tx, rows.ans + ch / 2 + 20, '1', GREEN, 28);
   }
 
   function button(label, cx, y, w, onPress) {
-    const g = S('g', { class: 'btn', role: 'button', tabindex: 0 });
-    g.appendChild(S('rect', { x: cx - w / 2, y, width: w, height: 66, rx: 33, fill: 'rgba(95,212,255,.16)', stroke: CYAN, 'stroke-width': 3 }));
-    g.appendChild(text(cx, y + 34, label, 27, COL.ink, 'middle', 600));
+    // Primary control (style v2): blue face, darker bottom edge, presses down 4 px.
+    const g = S('g', { class: 'wbtn', role: 'button', tabindex: 0 });
+    const h = 64;
+    g.appendChild(S('rect', { class: 'edge', x: cx - w / 2, y: y + 5, width: w, height: h, rx: 18, fill: PAL.blueDark }));
+    const face = S('g', { class: 'face' });
+    face.appendChild(S('rect', { x: cx - w / 2, y, width: w, height: h, rx: 18, fill: PAL.blue }));
+    face.appendChild(text(cx, y + h / 2 + 1, label, 28, '#ffffff', 'middle', 700));
+    g.appendChild(face);
+    const up = () => g.classList.remove('down');
+    g.addEventListener('pointerdown', () => g.classList.add('down'));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(n => g.addEventListener(n, up));
     gBtn.appendChild(g);
     btnUnbinds.push(onTap(g, () => { if (!busy) onPress(); }));
   }
@@ -361,8 +375,9 @@ export function mount(el, props = {}, ctx = {}) {
     {
       const top = op === '+' ? 18 : 76, bot = op === '+' ? 410 : 344;
       const tEnd = G.TX + (op === '+' ? 9 : 8) * G.RP + G.RW + 12;
-      gZone.appendChild(S('rect', { x: G.TX - 12, y: top, width: tEnd - (G.TX - 12), height: bot - top, rx: 16, fill: 'rgba(242,181,68,.035)', stroke: 'rgba(242,181,68,.16)', 'stroke-width': 2 }));
-      gZone.appendChild(S('rect', { x: G.OX - 12, y: top, width: G.CP + G.CS + 24, height: bot - top, rx: 16, fill: 'rgba(95,212,255,.035)', stroke: 'rgba(95,212,255,.16)', 'stroke-width': 2 }));
+      // Soft grey mats: one for the tens, one for the ones.
+      gZone.appendChild(S('rect', { x: G.TX - 14, y: top, width: tEnd + 2 - (G.TX - 14), height: bot - top, rx: 18, fill: COL.surface2 }));
+      gZone.appendChild(S('rect', { x: G.OX - 14, y: top, width: G.CP + G.CS + 28, height: bot - top, rx: 18, fill: COL.surface2 }));
     }
     root.appendChild(gAll);
     rods = []; cubes = []; combined = false; exchanged = 0;
@@ -373,8 +388,8 @@ export function mount(el, props = {}, ctx = {}) {
       for (let i = 0; i < bt; i++) rods.push(makeRod('b'));
       for (let i = 0; i < ao; i++) cubes.push(makeCube('a'));
       for (let i = 0; i < bo; i++) cubes.push(makeCube('b'));
-      labA = text(138, G.bottoms.a - 85, A, 60, COL.ink, 'end', 700, 'lab');
-      labB = text(138, G.bottoms.b - 85, `+ ${B}`, 60, COL.ink, 'end', 700, 'lab');
+      labA = text(136, G.bottoms.a - 85, A, 62, COL.ink, 'end', 800, 'lab');
+      labB = text(136, G.bottoms.b - 85, `+ ${B}`, 62, COL.ink, 'end', 800, 'lab');
       gLab.append(labA, labB);
       if (p.combined) {
         combined = true;
@@ -384,8 +399,8 @@ export function mount(el, props = {}, ctx = {}) {
       for (let i = 0; i < at; i++) rods.push(makeRod('a'));
       for (let i = 0; i < ao; i++) cubes.push(makeCube('a'));
       rodsLeft = rods.length; cubesLeft = cubes.length;
-      gLab.appendChild(text(138, G.bottoms.a - 150, A, 72, COL.ink, 'end'));
-      if (B > 0) gLab.appendChild(text(138, G.bottoms.a - 82, `− ${B}`, 44, COL.ink2, 'end'));
+      gLab.appendChild(text(136, G.bottoms.a - 150, A, 74, COL.ink, 'end', 800));
+      if (B > 0) gLab.appendChild(text(136, G.bottoms.a - 82, `− ${B}`, 46, COL.ink2, 'end', 800));
       const t0 = clamp(int(p.taken, 0), 0, B > 0 ? B : A);
       if (t0 > 0) applyTake(t0);
     }

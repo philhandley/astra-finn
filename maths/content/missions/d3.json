@@ -227,14 +227,14 @@
     "Can you spot the slip?"
    ],
    "lines": [
-    "Crystals: Pink 4, Purple 6, Gold 3",
+    "Crystals: Pink 4, Purple 6, Yellow 3",
     "Pink column: 4 blocks",
     "Purple column: 6 blocks",
-    "Gold column: 4 blocks"
+    "Yellow column: 4 blocks"
    ],
    "wrong": 3,
    "fix": [
-    "Gold should be 3 blocks, not 4.",
+    "Yellow should be 3 blocks, not 4.",
     "Check each column against the numbers."
    ]
   },

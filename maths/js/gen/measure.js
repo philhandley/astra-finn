@@ -147,7 +147,7 @@ export const makeLength = {
     const goal = level === 1 ? R.int(3, 15) : level === 2 ? R.int(7, Math.min(19, max - start)) : R.int(4, 14);
     const from = goal === 2 ? 5 : 2;
     return {
-      lines: [`Make the ${NAME[obj]} ${goal} cm long.`, level === 3 ? `It starts at ${start}.` : 'Drag the gold handle.'],
+      lines: [`Make the ${NAME[obj]} ${goal} cm long.`, level === 3 ? `It starts at ${start}.` : 'Drag the orange handle.'],
       caption: `${goal} cm`,
       widget: 'measure', props: { tool: 'ruler', unit: 'cm', max, start, value: from, object: obj, marks: 1, labels: max === 15 ? 1 : max === 20 ? 2 : 5, interactive: true },
       input: 'widget', goal: { value: goal },

@@ -19,7 +19,7 @@
   {
    "type": "look",
    "lines": [
-    "Look at the gold face of this cylinder.",
+    "Look at the yellow face of this cylinder.",
     "It is flat."
    ],
    "question": "What 2-D shape is it?",
@@ -44,12 +44,12 @@
     {
      "say": [
       "Spin the cylinder with your finger.",
-      "Look at the gold face."
+      "Look at the yellow face."
      ]
     },
     {
      "say": [
-      "Which 2-D shape is the gold face?"
+      "Which 2-D shape is the yellow face?"
      ],
      "input": "choice",
      "options": [
@@ -93,7 +93,7 @@
      },
      "say": [
       "Now look at this pyramid.",
-      "What shape is the gold face?"
+      "What shape is the yellow face?"
      ],
      "input": "choice",
      "options": [
@@ -136,7 +136,7 @@
       "highlight": "base"
      },
      "say": [
-      "Now the gold face is underneath.",
+      "Now the yellow face is underneath.",
       "What shape is it?"
      ],
      "input": "choice",
@@ -324,7 +324,7 @@
      "widget": "shapes2d",
      "props": {
       "shape": "square",
-      "colour": "cyan"
+      "colour": "blue"
      }
     },
     {
@@ -340,7 +340,7 @@
      "widget": "shapes2d",
      "props": {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      }
     },
     {

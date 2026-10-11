@@ -20,7 +20,7 @@
       "type": "look",
       "lines": [
         "7 red rockets.",
-        "4 blue rockets."
+        "4 yellow rockets."
       ],
       "question": "How many more red rockets?",
       "widget": "bar",
@@ -29,7 +29,7 @@
         "a": 7,
         "b": 4,
         "labelA": "Red",
-        "labelB": "Blue",
+        "labelB": "Yellow",
         "icons": "rocket",
         "unknown": "difference"
       }
@@ -46,7 +46,7 @@
         "a": 7,
         "b": 4,
         "labelA": "Red",
-        "labelB": "Blue",
+        "labelB": "Yellow",
         "icons": "rocket",
         "unknown": "difference"
       },
@@ -68,7 +68,7 @@
         },
         {
           "say": [
-            "How many fewer blue rockets?"
+            "How many fewer yellow rockets?"
           ],
           "input": "numpad",
           "answer": 3,

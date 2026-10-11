@@ -29,11 +29,11 @@
     "shapes": [
      {
       "shape": "hexagon",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "l-hexagon",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "irregular-hexagon",
@@ -62,7 +62,7 @@
    "widget": "shapes2d",
    "props": {
     "shape": "star",
-    "colour": "gold"
+    "colour": "yellow"
    },
    "revealProps": {
     "showAll": "sides"
@@ -179,7 +179,7 @@
     {
      "set": {
       "shape": "parallelogram",
-      "colour": "cyan"
+      "colour": "blue"
      },
      "say": [
       "Try this shape.",
@@ -196,7 +196,7 @@
     {
      "set": {
       "shape": "house",
-      "colour": "gold"
+      "colour": "yellow"
      },
      "say": [
       "Will this one match?",
@@ -212,7 +212,7 @@
     {
      "set": {
       "shape": "right-triangle",
-      "colour": "green"
+      "colour": "orange"
      },
      "say": [
       "Does this one have a vertical line of symmetry?",
@@ -292,7 +292,7 @@
      "widget": "shapes2d",
      "props": {
       "shape": "square",
-      "colour": "cyan"
+      "colour": "blue"
      }
     },
     {
@@ -300,7 +300,7 @@
      "widget": "shapes2d",
      "props": {
       "shape": "rectangle",
-      "colour": "gold"
+      "colour": "yellow"
      }
     },
     {

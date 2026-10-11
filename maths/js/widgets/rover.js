@@ -1,4 +1,6 @@
 // rover: a Moon-base floor grid seen from above, with a rover that faces N, E, S or W (up, right, down, left on screen).
+// Look (style v2): a clean white map with light grid squares, outlined grey moon rocks, a yellow flag and a sticker-style rover;
+//        white push buttons with ink arrows. Clockwise turns are blue, anticlockwise turns pink (buttons and turn arcs match).
 // Props: cols (default 6), rows (default 5), start { x, y, dir } (x from the left, y from the top, dir 'N' | 'E' | 'S' | 'W'),
 //        target { x, y } (a flag), rocks (array of { x, y } blocked squares),
 //        controls (array from 'forward', 'back', 'left' (quarter turn anticlockwise), 'right' (quarter turn clockwise), 'half'),
@@ -11,7 +13,7 @@
 // Debug: dev/harness.html?widget=rover&props={"controls":["forward","left","right"],"target":{"x":4,"y":1},"showTurnArc":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
 import { artInner } from '../core/art.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -26,6 +28,8 @@ const DV = { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] };
 const ANG = { N: 0, E: 90, S: 180, W: 270 };
 const CMDS = ['forward', 'back', 'left', 'right', 'half'];
 const LABEL = { forward: 'Forward', back: 'Back', left: 'anticlockwise', right: 'clockwise', half: 'Half turn' };
+const CW = PAL.blue, ACW = PAL.pink; // turn colours: clockwise, anticlockwise
+const ICON_COL = { forward: COL.ink, back: COL.ink, left: ACW, right: CW, half: CW };
 
 // Turn a direction by quarter turns (positive = clockwise).
 export const turnDir = (dir, quarters) => DIRS[(((DIRS.indexOf(dir) + quarters) % 4) + 4) % 4];
@@ -82,37 +86,57 @@ function arcArrow(cx, cy, r, a0, a1, head = 12) {
   return { d, head: `M${f1(tip[0])} ${f1(tip[1])}L${f1(b1[0])} ${f1(b1[1])}L${f1(b2[0])} ${f1(b2[1])}Z` };
 }
 
-function icon(cmd, cx, cy, s = 1, colour = COL.ink) {
+function icon(cmd, cx, cy, s = 1, colour = ICON_COL[cmd] || COL.ink) {
   const g = S('g', { transform: `translate(${cx} ${cy}) scale(${s})` });
   if (cmd === 'forward' || cmd === 'back') {
-    g.appendChild(S('path', { d: 'M0 -24L19 -3H7V22H-7V-3H-19Z', fill: colour, transform: cmd === 'back' ? 'rotate(180)' : '' }));
+    g.appendChild(S('path', { d: 'M0 -25L21 -2H8V23H-8V-2H-21Z', fill: colour, stroke: colour, 'stroke-width': 2, 'stroke-linejoin': 'round', transform: cmd === 'back' ? 'rotate(180)' : '' }));
   } else {
     const spec = cmd === 'right' ? [70, 330] : cmd === 'left' ? [-70, -330] : [-90, 90];
-    const a = arcArrow(0, cmd === 'half' ? 8 : 2, 18, spec[0], spec[1], 16);
-    g.appendChild(S('path', { d: a.d, fill: 'none', stroke: colour, 'stroke-width': 6, 'stroke-linecap': 'round' }));
-    g.appendChild(S('path', { d: a.head, fill: colour }));
+    const a = arcArrow(0, cmd === 'half' ? 8 : 2, 18, spec[0], spec[1], 17);
+    g.appendChild(S('path', { d: a.d, fill: 'none', stroke: colour, 'stroke-width': 7, 'stroke-linecap': 'round' }));
+    g.appendChild(S('path', { d: a.head, fill: colour, stroke: colour, 'stroke-width': 2, 'stroke-linejoin': 'round' }));
   }
   return g;
 }
 
+// The rover, facing up (N), drawn in a box about 100 units across: an outlined sticker with a red nose arrow.
 function roverSprite() {
+  const ink = { stroke: COL.ink, 'stroke-width': 4, 'stroke-linejoin': 'round' };
   const g = S('g');
-  for (const [x, y] of [[-42, -34], [28, -34], [-42, 10], [28, 10]]) g.appendChild(S('rect', { x, y, width: 14, height: 26, rx: 4, fill: '#3a4258', stroke: '#0c1430', 'stroke-width': 2 }));
-  g.appendChild(S('rect', { x: -29, y: -38, width: 58, height: 76, rx: 12, fill: COL.ink, stroke: '#0c1430', 'stroke-width': 3 }));
-  g.appendChild(S('rect', { x: -19, y: 2, width: 38, height: 28, rx: 4, fill: '#9fb4d8' }));
-  g.appendChild(S('path', { d: 'M-19 9H19M-19 16H19M-19 23H19', stroke: '#6c7fa6', 'stroke-width': 2 }));
-  g.appendChild(S('path', { d: 'M0 -56L17 -36H-17Z', fill: COL.tens, stroke: '#0c1430', 'stroke-width': 2, 'stroke-linejoin': 'round' }));
-  g.appendChild(S('circle', { cx: 0, cy: -18, r: 9, fill: COL.ones, stroke: '#0c1430', 'stroke-width': 3 }));
+  for (const [x, y] of [[-46, -33], [32, -33], [-46, 8], [32, 8]]) g.appendChild(S('rect', { x, y, width: 14, height: 25, rx: 5, fill: COL.ink }));
+  g.appendChild(S('path', { d: 'M0 -62L17 -40H-17Z', fill: PAL.red, ...ink }));
+  g.appendChild(S('rect', { x: -31, y: -38, width: 62, height: 74, rx: 15, fill: PAL.yellow, ...ink }));
+  g.appendChild(S('rect', { x: -20, y: 4, width: 40, height: 24, rx: 4, fill: PAL.blue, stroke: COL.ink, 'stroke-width': 3 }));
+  g.appendChild(S('path', { d: 'M-7 4V28M7 4V28M-20 16H20', stroke: '#fff', 'stroke-width': 2 }));
+  g.appendChild(S('circle', { cx: 0, cy: -18, r: 10, fill: '#fff', stroke: COL.ink, 'stroke-width': 3.5 }));
+  g.appendChild(S('circle', { cx: 0, cy: -18, r: 4.5, fill: COL.ink }));
   return g;
 }
+
+// A Synthesis-style push button: white face, light border, solid bottom edge (blue face for the main action).
+function ctlButton({ x, y, w, h, primary = false, off = false, aria, cls = '' }, children = []) {
+  const g = S('g', { class: `ctl btn3 ${cls}${off ? ' off' : ''}`, role: 'button', 'aria-label': aria }, [
+    S('rect', { x, y: y + 5, width: w, height: h, rx: 16, fill: primary ? PAL.blueDark : COL.line }),
+    S('g', { class: 'face' }, [S('rect', { x, y, width: w, height: h, rx: 16, fill: primary ? PAL.blue : COL.surface, stroke: primary ? PAL.blue : COL.line, 'stroke-width': 3 }), ...children]),
+  ]);
+  if (!off) {
+    const up = () => g.classList.remove('down');
+    g.addEventListener('pointerdown', () => g.classList.add('down'));
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => g.addEventListener(t, up));
+  }
+  return g;
+}
+const textW = (str, fs) => str.length * fs * 0.62; // Lexend bold, roughly
 
 export function mount(el, props = {}, ctx = {}) {
   injectCSS('w-rover', `
     .w-rover { width: 100%; height: 100%; }
-    .w-rover .btn3 { cursor: pointer; }
-    .w-rover .btn3:active rect { fill: rgba(242,181,68,.3); }
-    .w-rover .btn3.off { opacity: .45; cursor: default; }
+    .w-rover .ctl { cursor: pointer; }
+    .w-rover .ctl .face { transition: transform .08s ease; }
+    .w-rover .ctl.down .face { transform: translateY(4px); }
+    .w-rover .ctl.off { opacity: .45; cursor: default; }
     .w-rover .deco { pointer-events: none; }
+    @media (prefers-reduced-motion: reduce) { .w-rover .ctl .face { transition: none; } }
   `);
   let p = { ...props };
   let st, ang, trail, lastTurn, queue = [], running = false, ranIdx = -1;
@@ -166,14 +190,15 @@ export function mount(el, props = {}, ctx = {}) {
     const { cell, gx, gy } = L;
     const C = cols(), R = rows();
     // Floor.
-    root.appendChild(S('rect', { x: gx, y: gy, width: cell * C, height: cell * R, rx: 10, fill: 'rgba(95,212,255,.05)', stroke: COL.grid, 'stroke-width': 3 }));
+    root.appendChild(S('rect', { x: gx, y: gy, width: cell * C, height: cell * R, rx: 12, fill: COL.surface }));
     const lines = [];
     for (let i = 1; i < C; i++) lines.push(`M${f1(gx + i * cell)} ${f1(gy)}V${f1(gy + cell * R)}`);
     for (let j = 1; j < R; j++) lines.push(`M${f1(gx)} ${f1(gy + j * cell)}H${f1(gx + cell * C)}`);
-    if (lines.length) root.appendChild(S('path', { d: lines.join(''), stroke: COL.grid, 'stroke-width': 2, 'stroke-opacity': 0.7 }));
+    if (lines.length) root.appendChild(S('path', { d: lines.join(''), stroke: COL.line, 'stroke-width': 3 }));
+    root.appendChild(S('rect', { x: gx, y: gy, width: cell * C, height: cell * R, rx: 12, fill: 'none', stroke: COL.lineStrong, 'stroke-width': 4 }));
     // Trail.
     if (p.trail !== false) {
-      trail.slice(0, -1).forEach(([x, y]) => root.appendChild(S('circle', { class: 'deco', cx: f1(L.cx(x)), cy: f1(L.cy(y)), r: Math.max(4, cell * 0.08), fill: COL.ones, 'fill-opacity': 0.55 })));
+      trail.slice(0, -1).forEach(([x, y]) => root.appendChild(S('circle', { class: 'deco', cx: f1(L.cx(x)), cy: f1(L.cy(y)), r: Math.max(5, cell * 0.09), fill: PAL.blue, 'fill-opacity': 0.3 })));
     }
     // Rocks and flag.
     const art = (name, x, y, size) => {
@@ -184,7 +209,7 @@ export function mount(el, props = {}, ctx = {}) {
     rocks().forEach(r => { if (r.x >= 0 && r.y >= 0 && r.x < C && r.y < R) art('asteroid', r.x, r.y, cell * 0.8); });
     const t = target();
     if (t && t.x >= 0 && t.y >= 0 && t.x < C && t.y < R) {
-      if (atTarget() && !running) root.appendChild(S('rect', { class: 'deco', x: f1(gx + t.x * cell + 4), y: f1(gy + t.y * cell + 4), width: f1(cell - 8), height: f1(cell - 8), rx: 10, fill: 'rgba(242,181,68,.18)', stroke: COL.tens, 'stroke-width': 4 }));
+      if (atTarget() && !running) root.appendChild(S('rect', { class: 'deco', x: f1(gx + t.x * cell + 4), y: f1(gy + t.y * cell + 4), width: f1(cell - 8), height: f1(cell - 8), rx: 10, fill: COL.goodSoft, stroke: COL.good, 'stroke-width': 4 }));
       art('flag', t.x, t.y, cell * 0.78);
     }
     overlay = S('g', { class: 'deco' });
@@ -196,9 +221,8 @@ export function mount(el, props = {}, ctx = {}) {
     if (L.showCtl) {
       // Reset (home) button beside the grid.
       const rx = Math.min(gx + cell * C + 18, W - 78), ry = gy;
-      const rb = S('g', { class: 'btn3', role: 'button', 'aria-label': 'Back to start' }, [
-        S('rect', { x: rx, y: ry, width: 68, height: 68, rx: 16, fill: 'rgba(255,255,255,.06)', stroke: COL.ink3, 'stroke-width': 2 }),
-        S('path', { d: `M${rx + 34} ${ry + 16}L${rx + 54} ${ry + 34}H${rx + 48}V${ry + 52}H${rx + 20}V${ry + 34}H${rx + 14}Z`, fill: COL.ink2 }),
+      const rb = ctlButton({ x: rx, y: ry, w: 68, h: 68, aria: 'Back to start', off: running }, [
+        S('path', { d: `M${rx + 34} ${ry + 15}L${rx + 55} ${ry + 34}H${rx + 49}V${ry + 53}H${rx + 19}V${ry + 34}H${rx + 13}Z`, fill: COL.ink, stroke: COL.ink, 'stroke-width': 2, 'stroke-linejoin': 'round' }),
       ]);
       unbinds.push(onTap(rb, () => { if (running) return; resetPos(); ranIdx = -1; sfx('click'); draw(); changed(); }));
       root.appendChild(rb);
@@ -210,40 +234,46 @@ export function mount(el, props = {}, ctx = {}) {
   function drawButtons() {
     const ctl = controls();
     const n = ctl.length;
-    const gap = 12, bw = Math.min(150, (W - 20) / n - gap), bh = 96;
-    const total = n * bw + (n - 1) * gap, x0 = (W - total) / 2, y0 = H - bh - 6;
+    // Each button is as wide as its word needs, so "anticlockwise" stays big enough to read.
+    const gap = 12, bh = 92, avail = W - 16 - (n - 1) * gap;
+    let fs = 23;
+    const need = f => ctl.map(c => Math.max(112, textW(LABEL[c], f) + 26));
+    let ws = need(fs);
+    while (ws.reduce((a, b) => a + b, 0) > avail && fs > 16) { fs -= 0.5; ws = need(fs); }
+    const extra = Math.max(0, (avail - ws.reduce((a, b) => a + b, 0)) / n);
+    ws = ws.map(w => Math.min(w + extra, 210));
+    const total = ws.reduce((a, b) => a + b, 0) + (n - 1) * gap;
+    let x = (W - total) / 2;
+    const y0 = H - bh - 8;
     ctl.forEach((cmd, i) => {
-      const x = x0 + i * (bw + gap);
-      const label = LABEL[cmd];
-      const fs = Math.min(22, (bw - 10) / (label.length * 0.56));
-      const g = S('g', { class: 'btn3' + (running ? ' off' : ''), role: 'button', 'aria-label': cmd === 'left' ? 'Quarter turn anticlockwise' : cmd === 'right' ? 'Quarter turn clockwise' : label }, [
-        S('rect', { x, y: y0, width: bw, height: bh, rx: 18, fill: 'rgba(242,181,68,.12)', stroke: COL.tens, 'stroke-width': 3 }),
-        icon(cmd, x + bw / 2, y0 + 36, 1, COL.tens),
-        S('text', { x: x + bw / 2, y: y0 + bh - 14, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 600, 'font-size': f1(fs), fill: COL.ink }, [label]),
+      const bw = ws[i], label = LABEL[cmd];
+      const g = ctlButton({ x, y: y0, w: bw, h: bh, off: running, aria: cmd === 'left' ? 'Quarter turn anticlockwise' : cmd === 'right' ? 'Quarter turn clockwise' : label }, [
+        icon(cmd, x + bw / 2, y0 + 34, 1),
+        S('text', { x: x + bw / 2, y: y0 + bh - 13, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': f1(fs), fill: COL.ink }, [label]),
       ]);
       unbinds.push(onTap(g, () => press(cmd)));
       root.appendChild(g);
+      x += bw + gap;
     });
   }
 
   function drawProgram() {
-    const y = 310, cs = 44, step = 47;
-    root.appendChild(S('rect', { x: 10, y: y - 4, width: W - 250, height: cs + 26, rx: 14, fill: 'rgba(255,255,255,.04)', stroke: COL.line, 'stroke-width': 2 }));
+    const y = 310, cs = 46, step = 50;
+    root.appendChild(S('rect', { x: 10, y: y - 4, width: W - 252, height: cs + 26, rx: 16, fill: COL.surface2, stroke: COL.line, 'stroke-width': 3 }));
     queue.forEach((cmd, i) => {
       const x = 20 + i * step;
       const done = running ? i <= ranIdx : false;
-      root.appendChild(S('rect', { class: 'deco', x, y: y + 9, width: cs, height: cs, rx: 9, fill: done ? 'rgba(242,181,68,.35)' : 'rgba(95,212,255,.14)', stroke: done ? COL.tens : COL.ones, 'stroke-width': 2.5 }));
-      root.appendChild(icon(cmd, x + cs / 2, y + 9 + cs / 2, 0.78, done ? COL.tens : COL.ones));
+      root.appendChild(S('rect', { class: 'deco', x, y: y + 9, width: cs, height: cs, rx: 10, fill: done ? COL.focusSoft : COL.surface, stroke: done ? COL.focus : COL.lineStrong, 'stroke-width': 3 }));
+      root.appendChild(icon(cmd, x + cs / 2, y + 9 + cs / 2, 0.74));
     });
-    const undo = S('g', { class: 'btn3' + (running || !queue.length ? ' off' : ''), role: 'button', 'aria-label': 'Undo' }, [
-      S('rect', { x: W - 232, y: y - 4, width: 96, height: 70, rx: 16, fill: 'rgba(255,255,255,.06)', stroke: COL.ink3, 'stroke-width': 2 }),
-      S('text', { x: W - 184, y: y + 40, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 600, 'font-size': 22, fill: COL.ink }, ['Undo']),
+    const off = running || !queue.length;
+    const undo = ctlButton({ x: W - 232, y: y - 6, w: 98, h: 68, off, aria: 'Undo' }, [
+      S('text', { x: W - 183, y: y + 36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 24, fill: COL.ink }, ['Undo']),
     ]);
     unbinds.push(onTap(undo, () => { if (running || !queue.length) return; queue.pop(); sfx('click'); draw(); changed(); }));
     root.appendChild(undo);
-    const go = S('g', { class: 'btn3' + (running || !queue.length ? ' off' : ''), role: 'button', 'aria-label': 'Go' }, [
-      S('rect', { x: W - 126, y: y - 4, width: 116, height: 70, rx: 16, fill: COL.tens }),
-      S('text', { x: W - 68, y: y + 42, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: '#1a1205' }, ['Go!']),
+    const go = ctlButton({ x: W - 124, y: y - 6, w: 114, h: 68, primary: true, off, aria: 'Go' }, [
+      S('text', { x: W - 67, y: y + 39, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: '#fff' }, ['Go!']),
     ]);
     unbinds.push(onTap(go, runProgram));
     root.appendChild(go);
@@ -262,8 +292,8 @@ export function mount(el, props = {}, ctx = {}) {
     if (!p.showTurnArc || !lastTurn || !L) return;
     const cx = L.cx(st.x), cy = L.cy(st.y), r = L.cell * 0.62;
     const a0 = ANG[lastTurn.from], a1 = a0 + lastTurn.qd * 90;
-    const col = lastTurn.qd > 0 ? COL.tens : COL.ones;
-    overlay.appendChild(S('line', { x1: f1(cx), y1: f1(cy), ...(([x, y]) => ({ x2: f1(x), y2: f1(y) }))(at(cx, cy, r, a0)), stroke: COL.ink2, 'stroke-width': 3, 'stroke-dasharray': '7 6' }));
+    const col = lastTurn.qd > 0 ? CW : ACW;
+    overlay.appendChild(S('line', { x1: f1(cx), y1: f1(cy), ...(([x, y]) => ({ x2: f1(x), y2: f1(y) }))(at(cx, cy, r, a0)), stroke: COL.ink3, 'stroke-width': 3, 'stroke-dasharray': '7 6' }));
     overlay.appendChild(S('line', { x1: f1(cx), y1: f1(cy), ...(([x, y]) => ({ x2: f1(x), y2: f1(y) }))(at(cx, cy, r, a1)), stroke: col, 'stroke-width': 4 }));
     if (Math.abs(lastTurn.qd) === 1) {
       const m = L.cell * 0.16;
@@ -275,7 +305,7 @@ export function mount(el, props = {}, ctx = {}) {
     overlay.appendChild(S('path', { d: a.head, fill: col }));
     // Small label in the top-left corner.
     const words = [Math.abs(lastTurn.qd) === 2 ? 'Half turn' : 'Quarter turn', lastTurn.qd > 0 ? 'clockwise' : 'anticlockwise'];
-    words.forEach((w, i) => overlay.appendChild(S('text', { x: 14, y: 34 + i * 28, 'font-family': FONT.display, 'font-weight': 600, 'font-size': 24, fill: col }, [w])));
+    words.forEach((w, i) => overlay.appendChild(S('text', { x: 14, y: 32 + i * 30, 'font-family': FONT.display, 'font-weight': i ? 700 : 600, 'font-size': 24, fill: i ? col : COL.ink2 }, [w])));
   }
 
   function tween(target, dur) {

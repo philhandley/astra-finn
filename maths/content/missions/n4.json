@@ -30,12 +30,12 @@
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 43, "label": "43", "colour": "gold" }, { "at": 34, "label": "34", "colour": "cyan" }] },
+      "props": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 43, "label": "43", "colour": "orange" }, { "at": 34, "label": "34", "colour": "purple" }] },
       "script": [
         { "say": ["Look at 43 and 34.", "Which one is further along?"], "input": "choice", "options": [43, 34], "answer": 43, "then": ["43 is greater than 34.", "4 tens is more than 3 tens."] },
         { "caption": "43 ? 34", "say": ["Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": ">", "then": ["43 > 34.", "The open mouth faces 43."] },
-        { "set": { "min": 60, "max": 70, "labels": "all", "marks": [{ "at": 67, "label": "67", "colour": "gold" }, { "at": 61, "label": "61", "colour": "cyan" }] }, "caption": "61 ? 67", "say": ["Same tens!", "Look at the ones."], "input": "choice", "options": ["<", ">", "="], "answer": "<", "then": ["61 < 67.", "61 is less than 67."] },
-        { "set": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 34, "label": "34", "colour": "gold" }] }, "caption": "30 + 4 ? 34", "say": ["What is 30 + 4?", "Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": "=", "then": ["30 + 4 = 34.", "Both sides are equal."] }
+        { "set": { "min": 60, "max": 70, "labels": "all", "marks": [{ "at": 67, "label": "67", "colour": "orange" }, { "at": 61, "label": "61", "colour": "purple" }] }, "caption": "61 ? 67", "say": ["Same tens!", "Look at the ones."], "input": "choice", "options": ["<", ">", "="], "answer": "<", "then": ["61 < 67.", "61 is less than 67."] },
+        { "set": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 34, "label": "34", "colour": "orange" }] }, "caption": "30 + 4 ? 34", "say": ["What is 30 + 4?", "Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": "=", "then": ["30 + 4 = 34.", "Both sides are equal."] }
       ]
     },
     {

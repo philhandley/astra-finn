@@ -1,17 +1,27 @@
 // Tile Dock (SVG). A grid of number tiles with gaps; row totals on the right, column totals underneath.
 // Drag (or tap, then tap a gap) the loose tiles into the gaps until every row and column adds up.
-// Matched totals turn green, unmatched stay grey. Five puzzles make a round.
+// Matched totals turn green. Five puzzles make a round.
+// Style v2 (Synthesis tile-sums look): white board, peach tiles with dark purple numerals and dot patterns,
+// solid orange gaps on a soft peach plate, pill toggles for Hints and New puzzle.
 // Tests only: ctx.debug or ?arcdebug exposes window.__arc (puzzle, solved).
-import { S, svgRoot, svgPoint, onTap, drag, injectCSS, clamp, esc } from '../core/dom.js';
+import { S, svgRoot, onTap, drag, injectCSS, clamp, esc } from '../core/dom.js';
 import { makeRand } from '../core/rand.js';
 import { COL, FONT } from '../core/theme.js';
+import { artInner } from '../core/art.js';
 import { sfx as coreSfx } from '../core/sfx.js';
 
 export const meta = { id: 'tiledock', title: 'Tile Dock', about: 'Slot the tiles in so every row and column adds up.', icon: 'crystal' };
 
 const C = 'arc-tile';
-const VW = 1000, VH = 640;
+const VW = 1000, VH = 540;
 const ROUND = 5;
+// Tile colours (Synthesis-like peach and purple).
+const TD = {
+  plate: '#ffd7ae', plateEdge: '#f8bd83',
+  tile: '#ffe4cc', edge: '#f59e0b', lip: '#d98a1c',
+  slot: '#fb923c', slotHot: '#f97316',
+  num: '#3b1d5e', dot: '#ea7a0c',
+};
 
 // ---------- puzzles ----------
 function lines(size) {
@@ -59,52 +69,65 @@ export function makePuzzle(level, R) {
     : { size: 3, grid: [2, 5, 3, 4, 1, 6, 3, 2, 4], blanks: [1, 3, 8], rows: [10, 11, 9], cols: [9, 8, 13], tray: [4, 5, 4] };
 }
 
+
 // ---------- shared strip (each arcade file carries its own copy) ----------
-const BACK = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// Black top bar like the app's mission bar: chunky Exit and level keys (solid bottom edge), white title, quiet star tally.
+const BACK = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const STAR_D = 'M50 6l12 28 30 3-23 20 7 30-26-16-26 16 7-30L8 37l30-3z';
+const starSvg = (size, fill = '#ffcc33') => `<svg class="st" viewBox="-6 -6 112 112" width="${size}" height="${size}" aria-hidden="true"><path d="${STAR_D}" fill="${fill}" stroke="#1b1e2e" stroke-width="7" stroke-linejoin="round"/></svg>`;
+const withStars = (html, size) => String(html).replace(/★/g, starSvg(size)).replace(/☆/g, starSvg(size, '#d3d9e3'));
 function stripCSS(c) {
   return `
-  .${c} { position: absolute; inset: 0; display: flex; flex-direction: column; color: var(--ink, #f3efe6); font-family: var(--font-body, system-ui); overflow: hidden; user-select: none; -webkit-user-select: none; }
-  .${c}-top { flex: none; height: 84px; display: flex; align-items: center; gap: 18px; padding: 0 18px; border-bottom: 1px solid var(--line, rgba(255,255,255,.12)); background: rgba(5,8,18,.6); position: relative; z-index: 3; }
-  .${c} button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-  .${c}-exit { appearance: none; min-height: 64px; min-width: 64px; padding: 0 22px 0 14px; border-radius: 999px; border: 1.5px solid var(--line, rgba(255,255,255,.12)); background: rgba(255,255,255,.04); color: var(--ink, #f3efe6); font: 600 22px ${FONT.display}; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-  .${c}-exit:active { transform: scale(.96); }
-  .${c}-title { flex: 1; font: 600 28px ${FONT.display}; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .${c}-lv { display: flex; align-items: center; gap: 8px; }
-  .${c}-lv span { font: 600 15px ${FONT.display}; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3, #7d869a); margin-right: 4px; }
-  .${c}-lv button { appearance: none; width: 64px; height: 64px; border-radius: 50%; border: 1.5px solid var(--line, rgba(255,255,255,.12)); background: transparent; color: var(--ink, #f3efe6); font: 600 26px ${FONT.display}; cursor: pointer; transition: background .2s, color .2s; }
-  .${c}-lv button.on { background: var(--gold, #f2b544); border-color: var(--gold, #f2b544); color: #1a1205; }
-  .${c}-tally { min-width: 130px; text-align: right; line-height: 1.1; }
-  .${c}-tally b { font: 700 30px ${FONT.display}; color: var(--gold, #f2b544); }
-  .${c}-tally small { display: block; font: 500 16px ${FONT.display}; color: var(--ink-3, #7d869a); margin-top: 3px; }
-  .${c}-tally b.bump { animation: ${c}-bump .35s ease; display: inline-block; }
-  @keyframes ${c}-bump { 40% { transform: scale(1.3); } }
-  .${c}-sum { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(4,6,14,.62); z-index: 5; animation: ${c}-fade .3s ease; }
-  .${c}-sum .${c}-card { min-width: 460px; max-width: 640px; text-align: center; padding: 34px 40px 30px; border-radius: 24px; background: #111a2e; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  .${c}-sum .eb { font: 600 16px ${FONT.display}; letter-spacing: .16em; text-transform: uppercase; color: var(--gold, #f2b544); }
-  .${c}-sum .big { font: 700 64px ${FONT.display}; color: var(--gold, #f2b544); margin: 10px 0 2px; }
-  .${c}-sum p { margin: 6px 0; font-size: 22px; color: var(--ink-2, #b9c0cf); }
-  .${c}-sum p.best { font-size: 18px; color: var(--ink-3, #7d869a); }
+  .${c} { position: absolute; inset: 0; display: flex; flex-direction: column; background: #000; color: #fff; font-family: ${FONT.display}; overflow: hidden; user-select: none; -webkit-user-select: none; }
+  .${c} button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; font-family: ${FONT.display}; }
+  .${c}-top { flex: none; height: 82px; display: flex; align-items: center; gap: 14px; padding: 0 16px 4px; background: #000; position: relative; z-index: 3; }
+  .${c}-key { appearance: none; cursor: pointer; min-width: 60px; min-height: 60px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 16px; border: 2px solid #3a3f4d; background: #23262f; color: #fff; font-weight: 700; font-size: 22px; box-shadow: 0 5px 0 #3a3f4d; transition: transform .1s ease, box-shadow .1s ease, background .2s; }
+  .${c}-key:active { transform: translateY(4px); box-shadow: 0 1px 0 #3a3f4d; }
+  .${c}-exit { padding: 0 22px 0 14px; }
+  .${c}-title { flex: 1; min-width: 0; font-weight: 700; font-size: 26px; letter-spacing: -.01em; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .${c}-lv { display: flex; align-items: center; gap: 10px; }
+  .${c}-lv span { font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #7d8397; margin-right: 2px; }
+  .${c}-lv button { width: 60px; height: 60px; padding: 0; font-size: 26px; font-weight: 800; }
+  .${c}-lv button.on { background: #ffcc33; border-color: #ffcc33; color: #1d1600; box-shadow: 0 5px 0 #c99a0e; }
+  .${c}-lv button.on:active { box-shadow: 0 1px 0 #c99a0e; }
+  .${c}-tally { min-width: 124px; text-align: right; line-height: 1.1; margin-left: 6px; }
+  .${c}-tally b { display: inline-flex; align-items: center; gap: 7px; font-weight: 800; font-size: 28px; color: #fff; }
+  .${c}-tally b span { display: inline-flex; align-items: center; gap: 7px; margin-left: 8px; }
+  .${c}-tally .st { flex: none; }
+  .${c}-tally small { display: block; font-weight: 500; font-size: 14px; color: #7d8397; margin-top: 4px; }
+  .${c}-tally b.bump { animation: ${c}-bump .35s ease; }
+  @keyframes ${c}-bump { 40% { transform: scale(1.25); } }
+  .${c}-sum { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.55); z-index: 5; animation: ${c}-fade .3s ease; }
+  .${c}-card { min-width: 480px; max-width: 660px; text-align: center; padding: 30px 44px 34px; border-radius: 28px; background: #fff; color: #1b1e2e; border: 4px solid #1b1e2e; box-shadow: 0 8px 0 #1b1e2e, 0 30px 70px rgba(0,0,0,.45); animation: ${c}-pop .45s cubic-bezier(.2,1.4,.4,1); }
+  .${c}-sum .eb { font-weight: 700; font-size: 15px; letter-spacing: .16em; text-transform: uppercase; color: #4b5168; }
+  .${c}-sum .big { display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 800; font-size: 72px; line-height: 1; margin: 16px 0 10px; color: #1b1e2e; }
+  .${c}-sum .big span { display: inline-flex; align-items: center; gap: 12px; margin-left: 18px; }
+  .${c}-sum p { margin: 6px 0; font-size: 22px; font-weight: 500; color: #4b5168; }
+  .${c}-sum p.best { font-size: 18px; color: #8b91a7; min-height: 1.2em; }
   .${c}-sum .row { display: flex; gap: 14px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
-  .${c}-btn { appearance: none; border: 0; min-height: 64px; padding: 0 30px; border-radius: 999px; font: 600 23px ${FONT.display}; background: var(--gold, #f2b544); color: #1a1205; cursor: pointer; }
-  .${c}-btn.ghost { background: transparent; color: var(--ink, #f3efe6); border: 1.5px solid rgba(255,255,255,.18); }
-  .${c}-btn:active { transform: scale(.96); }
+  .${c}-btn { appearance: none; cursor: pointer; min-height: 64px; padding: 0 30px; border-radius: 18px; border: 3px solid #1d4ed8; background: #3b82f6; color: #fff; font-weight: 700; font-size: 23px; box-shadow: 0 5px 0 #1d4ed8; transition: transform .1s ease, box-shadow .1s ease; }
+  .${c}-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #1d4ed8; }
+  .${c}-btn.ghost { background: #fff; color: #1b1e2e; border-color: #dfe3ec; box-shadow: 0 5px 0 #dfe3ec; }
+  .${c}-btn.ghost:active { box-shadow: 0 1px 0 #dfe3ec; }
   @keyframes ${c}-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ${c}-pop { from { transform: scale(.8); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .${c} *, .${c} *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   `;
 }
 function makeStrip(root, c, title, level, { onExit, onLevel }) {
   const top = document.createElement('div');
   top.className = `${c}-top`;
-  top.innerHTML = `<button type="button" class="${c}-exit" aria-label="Exit">${BACK}Exit</button>
+  top.innerHTML = `<button type="button" class="${c}-key ${c}-exit" aria-label="Exit">${BACK}Exit</button>
     <div class="${c}-title">${esc(title)}</div>
-    <div class="${c}-lv" role="group" aria-label="Level"><span>Level</span>${[1, 2, 3].map(n => `<button type="button" data-l="${n}" aria-label="Level ${n}">${n}</button>`).join('')}</div>
-    <div class="${c}-tally" aria-live="polite"><b>★ 0</b><small></small></div>`;
+    <div class="${c}-lv" role="group" aria-label="Level"><span>Level</span>${[1, 2, 3].map(n => `<button type="button" class="${c}-key" data-l="${n}" aria-label="Level ${n}">${n}</button>`).join('')}</div>
+    <div class="${c}-tally" aria-live="polite"><b>${withStars('★ 0', 30)}</b><small></small></div>`;
   root.appendChild(top);
   const unb = [onTap(top.querySelector(`.${c}-exit`), () => onExit())];
   top.querySelectorAll(`.${c}-lv button`).forEach(b => unb.push(onTap(b, () => onLevel(+b.dataset.l))));
   const tb = top.querySelector(`.${c}-tally b`), ts = top.querySelector(`.${c}-tally small`);
   const api = {
     setLevel(l) { top.querySelectorAll(`.${c}-lv button`).forEach(b => b.classList.toggle('on', +b.dataset.l === l)); },
-    setTally(html, bump) { tb.innerHTML = html; if (bump) { tb.classList.remove('bump'); void tb.offsetWidth; tb.classList.add('bump'); } },
+    setTally(html, bump) { tb.innerHTML = withStars(html, 30); if (bump) { tb.classList.remove('bump'); void tb.offsetWidth; tb.classList.add('bump'); } },
     setNote(t) { ts.textContent = t || ''; },
     destroy() { unb.forEach(u => u()); },
   };
@@ -115,34 +138,43 @@ function makeStrip(root, c, title, level, { onExit, onLevel }) {
 // ---------- the game ----------
 export function mount(el, ctx = {}) {
   injectCSS(C, stripCSS(C) + `
-  .${C}-body { flex: 1; min-height: 0; display: flex; }
-  .${C}-stage { flex: 1; min-width: 0; position: relative; padding: 8px 0 8px 12px; }
-  .${C}-side { flex: none; width: 250px; padding: 22px 22px 18px 6px; display: flex; flex-direction: column; gap: 14px; }
-  .${C}-side .lab { font: 600 15px ${FONT.display}; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3, #7d869a); }
-  .${C}-seg { display: flex; border: 1.5px solid rgba(255,255,255,.14); border-radius: 999px; padding: 4px; gap: 4px; }
-  .${C}-seg button { appearance: none; flex: 1; min-height: 62px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2, #b9c0cf); font: 600 21px ${FONT.display}; cursor: pointer; }
-  .${C}-seg button.on { background: rgba(95,212,255,.18); color: var(--cyan, #5fd4ff); }
-  .${C}-side .${C}-btn { width: 100%; }
-  .${C}-msg { font-size: 21px; line-height: 1.35; color: var(--ink-2, #b9c0cf); min-height: 90px; }
-  .${C}-msg b { color: var(--green, #6fe3a5); font-family: ${FONT.display}; font-size: 30px; display: block; }
-  .${C}-pips { display: flex; gap: 10px; margin-top: auto; align-items: center; }
-  .${C}-pips i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); }
-  .${C}-pips i.done { background: var(--gold, #f2b544); border-color: var(--gold, #f2b544); }
-  .${C}-pips i.now { border-color: var(--gold, #f2b544); }
-  .${C} svg .td-slot { fill: rgba(95,212,255,.05); stroke: rgba(255,255,255,.32); stroke-width: 3; stroke-dasharray: 10 8; transition: fill .15s, stroke .15s; }
-  .${C} svg .td-slot.td-hot { fill: rgba(95,212,255,.18); stroke: ${COL.ones}; stroke-dasharray: none; }
-  .${C} svg .td-slot.td-ready { stroke: rgba(242,181,68,.7); }
+  .${C}-board { flex: 1; min-height: 0; margin: 0 12px 12px; border-radius: 26px; background: ${COL.surface}; color: ${COL.ink}; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+  .${C}-ctl { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 18px; padding: 16px 24px 6px; }
+  .${C}-lab { font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: ${COL.ink3}; }
+  .${C}-prog { display: flex; align-items: center; gap: 14px; }
+  .${C}-pips { display: flex; gap: 9px; align-items: center; }
+  .${C}-pips i { width: 20px; height: 20px; border-radius: 50%; border: 3px solid ${COL.line}; background: #fff; transition: background .3s, border-color .3s; }
+  .${C}-pips i.done { background: ${TD.edge}; border-color: ${TD.edge}; }
+  .${C}-pips i.now { border-color: ${TD.edge}; }
+  .${C}-mid { display: flex; align-items: center; gap: 14px; }
+  .${C}-seg { display: inline-flex; border: 3px solid ${COL.line}; border-radius: 18px; background: #fff; box-shadow: 0 5px 0 ${COL.line}; overflow: hidden; }
+  .${C}-seg button { appearance: none; cursor: pointer; border: 0; min-width: 84px; min-height: 60px; padding: 0 18px; background: #fff; color: ${COL.ink2}; font-weight: 700; font-size: 21px; transition: background .15s, color .15s; }
+  .${C}-seg button + button { border-left: 3px solid ${COL.line}; }
+  .${C}-seg button.on { background: #ffdcb8; color: ${TD.num}; }
+  .${C}-new { appearance: none; cursor: pointer; min-height: 60px; min-width: 60px; padding: 0 22px; border-radius: 18px; border: 3px solid ${COL.line}; background: #fff; color: ${COL.ink}; font-weight: 700; font-size: 21px; box-shadow: 0 5px 0 ${COL.line}; display: inline-flex; align-items: center; gap: 8px; transition: transform .1s ease, box-shadow .1s ease; }
+  .${C}-new svg { width: 24px; height: 24px; }
+  .${C}-new:active { transform: translateY(4px); box-shadow: 0 1px 0 ${COL.line}; }
+  .${C}-msg { text-align: right; font-size: 19px; font-weight: 500; line-height: 1.3; color: ${COL.ink2}; }
+  .${C}-msg b { color: #15803d; font-weight: 800; }
+  .${C}-stage { flex: 1; min-height: 0; position: relative; }
+  .${C}-stage svg { position: absolute; inset: 0; }
+  .${C} svg .td-plate { fill: ${TD.plate}; stroke: ${TD.plateEdge}; stroke-width: 3; transition: stroke .3s, stroke-width .3s; }
+  .${C} svg.td-solved .td-plate { stroke: ${COL.good}; stroke-width: 6; }
+  .${C} svg .td-slot { fill: ${TD.slot}; stroke: transparent; stroke-width: 5; transition: fill .15s, stroke .15s; }
+  .${C} svg .td-slot.td-ready { stroke: #fff; stroke-width: 4; stroke-dasharray: 10 8; }
+  .${C} svg .td-slot.td-hot { fill: ${TD.slotHot}; stroke: ${COL.focus}; stroke-width: 6; stroke-dasharray: none; }
   .${C} svg .td-tile { cursor: grab; }
-  .${C} svg .td-tile.td-sel .td-face { stroke: ${COL.tens}; stroke-width: 6; }
-  .${C} svg .td-tile.td-sel { filter: drop-shadow(0 0 10px rgba(242,181,68,.6)); }
-  .${C} svg .td-tot rect { fill: rgba(255,255,255,.05); stroke: rgba(255,255,255,.16); stroke-width: 2; transition: fill .25s, stroke .25s; }
-  .${C} svg .td-tot text { fill: ${COL.ink2}; transition: fill .25s; }
-  .${C} svg .td-tot.td-ok rect { fill: rgba(111,227,165,.16); stroke: ${COL.good}; }
-  .${C} svg .td-tot.td-ok text { fill: ${COL.good}; }
-  .${C} svg .td-frame { fill: rgba(18,27,51,.85); stroke: rgba(255,255,255,.12); stroke-width: 2; transition: stroke .3s; }
-  .${C} svg.td-solved .td-frame { stroke: ${COL.good}; stroke-width: 4; filter: drop-shadow(0 0 16px rgba(111,227,165,.7)); }
+  .${C} svg .td-tile.td-sel .td-face { stroke: ${COL.focus}; stroke-width: 6; }
+  .${C} svg .td-num { transition: transform .2s ease; }
+  .${C} svg.td-nohints .td-num { transform: translateY(var(--td-shift, 10px)); }
   .${C} svg .td-dots { transition: opacity .2s; }
   .${C} svg.td-nohints .td-dots { opacity: 0; }
+  .${C} svg .td-tot rect { fill: ${COL.surface2}; stroke: transparent; stroke-width: 3; transition: fill .25s, stroke .25s; }
+  .${C} svg .td-tot text { fill: ${COL.ink}; transition: fill .25s; }
+  .${C} svg .td-tot.td-ok rect { fill: ${COL.goodSoft}; stroke: ${COL.good}; }
+  .${C} svg .td-tot.td-ok text { fill: #15803d; }
+  .${C} svg .td-traywell { transition: opacity .3s; }
+  .${C} svg.td-solved .td-traywell { opacity: 0; }
   .${C} svg .td-docked { opacity: 0; transition: opacity .3s; pointer-events: none; }
   .${C} svg.td-solved .td-docked { opacity: 1; }
   `);
@@ -158,15 +190,18 @@ export function mount(el, ctx = {}) {
   el.appendChild(root);
   const strip = makeStrip(root, C, meta.title, level, { onExit: () => ctx.onExit && ctx.onExit(), onLevel: l => { level = l; strip.setLevel(l); startRound(); } });
   const body = document.createElement('div');
-  body.className = `${C}-body`;
-  body.innerHTML = `<div class="${C}-stage"></div>
-    <div class="${C}-side">
-      <div class="lab">Hints</div>
-      <div class="${C}-seg" role="group" aria-label="Hints"><button type="button" data-h="1">On</button><button type="button" data-h="0">Off</button></div>
-      <button type="button" class="${C}-btn ghost newp">New puzzle</button>
+  body.className = `${C}-board`;
+  const REFRESH = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  body.innerHTML = `<div class="${C}-ctl">
+      <div class="${C}-prog"><span class="${C}-lab">Puzzle</span><div class="${C}-pips"></div></div>
+      <div class="${C}-mid">
+        <span class="${C}-lab">Hints</span>
+        <div class="${C}-seg" role="group" aria-label="Hints"><button type="button" data-h="1">On</button><button type="button" data-h="0">Off</button></div>
+        <button type="button" class="${C}-new newp">${REFRESH}New puzzle</button>
+      </div>
       <div class="${C}-msg" aria-live="polite"></div>
-      <div class="${C}-pips"></div>
-    </div>`;
+    </div>
+    <div class="${C}-stage"></div>`;
   root.appendChild(body);
   const stage = body.querySelector(`.${C}-stage`);
   const msgEl = body.querySelector(`.${C}-msg`);
@@ -192,45 +227,50 @@ export function mount(el, ctx = {}) {
   const total = () => +(load('docked') || 0);
   const showNote = () => { const t = total(); strip.setNote(t ? `Docked ${t}` : ''); };
 
-  function geom(size) {
-    const cell = size === 2 ? 140 : 112, gap = size === 2 ? 16 : 12, pad = 16, totW = 84;
+  // Layout: the grid on its peach plate, row totals to the right, column totals underneath, the tile dock on the far right.
+  function geom(size, nTray) {
+    const cell = size === 2 ? 160 : 118, gap = size === 2 ? 18 : 12, pad = 18, totW = 84, totH = 58;
     const gridW = size * cell + (size - 1) * gap;
-    const blockW = gridW + 2 * pad + 26 + totW;
-    const x0 = (VW - blockW) / 2 + pad;
-    const y0 = size === 2 ? 52 : 34;
+    const plateW = gridW + 2 * pad;
+    const blockW = plateW + 24 + totW, blockH = plateW + 22 + totH;
+    const tCols = nTray <= 2 ? 1 : 2, tRows = Math.ceil(nTray / tCols), tg = 20, tp = 22;
+    const trayW = tCols * cell + (tCols - 1) * tg + 2 * tp, trayH = tRows * cell + (tRows - 1) * tg + 2 * tp;
+    const between = 64;
+    const bx = (VW - (blockW + between + trayW)) / 2, by = (VH - blockH) / 2;
+    const x0 = bx + pad, y0 = by + pad;
     const at = i => ({ x: x0 + (i % size) * (cell + gap), y: y0 + Math.floor(i / size) * (cell + gap) });
-    const colY = y0 + gridW + pad + 38;
-    const trayY = colY + 46;
-    const midX = x0 + gridW / 2;
-    return { cell, gap, pad, totW, gridW, x0, y0, at, rowX: x0 + gridW + pad + 26 + totW / 2, colY, trayY, midX };
+    const tx = bx + blockW + between, ty = by + (plateW - trayH) / 2;
+    const trayAt = k => {
+      const row = Math.floor(k / tCols), col = k % tCols;
+      const inRow = Math.min(tCols, nTray - row * tCols);
+      const shift = inRow < tCols ? ((tCols - inRow) * (cell + tg)) / 2 : 0;
+      return { x: tx + tp + shift + col * (cell + tg), y: ty + tp + row * (cell + tg) };
+    };
+    return { cell, gap, pad, totW, totH, gridW, plateW, bx, by, x0, y0, at, rowX: bx + plateW + 24 + totW / 2, colY: by + plateW + 22 + totH / 2, tray: { x: tx, y: ty, w: trayW, h: trayH }, trayAt };
   }
-  function trayPos(k, count) {
-    const sp = G.cell + 22;
-    const x = G.midX - ((count - 1) * sp) / 2 + k * sp - G.cell / 2;
-    return { x, y: G.trayY };
-  }
+  const trayPos = k => G.trayAt(k);
 
-  function dotsFor(v, cell, col) {
+  function dotsFor(v, cell) {
     const g = S('g', { class: 'td-dots' });
-    const r = cell * 0.042, sp = cell * 0.13;
+    const r = cell * 0.04, sp = cell * 0.118;
     const rowsN = v > 5 ? 2 : 1;
     for (let i = 0; i < v; i++) {
       const row = i < 5 ? 0 : 1;
       const inRow = row === 0 ? Math.min(v, 5) : v - 5;
       const k = row === 0 ? i : i - 5;
       const cx = cell / 2 + (k - (inRow - 1) / 2) * sp;
-      const cy = rowsN === 1 ? cell * 0.77 : cell * (0.71 + row * 0.13);
-      g.appendChild(S('circle', { cx, cy, r, fill: col }));
+      const cy = rowsN === 1 ? cell * 0.79 : cell * (0.74 + row * 0.11);
+      g.appendChild(S('circle', { cx, cy, r, fill: TD.dot }));
     }
     return g;
   }
   function tileFace(v, movable) {
     const cell = G.cell;
     const g = S('g', {});
-    g.appendChild(S('rect', { x: 2, y: 6, width: cell, height: cell, rx: 18, fill: 'rgba(0,0,0,.35)' }));
-    g.appendChild(S('rect', { class: 'td-face', x: 0, y: 0, width: cell, height: cell, rx: 18, fill: movable ? '#f3efe6' : '#1d2a4c', stroke: movable ? '#d9ccb0' : 'rgba(255,255,255,.14)', 'stroke-width': 2 }));
-    g.appendChild(S('text', { class: 'td-num', x: cell / 2, y: cell * 0.43, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 700, 'font-size': Math.round(cell * 0.44), fill: movable ? '#0c1430' : COL.ink }, [String(v)]));
-    g.appendChild(dotsFor(v, cell, movable ? '#2f78d6' : COL.ones));
+    if (movable) g.appendChild(S('rect', { x: 0, y: 7, width: cell, height: cell, rx: 18, fill: TD.lip }));
+    g.appendChild(S('rect', { class: 'td-face', x: 1.5, y: 1.5, width: cell - 3, height: cell - 3, rx: 17, fill: TD.tile, stroke: TD.edge, 'stroke-width': 3 }));
+    g.appendChild(S('text', { class: 'td-num', x: cell / 2, y: cell * 0.42, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 800, 'font-size': Math.round(cell * 0.46), fill: TD.num }, [String(v)]));
+    g.appendChild(dotsFor(v, cell));
     return g;
   }
   function place(t, x, y, animate = true) {
@@ -239,7 +279,7 @@ export function mount(el, ctx = {}) {
     t.g.style.transform = `translate(${x}px, ${y}px)`;
   }
   function home(t) {
-    const p = trayPos(t.home, P.tray.length);
+    const p = trayPos(t.home);
     place(t, p.x, p.y);
   }
 
@@ -248,14 +288,15 @@ export function mount(el, ctx = {}) {
     tileUnb.forEach(u => u()); tileUnb = [];
     svg.replaceChildren();
     svg.classList.remove('td-solved');
-    G = geom(P.size);
+    G = geom(P.size, P.tray.length);
+    svg.style.setProperty('--td-shift', `${Math.round(G.cell * 0.08)}px`);
     const L = n => { const g = S('g', { class: n }); svg.appendChild(g); return g; };
-    layers = { frame: L('l-frame'), fixed: L('l-fixed'), slots: L('l-slots'), tot: L('l-tot'), tray: L('l-tray'), tiles: L('l-tiles'), drag: L('l-drag'), msg: L('l-msg') };
-    layers.frame.appendChild(S('rect', { class: 'td-frame', x: G.x0 - G.pad, y: G.y0 - G.pad, width: G.gridW + 2 * G.pad, height: G.gridW + 2 * G.pad, rx: 26 }));
+    layers = { frame: L('l-frame'), fixed: L('l-fixed'), slots: L('l-slots'), tot: L('l-tot'), tray: L('l-tray'), msg: L('l-msg'), tiles: L('l-tiles'), drag: L('l-drag') };
+    layers.frame.appendChild(S('rect', { class: 'td-plate', x: G.bx, y: G.by, width: G.plateW, height: G.plateW, rx: 26 }));
     P.grid.forEach((v, i) => {
       const p = G.at(i);
       if (P.blanks.includes(i)) {
-        const s = S('rect', { class: 'td-slot', x: p.x + 2, y: p.y + 2, width: G.cell - 4, height: G.cell - 4, rx: 18, 'data-cell': i });
+        const s = S('rect', { class: 'td-slot', x: p.x, y: p.y, width: G.cell, height: G.cell, rx: 18, 'data-cell': i });
         layers.slots.appendChild(s);
         tileUnb.push(onTap(s, () => { if (!locked && selected) { moveTo(selected, i); } }));
       } else {
@@ -264,28 +305,20 @@ export function mount(el, ctx = {}) {
         layers.fixed.appendChild(f);
       }
     });
-    // Totals.
+    // Totals: soft pills in ink; matched ones go green.
     const totEls = { rows: [], cols: [] };
-    const pillH = 56;
-    for (let r = 0; r < P.size; r++) {
-      const y = G.y0 + r * (G.cell + G.gap) + G.cell / 2;
-      const g = S('g', { class: 'td-tot', transform: `translate(${G.rowX} ${y})` });
-      g.appendChild(S('rect', { x: -G.totW / 2, y: -pillH / 2, width: G.totW, height: pillH, rx: 28 }));
-      g.appendChild(S('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', y: 2, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 34 }, [String(P.rows[r])]));
-      layers.tot.appendChild(g); totEls.rows.push(g);
-    }
-    for (let c = 0; c < P.size; c++) {
-      const x = G.x0 + c * (G.cell + G.gap) + G.cell / 2;
-      const g = S('g', { class: 'td-tot', transform: `translate(${x} ${G.colY})` });
-      g.appendChild(S('rect', { x: -G.totW / 2, y: -pillH / 2, width: G.totW, height: pillH, rx: 28 }));
-      g.appendChild(S('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', y: 2, 'font-family': FONT.display, 'font-weight': 700, 'font-size': 34 }, [String(P.cols[c])]));
-      layers.tot.appendChild(g); totEls.cols.push(g);
-    }
+    const tot = (x, y, val) => {
+      const g = S('g', { class: 'td-tot', transform: `translate(${x} ${y})` });
+      g.appendChild(S('rect', { x: -G.totW / 2, y: -G.totH / 2, width: G.totW, height: G.totH, rx: G.totH / 2 }));
+      g.appendChild(S('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', y: 2, 'font-family': FONT.display, 'font-weight': 800, 'font-size': 36 }, [String(val)]));
+      layers.tot.appendChild(g);
+      return g;
+    };
+    for (let r = 0; r < P.size; r++) totEls.rows.push(tot(G.rowX, G.y0 + r * (G.cell + G.gap) + G.cell / 2, P.rows[r]));
+    for (let c = 0; c < P.size; c++) totEls.cols.push(tot(G.x0 + c * (G.cell + G.gap) + G.cell / 2, G.colY, P.cols[c]));
     P.totEls = totEls;
-    // Tray dock.
-    const n = P.tray.length;
-    const a = trayPos(0, n), b = trayPos(n - 1, n);
-    layers.tray.appendChild(S('rect', { x: a.x - 16, y: a.y - 12, width: b.x - a.x + G.cell + 32, height: G.cell + 26, rx: 26, fill: 'rgba(255,255,255,.03)', stroke: 'rgba(255,255,255,.1)', 'stroke-width': 2 }));
+    // Tile dock: a soft well on the right.
+    layers.tray.appendChild(S('rect', { class: 'td-traywell', x: G.tray.x, y: G.tray.y, width: G.tray.w, height: G.tray.h, rx: 26, fill: COL.surface2, stroke: COL.line, 'stroke-width': 3 }));
     // Movable tiles.
     tiles = P.tray.map((v, k) => {
       const g = S('g', { class: 'td-tile', role: 'button', 'aria-label': `Tile ${v}` });
@@ -298,9 +331,13 @@ export function mount(el, ctx = {}) {
     });
     placed = new Map();
     selected = null;
-    // Docked message where the tray was.
-    const m = S('g', { class: 'td-docked', transform: `translate(${G.midX} ${G.trayY + G.cell / 2})` });
-    m.appendChild(S('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 52, fill: COL.good }, ['★ Docked!']));
+    // "Docked!" where the tile dock was.
+    const cx = G.tray.x + G.tray.w / 2, cy = G.tray.y + G.tray.h / 2;
+    const m = S('g', { class: 'td-docked' });
+    const star = S('g', { transform: `translate(${cx - 55} ${cy - 108}) scale(1.1)` });
+    star.innerHTML = artInner('star');
+    m.appendChild(star);
+    m.appendChild(S('text', { x: cx, y: cy + 46, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 46, fill: '#15803d' }, ['Docked!']));
     layers.msg.appendChild(m);
     check(false);
   }
@@ -352,7 +389,7 @@ export function mount(el, ctx = {}) {
         ghost.style.transition = 'none';
         ghost.style.pointerEvents = 'none';
         ghost.classList.add('td-ghost');
-        ghost.style.filter = 'drop-shadow(0 10px 18px rgba(0,0,0,.55))';
+        ghost.style.filter = 'drop-shadow(0 12px 14px rgba(27,30,46,.28))';
         layers.drag.appendChild(ghost);
         t.g.style.opacity = '0';
       },
@@ -360,7 +397,7 @@ export function mount(el, ctx = {}) {
         if (!start) return;
         moved = Math.max(moved, Math.hypot(p.x - start.x, p.y - start.y));
         const x = p.x - off.x, y = p.y - off.y;
-        ghost.style.transform = `translate(${x}px, ${y}px) scale(1.04)`;
+        ghost.style.transform = `translate(${x}px, ${y}px) scale(1.05)`;
         const s = moved > 10 ? nearestSlot(x + G.cell / 2, y + G.cell / 2) : null;
         layers.slots.querySelectorAll('.td-slot').forEach(el2 => el2.classList.toggle('td-hot', +el2.dataset.cell === s));
       },
@@ -377,7 +414,8 @@ export function mount(el, ctx = {}) {
         void t.g.getBoundingClientRect();
         t.g.style.opacity = '1';
         if (wasTap) {
-          place(t, t.at === null ? trayPos(t.home, P.tray.length).x : G.at(t.at).x, t.at === null ? G.trayY : G.at(t.at).y, false);
+          const hp = t.at === null ? trayPos(t.home) : G.at(t.at);
+          place(t, hp.x, hp.y, false);
           if (t.at === null) { select(selected === t ? null : t); sfx('click'); }
           else if (selected && selected !== t) moveTo(selected, t.at);
           else moveTo(t, null);
@@ -408,7 +446,7 @@ export function mount(el, ctx = {}) {
       P.totEls.cols[c].classList.toggle('td-ok', ok); all = all && ok;
     }
     if (fromUser && all && !locked) solved();
-    else if (fromUser && placed.size === P.blanks.length && !all) msg('Every gap is full. Find a total that is still grey and check it.');
+    else if (fromUser && placed.size === P.blanks.length && !all) msg('Every gap is full. Check the totals that are not green.');
     else if (fromUser) msg('');
   }
   function msg(html) { msgEl.innerHTML = html; }
@@ -425,7 +463,7 @@ export function mount(el, ctx = {}) {
     strip.setTally(`★ ${solvedCount}`, true);
     save('docked', total() + 1);
     showNote();
-    msg('<b>Docked!</b>Every row and column adds up.');
+    msg('<b>Docked!</b> All the totals match.');
     pips();
     later(1700, () => { if (solvedCount >= ROUND) finish(); else newPuzzle(); });
   }
@@ -457,7 +495,7 @@ export function mount(el, ctx = {}) {
     sumEl.className = `${C}-sum`;
     sumEl.innerHTML = `<div class="${C}-card">
       <div class="eb">Round complete</div>
-      <div class="big">★ ${solvedCount}</div>
+      <div class="big">${withStars(`★ ${solvedCount}`, 64)}</div>
       <p>puzzles docked</p>
       <p class="best">${total()} docked in all.</p>
       <div class="row"><button type="button" class="${C}-btn go">Play again</button>${level < 3 ? `<button type="button" class="${C}-btn ghost up">Try level ${level + 1}</button>` : ''}</div>

@@ -20,7 +20,7 @@
    "type": "look",
    "lines": [
     "Our scanner spotted lots of asteroids.",
-    "Some have gold rings, some cyan, some green."
+    "Some have red rings, some yellow, some blue."
    ],
    "question": "Which colour do you think has the most?",
    "widget": "objects",
@@ -43,13 +43,13 @@
    "type": "guess",
    "prompt": "Which colour has the most asteroids?",
    "options": [
-    "Gold",
-    "Cyan",
-    "Green"
+    "Red",
+    "Yellow",
+    "Blue"
    ],
    "answer": 0,
    "reveal": [
-    "Gold has the most: 5.",
+    "Red has the most: 5.",
     "Counting carefully beats guessing!"
    ],
    "widget": "objects",
@@ -79,20 +79,20 @@
     "givenAs": "number",
     "cats": [
      {
-      "label": "Gold",
-      "colour": "gold",
+      "label": "Red",
+      "colour": "red",
       "icon": "asteroid",
       "value": 0
      },
      {
-      "label": "Cyan",
-      "colour": "cyan",
+      "label": "Yellow",
+      "colour": "yellow",
       "icon": "asteroid",
       "value": 0
      },
      {
-      "label": "Green",
-      "colour": "green",
+      "label": "Blue",
+      "colour": "blue",
       "icon": "asteroid",
       "value": 0
      }
@@ -102,7 +102,7 @@
     {
      "say": [
       "A tally mark is a quick line for each one.",
-      "Tap + by Gold 5 times."
+      "Tap + by Red 5 times."
      ],
      "goal": {
       "values": [
@@ -118,7 +118,7 @@
     },
     {
      "say": [
-      "Now tally 4 cyan and 3 green."
+      "Now tally 4 yellow and 3 blue."
      ],
      "goal": {
       "values": [
@@ -165,26 +165,26 @@
      "input": "choice",
      "options": [
       {
-       "value": "Gold",
-       "label": "Gold"
+       "value": "Red",
+       "label": "Red"
       },
       {
-       "value": "Cyan",
-       "label": "Cyan"
+       "value": "Yellow",
+       "label": "Yellow"
       },
       {
-       "value": "Green",
-       "label": "Green"
+       "value": "Blue",
+       "label": "Blue"
       }
      ],
-     "answer": "Green",
+     "answer": "Blue",
      "then": [
-      "Green has the fewest: 3."
+      "Blue has the fewest: 3."
      ]
     },
     {
      "say": [
-      "How many more gold than green?"
+      "How many more red than blue?"
      ],
      "input": "numpad",
      "answer": 2,
@@ -252,8 +252,8 @@
       "kind": "tally",
       "cats": [
        {
-        "label": "Gold",
-        "colour": "gold",
+        "label": "Red",
+        "colour": "red",
         "icon": "asteroid",
         "value": 7
        }
@@ -267,8 +267,8 @@
       "kind": "table",
       "cats": [
        {
-        "label": "Gold",
-        "colour": "gold",
+        "label": "Red",
+        "colour": "red",
         "icon": "asteroid",
         "value": 7
        }

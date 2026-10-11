@@ -204,6 +204,7 @@ export class Console {
     this.api = null; this.widgetName = null;
     this.wbox.replaceChildren();
     this.wbox.classList.add('none');
+    this.el.classList.remove('dark');
   }
   async widget(name, props = {}, { readonly = false, onChange } = {}) {
     const tok = ++this.token;
@@ -219,6 +220,7 @@ export class Console {
       return null;
     }
     if (tok !== this.token) return null;
+    this.el.classList.toggle('dark', mod.meta?.surface === 'dark');
     try {
       this.api = mod.mount(host, readonly ? { ...props, readonly: true } : { ...props }, { readonly, onChange: s => onChange && onChange(s) });
       this.widgetName = name;

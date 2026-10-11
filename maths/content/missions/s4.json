@@ -70,27 +70,27 @@
     "items": [
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "triangle",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "triangle",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "triangle",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "triangle",
-      "colour": "cyan"
+      "colour": "blue"
      }
     ],
     "gap": "end",
@@ -100,11 +100,11 @@
     "filled": [
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "triangle",
-      "colour": "cyan"
+      "colour": "blue"
      }
     ]
    }
@@ -116,23 +116,23 @@
     "items": [
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "square",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "square",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      }
     ],
     "gap": "end",
@@ -141,11 +141,11 @@
     "palette": [
      {
       "shape": "circle",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "square",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "triangle",
@@ -156,12 +156,12 @@
    "script": [
     {
      "say": [
-      "Gold circle, cyan square, gold circle...",
+      "Yellow circle, blue square, yellow circle...",
       "What comes next? Tap it."
      ],
      "goal": {
       "lastShape": "square",
-      "lastColour": "cyan"
+      "lastColour": "blue"
      },
      "then": [
       "Yes! The pattern repeats every 2."
@@ -172,7 +172,7 @@
       "items": [
        {
         "shape": "star",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "heart",
@@ -184,7 +184,7 @@
        },
        {
         "shape": "star",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "heart",
@@ -196,7 +196,7 @@
        },
        {
         "shape": "star",
-        "colour": "gold"
+        "colour": "yellow"
        }
       ],
       "gap": "end",
@@ -204,7 +204,7 @@
       "palette": [
        {
         "shape": "star",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "heart",
@@ -212,7 +212,7 @@
        },
        {
         "shape": "circle",
-        "colour": "cyan"
+        "colour": "blue"
        }
       ]
      },
@@ -224,7 +224,7 @@
       "seq": [
        "heart-pink",
        "heart-pink",
-       "star-gold"
+       "star-yellow"
       ]
      },
      "then": [
@@ -239,30 +239,30 @@
       "items": [
        {
         "shape": "arrow",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 90
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 180
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 270
        },
        {
         "shape": "arrow",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 90
        }
       ],
@@ -271,21 +271,21 @@
       "palette": [
        {
         "shape": "arrow",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 90
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 180
        },
        {
         "shape": "arrow",
-        "colour": "gold",
+        "colour": "yellow",
         "rotate": 270
        }
       ]
@@ -388,11 +388,11 @@
     "palette": [
      {
       "shape": "star",
-      "colour": "gold"
+      "colour": "yellow"
      },
      {
       "shape": "circle",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "triangle",
@@ -430,30 +430,30 @@
     "items": [
      {
       "shape": "arrow",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 270
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 180
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 90
      },
      {
       "shape": "arrow",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 270
      }
     ],
@@ -463,21 +463,21 @@
     "palette": [
      {
       "shape": "arrow",
-      "colour": "cyan"
+      "colour": "blue"
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 90
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 180
      },
      {
       "shape": "arrow",
-      "colour": "cyan",
+      "colour": "blue",
       "rotate": 270
      }
     ]
@@ -490,10 +490,10 @@
      ],
      "goal": {
       "seq": [
-       "arrow-cyan-r180",
-       "arrow-cyan-r90",
-       "arrow-cyan",
-       "arrow-cyan-r270"
+       "arrow-blue-r180",
+       "arrow-blue-r90",
+       "arrow-blue",
+       "arrow-blue-r270"
       ]
      },
      "then": [
@@ -515,27 +515,27 @@
       "items": [
        {
         "shape": "circle",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "circle",
-        "colour": "cyan"
+        "colour": "blue"
        },
        {
         "shape": "circle",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "circle",
-        "colour": "cyan"
+        "colour": "blue"
        },
        {
         "shape": "circle",
-        "colour": "gold"
+        "colour": "yellow"
        },
        {
         "shape": "circle",
-        "colour": "cyan"
+        "colour": "blue"
        }
       ]
      }

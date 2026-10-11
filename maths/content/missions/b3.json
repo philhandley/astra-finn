@@ -21,7 +21,7 @@
       "type": "look",
       "lines": [
         "64 and 3 more.",
-        "Gold rods are tens. Blue cubes are ones."
+        "Green rods are tens. Blue cubes are ones."
       ],
       "question": "Which blocks will change?",
       "widget": "blocks",
@@ -162,7 +162,7 @@
             "taken": 30
           },
           "hint": [
-            "Tap 3 gold rods."
+            "Tap 3 green rods."
           ],
           "then": [
             "7 tens − 3 tens = 4 tens.",

@@ -18,7 +18,7 @@
     {
       "type": "look",
       "lines": [
-        "6 gold, 7 blue and 4 green.",
+        "6 red, 7 yellow and 4 blue.",
         "Three groups to add."
       ],
       "question": "Which two would you add first?",
@@ -84,7 +84,7 @@
           "caption": "6 + 7 + 4 = ?",
           "say": [
             "6 + 7 + 4.",
-            "Put in 6 gold counters."
+            "Put in 6 red counters."
           ],
           "goal": {
             "a": 6,
@@ -96,14 +96,14 @@
         },
         {
           "say": [
-            "Tap blue. Add 4 to make 10."
+            "Tap yellow. Add 4 to make 10."
           ],
           "goal": {
             "count": 10,
             "a": 6
           },
           "hint": [
-            "The blue brush is on the right."
+            "The yellow brush is on the right."
           ],
           "then": [
             "6 + 4 = 10."

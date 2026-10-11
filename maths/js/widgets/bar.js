@@ -1,4 +1,6 @@
-// bar: a bar model (display only). Owner: addsub. Bars are drawn to scale; an unknown shows a gold "?".
+// bar: a bar model (display only). Owner: addsub. Bars are drawn to scale; an unknown shows a blue "?".
+// Style v2: flat coloured bars with ink outlines and big ink numbers. Whole bar blue; parts red, yellow, green, orange.
+//   Compare: bar a red, bar b yellow; the gap is a dashed box (unit boxes when icons are shown) with an ink bracket.
 // Props:
 //   kind        'partwhole' (default) | 'compare'
 //   partwhole:  whole, parts (array of 2 or 3), labels (array of part labels), wholeLabel,
@@ -12,7 +14,7 @@
 // Debug: dev/harness.html?widget=bar&props={"kind":"compare","a":9,"b":5,"labelA":"Finn","labelB":"Dad","unknown":"difference","icons":"star"}
 import { S, svgRoot, injectCSS, clamp } from '../core/dom.js';
 import { artInner } from '../core/art.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 
 export const meta = {
   title: 'Bar model',
@@ -21,12 +23,13 @@ export const meta = {
 };
 
 const W = 800, H = 500;
-const GOLD = COL.tens;
-const DARK = '#0c1430';
-const SEG_COL = [COL.a, COL.b, '#6fe3a5', '#ff8fb1'];
+const Q = COL.focus, QSOFT = COL.focusSoft; // the unknown: a blue "?" on a soft blue fill
+const WHOLE_COL = PAL.blue;
+const SEG_COL = [COL.a, COL.b, PAL.green, PAL.orange, PAL.purple, PAL.teal];
+const CMP_COL = [COL.a, COL.b];
 const num = v => { const x = Number(v); return Number.isFinite(x) ? clamp(x, 0, 100000) : 0; };
 
-function text(x, y, t, size, fill, anchor = 'middle', weight = 700) {
+function text(x, y, t, size, fill, anchor = 'middle', weight = 800) {
   return S('text', { x, y, 'text-anchor': anchor, 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': weight, 'font-size': size, fill }, [String(t)]);
 }
 
@@ -62,27 +65,27 @@ export function mount(el, props = {}, ctx = {}) {
   function seg(g, x, y, w, h, v, { colour, unknown, icons, numberAt, ink }) {
     const showIcons = icons && !unknown && v > 0 && v <= 12 && Number.isInteger(v) && w / v >= 30;
     g.appendChild(S('rect', {
-      class: 'seg', x, y, width: Math.max(w, 2), height: h, rx: 10,
-      fill: unknown ? 'rgba(242,181,68,.08)' : colour, 'fill-opacity': unknown ? 1 : 0.88,
-      stroke: unknown ? GOLD : 'rgba(0,0,0,.35)', 'stroke-width': unknown ? 4 : 2, 'stroke-dasharray': unknown ? '12 9' : null,
+      class: 'seg', x, y, width: Math.max(w, 2), height: h, rx: 14,
+      fill: unknown ? QSOFT : colour,
+      stroke: unknown ? Q : COL.ink, 'stroke-width': 4, 'stroke-dasharray': unknown ? '14 10' : null, 'stroke-linecap': 'round',
     }));
-    if (unknown) { g.appendChild(text(x + w / 2, y + h / 2, '?', Math.min(64, h * 0.7), GOLD)); return; }
+    if (unknown) { g.appendChild(text(x + w / 2, y + h / 2, '?', Math.min(66, h * 0.7), Q)); return; }
     if (showIcons) {
       const cw = w / v;
       const s = Math.min(cw * 0.78, h * 0.72);
       for (let k = 0; k < v; k++) {
-        if (k > 0) g.appendChild(S('line', { x1: x + k * cw, y1: y + 6, x2: x + k * cw, y2: y + h - 6, stroke: 'rgba(0,0,0,.28)', 'stroke-width': 2 }));
+        if (k > 0) g.appendChild(S('line', { x1: x + k * cw, y1: y + 2, x2: x + k * cw, y2: y + h - 2, stroke: COL.ink, 'stroke-opacity': 0.45, 'stroke-width': 2.5 }));
         const a = S('g', { transform: `translate(${x + k * cw + (cw - s) / 2} ${y + (h - s) / 2}) scale(${s / 100})` });
         a.innerHTML = artInner(icons);
         g.appendChild(a);
       }
-      if (numberAt) g.appendChild(text(numberAt.x, numberAt.y, v, 40, COL.ink, numberAt.anchor || 'middle'));
+      if (numberAt) g.appendChild(text(numberAt.x, numberAt.y, v, 52, COL.ink, numberAt.anchor || 'middle'));
       return;
     }
     const t = String(v);
-    const size = Math.min(48, h * 0.55, (w - 8) / (t.length * 0.62));
-    if (size >= 18) g.appendChild(text(x + w / 2, y + h / 2, t, size, ink || DARK));
-    else if (numberAt) g.appendChild(text(numberAt.x, numberAt.y, t, 36, COL.ink, numberAt.anchor || 'middle'));
+    const size = Math.min(54, h * 0.56, (w - 10) / (t.length * 0.66));
+    if (size >= 20) g.appendChild(text(x + w / 2, y + h / 2, t, size, ink || COL.ink));
+    else if (numberAt) g.appendChild(text(numberAt.x, numberAt.y, t, 46, COL.ink, numberAt.anchor || 'middle'));
   }
 
   function drawPartWhole(g) {
@@ -113,16 +116,19 @@ export function mount(el, props = {}, ctx = {}) {
       const bigSum = ws.reduce((s, w, i) => s + (small[i] ? 0 : w), 0);
       ws = ws.map((w, i) => (small[i] ? minW : bigSum > 0 ? w - (extra * w) / bigSum : w));
       let x = x0;
+      const GAP = 4; // a small gap between neighbouring parts; the outer edges stay lined up with the other row
       row.forEach((o, i) => {
-        const colour = isTop && !generic ? 'rgba(243,239,230,.22)' : SEG_COL[i % SEG_COL.length];
-        seg(g, x, y, ws[i], bh, o.v, {
-          colour, unknown: o.unknown, icons: hasIcons ? p.icons : null, ink: isTop && !generic ? COL.ink : DARK,
+        const gl = i > 0 ? GAP : 0, gr = i < row.length - 1 ? GAP : 0;
+        // The whole is blue; parts take red, yellow, green, orange in turn (a lone generic top bar is a whole too).
+        const colour = isTop && (!generic || row.length === 1) ? WHOLE_COL : SEG_COL[i % SEG_COL.length];
+        seg(g, x + gl, y, ws[i] - gl - gr, bh, o.v, {
+          colour, unknown: o.unknown, icons: hasIcons ? p.icons : null,
           numberAt: { x: x + ws[i] / 2, y: isTop ? y - 30 : y + bh + 30 },
         });
         if (o.label) {
           const lines = wrap(o.label, Math.max(8, Math.floor(ws[i] / 15)));
-          const ly = isTop ? y - (hasIcons ? 70 : 30) - (lines.length - 1) * 30 : y + bh + (hasIcons ? 70 : 32);
-          lines.forEach((ln, k) => g.appendChild(text(x + ws[i] / 2, ly + k * 30, ln, 26, COL.ink2, 'middle', 600)));
+          const ly = isTop ? y - (hasIcons ? 72 : 32) - (lines.length - 1) * 32 : y + bh + (hasIcons ? 72 : 34);
+          lines.forEach((ln, k) => g.appendChild(text(x + ws[i] / 2, ly + k * 32, ln, 29, COL.ink2, 'middle', 700)));
         }
         x += ws[i];
       });
@@ -136,7 +142,7 @@ export function mount(el, props = {}, ctx = {}) {
     const unk = p.unknown;
     const hasLabels = !!(p.labelA || p.labelB);
     const hasIcons = !!p.icons && Math.max(a, b) <= 12;
-    const x0 = hasLabels ? 210 : 60;
+    const x0 = hasLabels ? 222 : 60;
     const maxW = W - x0 - (hasIcons ? 110 : 50);
     const big = Math.max(a, b, 1);
     const sc = maxW / big;
@@ -150,30 +156,37 @@ export function mount(el, props = {}, ctx = {}) {
       const w = Math.max(v * sc, v > 0 ? 40 : 0);
       if (w > 0) {
         seg(g, x0, ys[r], w, bh, v, {
-          colour: r === 0 ? COL.a : COL.b, unknown: unknownRow === r, icons: hasIcons ? p.icons : null,
+          colour: CMP_COL[r], unknown: unknownRow === r, icons: hasIcons ? p.icons : null,
           numberAt: { x: x0 + maxW + 22, y: ys[r] + bh / 2, anchor: 'start' },
         });
       } else {
-        g.appendChild(S('line', { x1: x0, y1: ys[r], x2: x0, y2: ys[r] + bh, stroke: r === 0 ? COL.a : COL.b, 'stroke-width': 5 }));
+        g.appendChild(S('line', { x1: x0, y1: ys[r], x2: x0, y2: ys[r] + bh, stroke: COL.ink, 'stroke-width': 5, 'stroke-linecap': 'round' }));
       }
       const lab = r === 0 ? p.labelA : p.labelB;
       if (lab) {
-        const lines = wrap(lab);
-        lines.forEach((ln, k) => g.appendChild(text(x0 - 18, ys[r] + bh / 2 + (k - (lines.length - 1) / 2) * 32, ln, 28, COL.ink2, 'end', 600)));
+        const lines = wrap(lab, 10);
+        lines.forEach((ln, k) => g.appendChild(text(x0 - 18, ys[r] + bh / 2 + (k - (lines.length - 1) / 2) * 36, ln, 32, COL.ink2, 'end', 700)));
       }
     });
     if (diff > 0) {
       const xs = x0 + Math.min(a, b) * sc, xe = x0 + big * sc;
       const y = ys[smallRow];
-      g.appendChild(S('rect', { x: xs, y: y + 4, width: Math.max(xe - xs, 4), height: bh - 8, rx: 8, fill: 'rgba(255,255,255,.03)', stroke: COL.ink3, 'stroke-width': 3, 'stroke-dasharray': '10 8' }));
+      if (hasIcons && Number.isInteger(a) && Number.isInteger(b)) {
+        // One empty box per unit, so "count the empty boxes" works.
+        for (let k = 0; k < diff; k++) {
+          g.appendChild(S('rect', { x: xs + k * sc + 4, y: y + 4, width: Math.max(sc - 8, 4), height: bh - 8, rx: 10, fill: COL.surface2, stroke: COL.ink3, 'stroke-width': 3, 'stroke-dasharray': '9 7' }));
+        }
+      } else {
+        g.appendChild(S('rect', { x: xs + 3, y: y + 4, width: Math.max(xe - xs - 6, 4), height: bh - 8, rx: 12, fill: COL.surface2, stroke: COL.ink3, 'stroke-width': 3, 'stroke-dasharray': '10 8' }));
+      }
       const dir = smallRow === 1 ? 1 : -1;
       const by = smallRow === 1 ? y + bh + 10 : y - 10;
       const known = unk !== 'difference';
-      g.appendChild(S('path', { d: brace(xs, xe, by, dir), fill: 'none', stroke: known ? COL.ink2 : GOLD, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
-      const ly = by + dir * 46;
+      g.appendChild(S('path', { d: brace(xs, xe, by, dir), fill: 'none', stroke: COL.ink, 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+      const ly = by + dir * 50;
       const t = known ? String(p.diffLabel ?? diff) : '?';
-      if (!known) g.appendChild(S('rect', { x: (xs + xe) / 2 - 34, y: ly - 30, width: 68, height: 60, rx: 12, fill: 'rgba(242,181,68,.10)', stroke: GOLD, 'stroke-width': 3, 'stroke-dasharray': '9 7' }));
-      g.appendChild(text((xs + xe) / 2, ly, t, 44, known ? COL.ink : GOLD));
+      if (!known) g.appendChild(S('rect', { x: (xs + xe) / 2 - 40, y: ly - 35, width: 80, height: 70, rx: 16, fill: QSOFT, stroke: Q, 'stroke-width': 4, 'stroke-dasharray': '10 8', 'stroke-linecap': 'round' }));
+      g.appendChild(text((xs + xe) / 2, ly, t, known ? 48 : 52, known ? COL.ink : Q));
     }
   }
 

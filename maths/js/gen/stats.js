@@ -9,7 +9,7 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 const THEMES = [
   {
     id: 'asteroids', title: 'Asteroids by colour', which: 'Colour', symbol: 'asteroid',
-    cats: [['Red', 'red'], ['Blue', 'blue'], ['Green', 'green'], ['Gold', 'gold'], ['Purple', 'purple']].map(([label, colour]) => ({ label, colour, icon: 'asteroid' })),
+    cats: [['Red', 'red'], ['Blue', 'blue'], ['Green', 'green'], ['Yellow', 'yellow'], ['Purple', 'purple']].map(([label, colour]) => ({ label, colour, icon: 'asteroid' })),
     howMany: c => `How many ${c.label.toLowerCase()} asteroids?`,
     more: (a, b) => `How many more ${a.label.toLowerCase()} asteroids than ${b.label.toLowerCase()} ones?`,
     most: w => `Which colour has the ${w} asteroids?`,
@@ -36,7 +36,7 @@ const THEMES = [
   },
   {
     id: 'crystals', title: 'Moon crystals found', which: 'Colour', symbol: 'crystal',
-    cats: [['Pink', 'pink'], ['Purple', 'purple'], ['Cyan', 'cyan'], ['Gold', 'gold']].map(([label, colour]) => ({ label, colour, icon: 'crystal' })),
+    cats: [['Pink', 'pink'], ['Purple', 'purple'], ['Blue', 'blue'], ['Yellow', 'yellow']].map(([label, colour]) => ({ label, colour, icon: 'crystal' })),
     howMany: c => `How many ${c.label.toLowerCase()} crystals were found?`,
     more: (a, b) => `How many more ${a.label.toLowerCase()} crystals than ${b.label.toLowerCase()} ones?`,
     most: w => `Which colour has the ${w} crystals?`,

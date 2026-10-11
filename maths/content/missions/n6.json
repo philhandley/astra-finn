@@ -33,7 +33,7 @@
       "widget": "placevalue",
       "props": { "tens": 6, "ones": 8, "showExpanded": true, "showValue": true },
       "script": [
-        { "say": ["This is 68.", "Tap a ten.", "Swap it for 10 ones."], "goal": { "tens": 5, "ones": 18 }, "then": ["{tens} tens and {ones} ones.", "68 = 50 + 18."], "hint": ["Tap a gold rod.", "Then tap the swap button."] },
+        { "say": ["This is 68.", "Tap a ten.", "Swap it for 10 ones."], "goal": { "tens": 5, "ones": 18 }, "then": ["{tens} tens and {ones} ones.", "68 = 50 + 18."], "hint": ["Tap a green rod.", "Then tap the swap button."] },
         { "say": ["Do it again!"], "goal": { "tens": 4, "ones": 28 }, "then": ["68 = 40 + 28.", "Still {value}!"] },
         { "say": ["Make 68 with just 3 tens."], "goal": { "tens": 3, "ones": 38 }, "then": ["68 = 30 + 38.", "Lots of ways to make 68!"] },
         { "set": { "tens": 4, "ones": 7 }, "say": ["Here is 47.", "Make it with 3 tens."], "goal": { "tens": 3, "value": 47 }, "then": ["47 = 30 + 17."] },
@@ -61,7 +61,7 @@
       "tiers": [2, 3],
       "format": "wyr",
       "title": "Would you rather?",
-      "prompt": "Would you rather have 6 tens or 58 ones of moon gold?",
+      "prompt": "Would you rather have 6 tens or 58 ones of moon crystals?",
       "options": [
         { "label": "6 tens", "widget": "placevalue", "props": { "tens": 6, "ones": 0, "interactive": false } },
         { "label": "58 ones", "widget": "placevalue", "props": { "tens": 0, "ones": 58, "interactive": false } }

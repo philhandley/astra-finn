@@ -6,11 +6,12 @@
 //                          guesses); update({ hold: false }) lets it swing.
 //   readonly               (always display only)
 // The beam tilts down on the heavier side and is level when the sides are equal.
-// If a side contains "?" and its value is not given, the beam stays level and the "?" box glows gold.
+// If a side contains "?" and its value is not given, the beam stays level and the "?" card pulses blue.
+// Style v2: an ink-outlined balance with white pans; numbers are white cards with an ink outline and big ink digits.
 // State: { level, held, leftValue, rightValue } (no interaction)
 // Debug: dev/harness.html?widget=balance&props={"left":"? + 4","right":"9"}
 import { S, svgRoot, injectCSS } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 
 export const meta = {
   title: 'Balance',
@@ -19,7 +20,7 @@ export const meta = {
 };
 
 const W = 800, H = 500;
-const GOLD = COL.tens;
+const Q = COL.focus, QSOFT = COL.focusSoft; // the unknown: a blue "?" on a soft blue card
 const PX = 400, PY = 178, L = 252, DROP = 150, TILT = 9;
 
 const tokens = s => String(s ?? '').replace(/([+\-−=])/g, ' $1 ').replace(/\?/g, ' ? ').split(/\s+/).filter(Boolean);
@@ -44,7 +45,7 @@ export function mount(el, props = {}, ctx = {}) {
     .w-balance .beam { transform-origin: ${PX}px ${PY}px; transition: transform .6s cubic-bezier(.3,1.4,.5,1); }
     .w-balance .pan { transition: transform .6s cubic-bezier(.3,1.4,.5,1); }
     .w-balance .qglow { animation: w-balance-q 1.6s ease-in-out infinite; }
-    @keyframes w-balance-q { 50% { stroke-width: 9; fill: #4a3d1a; } }
+    @keyframes w-balance-q { 50% { stroke-width: 8; fill: #d3e3fd; } }
     @media (prefers-reduced-motion: reduce) { .w-balance .beam, .w-balance .pan { transition: none; } .w-balance .qglow { animation: none; } }
   `);
   let p = { ...props };
@@ -77,16 +78,16 @@ export function mount(el, props = {}, ctx = {}) {
     const inner = S('g', { transform: `scale(${scale}) translate(${-total / 2} 0)` });
     for (const q of parts) {
       if (q.isOp) {
-        inner.appendChild(S('text', { x: q.x + q.w / 2, y: -42, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 50, fill: COL.ink2 }, [q.tok === '-' ? '−' : q.tok]));
+        inner.appendChild(S('text', { x: q.x + q.w / 2, y: -42, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 52, fill: COL.ink }, [q.tok === '-' ? '−' : q.tok]));
         continue;
       }
       const isQ = q.tok === '?';
       inner.appendChild(S('rect', {
-        x: q.x, y: -84, width: q.w, height: 84, rx: 14,
-        fill: isQ ? '#2a2616' : COL.panel2, stroke: isQ ? GOLD : COL.ink3, 'stroke-width': isQ ? 5 : 3,
-        'stroke-dasharray': isQ ? '12 8' : null, class: isQ && highlight ? 'qglow' : null,
+        x: q.x, y: -86, width: q.w, height: 84, rx: 14,
+        fill: isQ ? QSOFT : COL.surface, stroke: isQ ? Q : COL.ink, 'stroke-width': 4,
+        'stroke-dasharray': isQ ? '12 8' : null, 'stroke-linecap': 'round', class: isQ && highlight ? 'qglow' : null,
       }));
-      inner.appendChild(S('text', { x: q.x + q.w / 2, y: -42, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 54, fill: isQ ? GOLD : COL.ink }, [q.tok]));
+      inner.appendChild(S('text', { x: q.x + q.w / 2, y: -44, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 56, fill: isQ ? Q : COL.ink }, [q.tok]));
     }
     g.appendChild(inner);
     return g;
@@ -104,13 +105,13 @@ export function mount(el, props = {}, ctx = {}) {
     root.replaceChildren();
     const v = values();
     // Stand.
-    root.appendChild(S('path', { d: `M${PX - 110} 488 L${PX + 110} 488 L${PX + 70} 462 L${PX - 70} 462 Z`, fill: COL.panel2, stroke: COL.ink3, 'stroke-width': 3, 'stroke-linejoin': 'round' }));
-    root.appendChild(S('rect', { x: PX - 11, y: PY, width: 22, height: 284, rx: 8, fill: COL.panel2, stroke: COL.ink3, 'stroke-width': 3 }));
+    root.appendChild(S('rect', { x: PX - 13, y: PY, width: 26, height: 280, rx: 8, fill: COL.surface3, stroke: COL.ink, 'stroke-width': 4 }));
+    root.appendChild(S('path', { d: `M${PX - 112} 490 L${PX + 112} 490 L${PX + 74} 460 L${PX - 74} 460 Z`, fill: COL.surface3, stroke: COL.ink, 'stroke-width': 4, 'stroke-linejoin': 'round' }));
     if (p.hold) {
       // Two supports under the pans keep the beam level until they are taken away.
       [-1, 1].forEach(side => {
         const ex = PX + side * L;
-        root.appendChild(S('rect', { x: ex - 34, y: PY + DROP + 30, width: 68, height: 488 - (PY + DROP + 30), rx: 8, fill: '#3a3226', stroke: '#8a7350', 'stroke-width': 3 }));
+        root.appendChild(S('rect', { x: ex - 36, y: PY + DROP + 32, width: 72, height: 490 - (PY + DROP + 32), rx: 10, fill: COL.surface3, stroke: COL.ink, 'stroke-width': 4 }));
       });
     }
     // Pans hang from the beam ends and move with them.
@@ -118,8 +119,8 @@ export function mount(el, props = {}, ctx = {}) {
       const ex = PX + side * L;
       const g = S('g', { class: 'pan' });
       g.style.transform = panAt(side, initialLevel ? 0 : v.angle);
-      g.appendChild(S('path', { d: `M${ex} ${PY} L${ex - 118} ${PY + DROP} M${ex} ${PY} L${ex + 118} ${PY + DROP}`, stroke: COL.ink3, 'stroke-width': 3, fill: 'none' }));
-      g.appendChild(S('path', { d: `M${ex - 128} ${PY + DROP} L${ex + 128} ${PY + DROP} Q${ex + 114} ${PY + DROP + 34} ${ex} ${PY + DROP + 34} Q${ex - 114} ${PY + DROP + 34} ${ex - 128} ${PY + DROP} Z`, fill: 'rgba(95,212,255,.12)', stroke: COL.ink2, 'stroke-width': 4, 'stroke-linejoin': 'round' }));
+      g.appendChild(S('path', { d: `M${ex} ${PY} L${ex - 118} ${PY + DROP} M${ex} ${PY} L${ex + 118} ${PY + DROP}`, stroke: COL.ink, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }));
+      g.appendChild(S('path', { d: `M${ex - 130} ${PY + DROP} L${ex + 130} ${PY + DROP} Q${ex + 116} ${PY + DROP + 36} ${ex} ${PY + DROP + 36} Q${ex - 116} ${PY + DROP + 36} ${ex - 130} ${PY + DROP} Z`, fill: COL.surface, stroke: COL.ink, 'stroke-width': 5, 'stroke-linejoin': 'round' }));
       const t = tiles(side < 0 ? p.left : p.right, v.unknown);
       t.setAttribute('transform', `translate(${ex} ${PY + DROP - 6})`);
       g.appendChild(t);
@@ -129,11 +130,11 @@ export function mount(el, props = {}, ctx = {}) {
     // Beam on top of the strings.
     beam = S('g', { class: 'beam' });
     beam.style.transform = `rotate(${initialLevel ? 0 : v.angle}deg)`;
-    beam.appendChild(S('rect', { x: PX - L - 14, y: PY - 9, width: 2 * L + 28, height: 18, rx: 9, fill: COL.ink2 }));
-    beam.appendChild(S('circle', { cx: PX - L, cy: PY, r: 9, fill: COL.panel, stroke: COL.ink2, 'stroke-width': 3 }));
-    beam.appendChild(S('circle', { cx: PX + L, cy: PY, r: 9, fill: COL.panel, stroke: COL.ink2, 'stroke-width': 3 }));
+    beam.appendChild(S('rect', { x: PX - L - 16, y: PY - 11, width: 2 * L + 32, height: 22, rx: 11, fill: PAL.blue, stroke: COL.ink, 'stroke-width': 4 }));
+    beam.appendChild(S('circle', { cx: PX - L, cy: PY, r: 8, fill: COL.surface, stroke: COL.ink, 'stroke-width': 3.5 }));
+    beam.appendChild(S('circle', { cx: PX + L, cy: PY, r: 8, fill: COL.surface, stroke: COL.ink, 'stroke-width': 3.5 }));
     root.appendChild(beam);
-    root.appendChild(S('circle', { cx: PX, cy: PY, r: 16, fill: GOLD, stroke: COL.panel, 'stroke-width': 4 }));
+    root.appendChild(S('circle', { cx: PX, cy: PY, r: 18, fill: PAL.yellow, stroke: COL.ink, 'stroke-width': 4 }));
     if (initialLevel && v.angle !== 0) {
       // Start level, then tip, so the eye sees the scales move.
       timer = setTimeout(() => {

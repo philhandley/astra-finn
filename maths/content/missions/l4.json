@@ -22,7 +22,7 @@
       "type": "look",
       "lines": [
         "A full tens frame.",
-        "7 gold counters and 3 blue."
+        "7 red counters and 3 yellow."
       ],
       "question": "How many counters altogether?",
       "widget": "tensframe",
@@ -72,7 +72,7 @@
       "script": [
         {
           "say": [
-            "Tap the frame to add gold counters.",
+            "Tap the frame to add red counters.",
             "Put in 6."
           ],
           "goal": {
@@ -86,7 +86,7 @@
         },
         {
           "say": [
-            "Now tap the blue brush.",
+            "Now tap the yellow brush.",
             "Fill the rest of the frame."
           ],
           "goal": {
@@ -94,10 +94,10 @@
             "a": 6
           },
           "hint": [
-            "The blue brush is the blue circle on the right."
+            "The yellow brush is the yellow circle on the right."
           ],
           "then": [
-            "{a} gold and {b} blue make 10.",
+            "{a} red and {b} yellow make 10.",
             "10 is made of {a} and {b}."
           ]
         },
@@ -115,21 +115,21 @@
             ]
           },
           "say": [
-            "3 gold counters now.",
-            "Fill the frame with blue."
+            "3 red counters now.",
+            "Fill the frame with yellow."
           ],
           "goal": {
             "count": 10,
             "a": 3
           },
           "hint": [
-            "Use the blue brush.",
+            "Use the yellow brush.",
             "Tap a counter to take it off."
           ]
         },
         {
           "say": [
-            "How many blue counters did you add?"
+            "How many yellow counters did you add?"
           ],
           "input": "numpad",
           "answer": "{b}",
@@ -156,7 +156,7 @@
             "b": 1
           },
           "hint": [
-            "Tap the gold circle."
+            "Tap the circle with the red counters."
           ],
           "then": [
             "7 is made of {a} and {b}."

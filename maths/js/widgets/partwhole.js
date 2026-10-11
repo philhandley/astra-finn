@@ -2,10 +2,12 @@
 // Props:
 //   whole                 the whole (top circle). Defaults to the sum of the parts.
 //   parts                 [a, b] or [a, b, c].
-//   hide                  'whole' | 0 | 1 | 2 | null: that circle shows a gold "?" instead of its number.
+//   hide                  'whole' | 0 | 1 | 2 | null: that circle shows a blue "?" instead of its number.
 //   counters              'digits' (default) | 'dots' | 'both'. Dots are drawn only for numbers up to 20.
 //   mode                  'display' (default) | 'split'.
 //   readonly              no interaction.
+// Style v2: white circles with an ink outline (the whole on a soft grey fill), ink joining lines, big ink numbers.
+//   Counters: part 0 red, part 1 yellow, part 2 blue (as the tens frame); the whole's counters are grey.
 // Split mode: the whole's counters sit in the part circles (all in part 0 unless valid parts are given).
 //   Tap a part circle to move one counter to the other part (with three parts: to the next part).
 //   Or drag a counter to the part you want. The part numbers update as counters move.
@@ -15,7 +17,7 @@
 // Debug: dev/harness.html?widget=partwhole&props={"whole":7,"mode":"split"}
 //        dev/harness.html?widget=partwhole&props={"whole":10,"parts":[6,4],"hide":1,"counters":"both"}
 import { S, svgRoot, injectCSS, clamp, drag } from '../core/dom.js';
-import { COL, FONT } from '../core/theme.js';
+import { COL, PAL, FONT } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -25,9 +27,10 @@ export const meta = {
 };
 
 const W = 800, H = 500;
-const PART_COL = [COL.a, COL.b, '#6fe3a5'];
-const GOLD = COL.tens;
-const DARK = '#0c1430';
+const PART_COL = [COL.a, COL.b, PAL.blue];
+const PART_DARK = [COL.aDark, COL.bDark, PAL.blueDark];
+const WHOLE_DOT = '#aab1c4', WHOLE_DOT_DARK = COL.ink2;
+const Q = COL.focus, QSOFT = COL.focusSoft; // the unknown: a blue "?" on a soft blue fill
 
 function geometry(n, split) {
   if (n === 3) {
@@ -59,12 +62,12 @@ const num = v => { const x = Math.round(Number(v)); return Number.isFinite(x) ? 
 export function mount(el, props = {}, ctx = {}) {
   injectCSS('w-partwhole', `
     .w-partwhole { width: 100%; height: 100%; }
-    .w-partwhole .ctr { pointer-events: none; transition: transform .26s ease, fill .26s ease; }
+    .w-partwhole .ctr { pointer-events: none; transition: transform .26s ease, fill .26s ease, stroke .26s ease; }
     .w-partwhole .ctr.nt { transition: none; }
     .w-partwhole .hit { cursor: pointer; }
     .w-partwhole.ro .hit { cursor: default; }
     .w-partwhole .glow { animation: w-partwhole-glow 1.2s ease-in-out 2; }
-    @keyframes w-partwhole-glow { 50% { stroke-width: 12; } }
+    @keyframes w-partwhole-glow { 50% { stroke-width: 10; } }
     @media (prefers-reduced-motion: reduce) { .w-partwhole .ctr { transition: none; } .w-partwhole .glow { animation: none; } }
   `);
   let p = {};
@@ -112,15 +115,16 @@ export function mount(el, props = {}, ctx = {}) {
 
   function circle(g, c, key, i) {
     const isHidden = hidden(key);
-    const stroke = isHidden ? GOLD : key === 'whole' ? COL.ink : (split ? PART_COL[i] : COL.ink2);
+    const isRevealed = revealed === key;
+    const fill = isHidden || isRevealed ? QSOFT : key === 'whole' ? COL.surface2 : COL.surface;
     g.appendChild(S('circle', {
-      cx: c.x, cy: c.y, r: c.r, fill: isHidden ? 'rgba(242,181,68,.08)' : 'rgba(255,255,255,.05)', stroke, 'stroke-width': key === 'whole' ? 5 : 4,
-      'stroke-dasharray': isHidden ? '14 10' : null, class: revealed === key ? 'glow' : null,
+      cx: c.x, cy: c.y, r: c.r, fill, stroke: isHidden || isRevealed ? Q : COL.ink, 'stroke-width': 4,
+      'stroke-dasharray': isHidden ? '16 11' : null, 'stroke-linecap': 'round', class: isRevealed ? 'glow' : null,
     }));
   }
 
   function bigText(g, x, y, text, size, fill) {
-    g.appendChild(S('text', { x, y: y + size * 0.35, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': size, fill }, [text]));
+    g.appendChild(S('text', { x, y: y + size * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': size, fill }, [text]));
   }
 
   function badgePos(c, key, i) {
@@ -132,8 +136,8 @@ export function mount(el, props = {}, ctx = {}) {
   function badge(g, c, key, i, v) {
     const b = badgePos(c, key, i);
     const isHidden = hidden(key);
-    g.appendChild(S('circle', { cx: b.x, cy: b.y, r: 34, fill: COL.panel2, stroke: isHidden ? GOLD : key === 'whole' ? COL.ink : PART_COL[i], 'stroke-width': 4 }));
-    bigText(g, b.x, b.y, isHidden ? '?' : String(v), String(v).length > 2 ? 30 : 40, isHidden ? GOLD : COL.ink);
+    g.appendChild(S('circle', { cx: b.x, cy: b.y, r: 36, fill: isHidden ? QSOFT : COL.surface, stroke: isHidden ? Q : COL.ink, 'stroke-width': 4 }));
+    bigText(g, b.x, b.y, isHidden ? '?' : String(v), String(v).length > 2 ? 30 : 42, isHidden ? Q : COL.ink);
   }
 
   // Number or "?" (and static dots in display mode) for one circle.
@@ -141,13 +145,13 @@ export function mount(el, props = {}, ctx = {}) {
     const isHidden = hidden(key);
     const dotsHere = !isHidden && useDots(v) && !(split && key === 'whole');
     if (isHidden) {
-      bigText(g, c.x, c.y, '?', c.r * 0.95, GOLD);
+      bigText(g, c.x, c.y, '?', c.r * 0.95, Q);
       return;
     }
     if (dotsHere) {
       if (!split) {
         const { pts, dr } = dotLayout(v, c.r);
-        pts.forEach(q => g.appendChild(S('circle', { cx: c.x + q.x, cy: c.y + q.y, r: dr, fill: key === 'whole' ? COL.ink2 : PART_COL[i], stroke: 'rgba(0,0,0,.25)', 'stroke-width': 2 })));
+        pts.forEach(q => g.appendChild(S('circle', { cx: c.x + q.x, cy: c.y + q.y, r: dr, fill: key === 'whole' ? WHOLE_DOT : PART_COL[i], stroke: key === 'whole' ? WHOLE_DOT_DARK : PART_DARK[i], 'stroke-width': 3 })));
       }
       if (useDigits(v) && (p.counters === 'both' || split)) badge(g, c, key, i, v);
       return;
@@ -172,6 +176,7 @@ export function mount(el, props = {}, ctx = {}) {
       c.el.setAttribute('r', dr);
       c.el.style.transform = `translate(${pc.x + q.x}px, ${pc.y + q.y}px)`;
       c.el.style.fill = PART_COL[c.part];
+      c.el.style.stroke = PART_DARK[c.part];
     }
   }
 
@@ -226,7 +231,7 @@ export function mount(el, props = {}, ctx = {}) {
     geo.parts.forEach(c => {
       // Join the circles edge to edge (the circle fills are see-through).
       const w = geo.whole, d = Math.hypot(c.x - w.x, c.y - w.y), ux = (c.x - w.x) / d, uy = (c.y - w.y) / d;
-      gStatic.appendChild(S('line', { x1: w.x + ux * w.r, y1: w.y + uy * w.r, x2: c.x - ux * c.r, y2: c.y - uy * c.r, stroke: COL.ink3, 'stroke-width': 5, 'stroke-linecap': 'round' }));
+      gStatic.appendChild(S('line', { x1: w.x + ux * w.r, y1: w.y + uy * w.r, x2: c.x - ux * c.r, y2: c.y - uy * c.r, stroke: COL.ink, 'stroke-width': 4, 'stroke-linecap': 'round' }));
     });
     circle(gStatic, geo.whole, 'whole', -1);
     geo.parts.forEach((c, i) => circle(gStatic, c, i, i));
@@ -234,7 +239,7 @@ export function mount(el, props = {}, ctx = {}) {
     if (split) {
       parts.forEach((v, part) => { for (let k = 0; k < v; k++) ctrs.push({ part, el: null }); });
       ctrs.forEach(c => {
-        c.el = S('circle', { class: 'ctr nt', cx: 0, cy: 0, r: 10, stroke: 'rgba(0,0,0,.28)', 'stroke-width': 2.5 });
+        c.el = S('circle', { class: 'ctr nt', cx: 0, cy: 0, r: 10, 'stroke-width': 3.5 });
         gCtr.appendChild(c.el);
       });
       if (!ro()) {

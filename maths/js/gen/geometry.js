@@ -384,7 +384,7 @@ export const facesEdgesVertices = {
   },
 };
 
-// Which 2-D shape is on the gold face?
+// Which 2-D shape is on the yellow face?
 const FLAT = ['circle', 'square', 'triangle', 'rectangle'];
 const flatOpt = s => ({ value: s, label: cap(s), widget: 'shapes2d', props: { shape: s, readonly: true } });
 const solidOpt = s => ({ value: s, label: cap(NAME3D[s]), widget: 'shapes3d', props: { shape: s, svg: true, readonly: true } });
@@ -421,16 +421,16 @@ export const faceShape = {
     const options = R.shuffle([answer, ...R.sample(FLAT.filter(x => x !== answer && !(answer === 'rectangle' && x === 'square') && !(answer === 'square' && x === 'rectangle')), nOpts - 1)]).map(flatOpt);
     const [rs, rh, ra] = L1[0];
     return {
-      lines: ['Look at the gold face.', 'Which 2-D shape is it?'],
+      lines: ['Look at the yellow face.', 'Which 2-D shape is it?'],
       widget: 'shapes3d',
       props: { shape, highlight, interactive: true },
       input: 'choice',
       options,
       answer,
-      hint: ['Trace round the gold face with your finger.', 'Count its sides. Are any curved?'],
-      explain: [`The gold face is ${an(answer)} ${answer}.`, `You can find ${answer}s on ${an(SOLID_LONG[shape])} ${SOLID_LONG[shape]}.`],
+      hint: ['Trace round the yellow face with your finger.', 'Count its sides. Are any curved?'],
+      explain: [`The yellow face is ${an(answer)} ${answer}.`, `You can find ${answer}s on ${an(SOLID_LONG[shape])} ${SOLID_LONG[shape]}.`],
       reteach: level <= 1 ? undefined : {
-        lines: ['Look at the gold face.', 'Which 2-D shape is it?'],
+        lines: ['Look at the yellow face.', 'Which 2-D shape is it?'],
         widget: 'shapes3d', props: { shape: rs, highlight: rh, interactive: true },
         input: 'choice', options: [flatOpt('circle'), flatOpt('square')], answer: ra,
         hint: ['Is it round or does it have corners?'],
@@ -582,7 +582,7 @@ export const composeShapes = {
       return {
         lines: ['Push these 2 pieces together.', 'What shape do they make?'],
         widget: 'shapes2d',
-        props: grow(pr.pieces, 1.4, 'cyan'),
+        props: grow(pr.pieces, 1.4, 'blue'),
         input: 'choice',
         options: R.shuffle([whole, ...R.sample(pool, 2)]).map(shapeOpt),
         answer: whole,
@@ -598,7 +598,7 @@ export const composeShapes = {
         widget: 'shapes2d',
         props: grow(PAIRS[whole].target, 1.5, 'purple'),
         input: 'choice',
-        options: labels.map(k => ({ value: k, label: PIECE_LABEL[k], widget: 'shapes2d', props: grow(PAIRS[k].pieces, 1.6, 'cyan') })),
+        options: labels.map(k => ({ value: k, label: PIECE_LABEL[k], widget: 'shapes2d', props: grow(PAIRS[k].pieces, 1.6, 'blue') })),
         answer: whole,
         hint: ['Imagine cutting the shape into 2 pieces.', 'Which pieces fit with no gaps?'],
         explain: [`${cap(PIECE_LABEL[whole])} fit together to make it.`],
@@ -611,7 +611,7 @@ export const composeShapes = {
     return {
       lines: ['This shape is made of small triangles.', 'How many triangles make it?'],
       widget: 'shapes2d',
-      props: { shapes: centred(polys, 400, 250, R.pick(['green', 'gold', 'cyan'])), unit: name === 'square' ? 120 : 140, readonly: true },
+      props: { shapes: centred(polys, 400, 250, R.pick(['green', 'yellow', 'blue'])), unit: name === 'square' ? 120 : 140, readonly: true },
       input: 'numpad',
       answer: n,
       hint: ['Count each triangle once.', 'Start at the top and go round.'],
@@ -629,7 +629,8 @@ export const composeShapes = {
 };
 
 // ---------- repeating patterns ----------
-const COLOUR_SET = ['gold', 'cyan', 'pink', 'green', 'purple'];
+// Palette words only (style v2). Orange is left out: it is too close to yellow to tell apart in a pattern.
+const COLOUR_SET = ['yellow', 'blue', 'pink', 'green', 'purple'];
 const PSHAPES = ['circle', 'square', 'triangle', 'star', 'heart', 'hexagon'];
 const ARROW_DIR = { 0: 'up', 90: 'right', 180: 'down', 270: 'left' };
 const say = it => (it.shape === 'arrow' ? `arrow pointing ${ARROW_DIR[((it.rotate || 0) % 360 + 360) % 360] || 'up'}` : `${it.colour ? it.colour + ' ' : ''}${it.shape || it.art}`);

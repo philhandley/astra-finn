@@ -22,10 +22,10 @@
     { "type": "ask", "text": "Have you written numbers in words at school?" },
     {
       "type": "guess",
-      "prompt": "Gold or cyan: which has more?",
-      "options": ["Gold", "Cyan", "The same"],
+      "prompt": "Red or yellow: which has more?",
+      "options": ["Red", "Yellow", "The same"],
       "answer": 1,
-      "reveal": ["Cyan has 11. Gold has 9.", "11 is more than 9.", "9 is fewer than 11."],
+      "reveal": ["Yellow has 11. Red has 9.", "11 is more than 9.", "9 is fewer than 11."],
       "widget": "objects",
       "props": { "n": 20, "icon": "dot", "arrange": "groups", "groups": [9, 11], "colours": [9, 11] }
     },

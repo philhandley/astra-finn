@@ -45,7 +45,7 @@
       "widget": "hundred",
       "props": { "mode": "tap" },
       "script": [
-        { "say": ["Count in 10s from 7.", "Tap 7 and the next 4 numbers."], "goal": { "taps": [7, 17, 27, 37, 47] }, "then": ["7, 17, 27, 37, 47.", "Only the tens digit changes!"], "hint": ["10 more is one row down.", "Tap a gold square again to undo it."] },
+        { "say": ["Count in 10s from 7.", "Tap 7 and the next 4 numbers."], "goal": { "taps": [7, 17, 27, 37, 47] }, "then": ["7, 17, 27, 37, 47.", "Only the tens digit changes!"], "hint": ["10 more is one row down.", "Tap a blue square again to undo it."] },
         { "set": { "highlight": [] }, "say": ["Now count back in 10s from 93.", "Tap 93 and the next 4."], "goal": { "taps": [93, 83, 73, 63, 53] }, "then": ["93, 83, 73, 63, 53.", "Back in 10s: one row up each time."], "hint": ["10 less is one row up."] }
       ]
     },

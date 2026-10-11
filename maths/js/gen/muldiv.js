@@ -4,6 +4,7 @@
 // Common params: tables (array of 2, 5, 10), icon (art name).
 // Debug: dev/gen.html?gen=muldiv&all=1   or   dev/gen.html?gen=muldiv.times5&level=3&n=20
 import { factKey } from '../core/facts.js';
+const rowsOf = n => (n === 1 ? '1 row' : `${n} rows`);
 
 // ---------- helpers ----------
 const TABLES = [2, 5, 10];
@@ -49,6 +50,14 @@ const pickNot = (R, a, b, avoid) => { let v; let k = 0; do { v = R.int(a, b); k+
 
 const objGroups = (g, s, icon = 'dot') => ({ widget: 'objects', props: { n: g * s, arrange: 'groups', groups: Array(g).fill(s), icon } });
 const blasterPic = (rows, size, extra = {}) => ({ widget: 'blaster', props: { size, rows, readonly: true, bar: false, highlightRows: true, ...extra } });
+// The groups widget holds at most 50 things. Bigger totals get a still picture instead, so the hint never shows wrong numbers.
+const GROUPS_MAX = 50;
+const shareHint = (b, e) => (b * e <= GROUPS_MAX
+  ? { widget: 'groups', props: { total: b * e, mode: 'share', bowls: b, icon: 'dot', interactive: true } }
+  : objGroups(b, e, 'dot'));
+const groupHint = (k, gs) => (k * gs <= GROUPS_MAX
+  ? { widget: 'groups', props: { total: k * gs, mode: 'group', groupSize: gs, icon: 'dot', interactive: true } }
+  : blasterPic(k, gs));
 const skip = (s, g) => Array.from({ length: g }, (_, i) => (i + 1) * s).join(', ');
 const repeated = (s, g) => Array(g).fill(s).join(' + ');
 
@@ -124,11 +133,11 @@ export const arrays = {
       const r = pickNot(R, 2, s === 10 ? 2 : 4, s);
       const t = r * s;
       return {
-        lines: [`${r} rows of ${s}.`, 'How many dots?'],
+        lines: [`${rowsOf(r)} of ${s}.`, 'How many dots?'],
         ...blasterPic(r, s),
         input: 'choice', answer: t, options: opts(R, t, [r + s, t + s, t - s]),
         hint: [`Count in ${s}s, one row at a time.`],
-        explain: [`${skip(s, r)}.`, `${r} rows of ${s} is ${t}.`],
+        explain: [`${skip(s, r)}.`, `${rowsOf(r)} of ${s} is ${t}.`],
         reteach: { lines: [`2 rows of ${s}.`, 'How many dots?'], ...blasterPic(2, s), input: 'choice', answer: 2 * s, options: opts(R, 2 * s, [s, 2 * s + 1, s + 2]), hint: [`Count every dot.`], explain: [`${s} and ${s} make ${2 * s}.`] },
       };
     }
@@ -156,7 +165,7 @@ export const arrays = {
       input: 'choice', answer: right,
       options: R.shuffle([right, `${r} + ${s} = ${r + s}`, `${r} × ${s} = ${t + s}`]),
       hint: ['Count the rows. Count the dots in one row.'],
-      explain: [`${r} rows of ${s}.`, `${right}.`],
+      explain: [`${rowsOf(r)} of ${s}.`, `${right}.`],
       fact: factKey('x', r, s),
       reteach: arrays.make(2, R, params),
     };
@@ -215,7 +224,7 @@ function tableGen(t) {
         const g = pickNot(R, 1, 5, t);
         const p = g * t;
         return {
-          lines: [`${g} rows of ${t}.`, 'How many dots?'],
+          lines: [`${rowsOf(g)} of ${t}.`, 'How many dots?'],
           caption: `${g} × ${t} = ?`,
           ...blasterPic(g, t),
           input: 'choice', answer: p, options: opts(R, p, [p + t, p - t, g + t]),
@@ -317,7 +326,7 @@ export const commutative = {
           ...blasterPic(r, s, { flipButton: true }),
           input: 'choice', answer: 'Yes', options: ['Yes', 'No'],
           hint: ['Turn the array round in your head.', 'Are there more dots?'],
-          explain: [`${r} rows of ${s} is ${s} rows of ${r}.`, `Both make ${r * s}.`],
+          explain: [`${rowsOf(r)} of ${s} is ${rowsOf(s)} of ${r}.`, `Both make ${r * s}.`],
         };
       }
       const big = r * s;
@@ -333,16 +342,16 @@ export const commutative = {
       const rr = Math.min(r, 5), ss = Math.min(s, 5) === rr ? (rr === 5 ? 4 : rr + 1) : Math.min(s, 5);
       const pic = (rows, per) => ({ widget: 'objects', props: { n: rows * per, arrange: 'rows', perRow: per, icon: 'dot', readonly: true } });
       return {
-        lines: [`${rr} rows of ${ss}.`, 'Which array has the same number of dots?'],
+        lines: [`${rowsOf(rr)} of ${ss}.`, 'Which array has the same number of dots?'],
         ...pic(rr, ss),
         input: 'choice', answer: 'flip',
         options: R.shuffle([
-          { label: `${ss} rows of ${rr}`, value: 'flip', ...pic(ss, rr) },
-          { label: `${ss} rows of ${rr + 1}`, value: 'more', ...pic(ss, rr + 1) },
-          { label: `${rr} rows of ${ss - 1}`, value: 'less', ...pic(rr, ss - 1) },
+          { label: `${rowsOf(ss)} of ${rr}`, value: 'flip', ...pic(ss, rr) },
+          { label: `${rowsOf(ss)} of ${rr + 1}`, value: 'more', ...pic(ss, rr + 1) },
+          { label: `${rowsOf(rr)} of ${ss - 1}`, value: 'less', ...pic(rr, ss - 1) },
         ]),
         hint: ['Turn the array a quarter turn in your head.'],
-        explain: [`${rr} rows of ${ss} is ${ss} rows of ${rr}.`, `${rr} × ${ss} = ${ss} × ${rr} = ${rr * ss}.`],
+        explain: [`${rowsOf(rr)} of ${ss} is ${rowsOf(ss)} of ${rr}.`, `${rr} × ${ss} = ${ss} × ${rr} = ${rr * ss}.`],
         reteach: commutative.make(1, R, params),
       };
     }
@@ -453,7 +462,7 @@ export const sharing = {
       caption: `${total} ÷ ${b} = ?`,
       input: 'numpad', answer: e,
       hint: [`Think: ? × ${b} = ${total}.`],
-      hintWidget: { widget: 'groups', props: { total, mode: 'share', bowls: b, icon: 'dot', interactive: true } },
+      hintWidget: shareHint(b, e),
       explain: [`${e} × ${b} = ${total}.`, `So ${total} ÷ ${b} = ${e}.`],
       fact: factKey('÷', total, b),
       reteach: sharing.make(2, R, { bowls: [2, 5] }),
@@ -598,7 +607,7 @@ export const mulDivProblem = {
         lines: [`${b} ${who} share ${total} ${c.item} equally.`, 'How many does each one get?'],
         input: 'numpad', answer: e,
         hint: [`Think: ${b} × ? = ${total}.`],
-        hintWidget: { widget: 'groups', props: { total, mode: 'share', bowls: b, icon: 'dot', interactive: true } },
+        hintWidget: shareHint(b, e),
         explain: [`${total} ÷ ${b} = ${e}.`, `Each one gets ${e}.`],
         fact: factKey('÷', total, b),
         reteach: sharing.make(1, R),
@@ -612,7 +621,7 @@ export const mulDivProblem = {
       lines: [`There are ${total} ${c.item}.`, `${gs} fit ${c.where}. How many ${c.g}?`],
       input: 'numpad', answer: k,
       hint: [`Count in ${gs}s until you reach ${total}.`],
-      hintWidget: { widget: 'groups', props: { total, mode: 'group', groupSize: gs, icon: 'dot', interactive: true } },
+      hintWidget: groupHint(k, gs),
       explain: [`? × ${gs} = ${total}.`, `${k} × ${gs} = ${total}, so ${k} ${c.g}.`],
       fact: factKey('÷', total, gs),
       reteach: grouping.make(1, R),
