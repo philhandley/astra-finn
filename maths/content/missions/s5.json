@@ -21,9 +21,19 @@
    "type": "look",
    "lines": [
     "Our Moon rover needs to reach the flag.",
-    "Watch out for rocks."
+    "Its red nose shows which way it faces."
    ],
    "question": "Which way is the rover facing?",
+   "options": [
+    "↑ Up",
+    "→ Right",
+    "↓ Down"
+   ],
+   "answer": 0,
+   "reveal": [
+    "Up! Its red nose points up.",
+    "Forward takes it along the blue arrow."
+   ],
    "widget": "rover",
    "props": {
     "cols": 6,
@@ -43,6 +53,9 @@
       "y": 2
      }
     ]
+   },
+   "revealProps": {
+    "ahead": true
    }
   },
   {
@@ -53,11 +66,11 @@
    "type": "guess",
    "prompt": "The rover faces up. It makes a half turn. Which way does it face?",
    "options": [
-    "Up",
-    "Down",
-    "Right"
+    "↑ Up",
+    "→ Right",
+    "↓ Down"
    ],
-   "answer": 1,
+   "answer": 2,
    "reveal": [
     "Down!",
     "A half turn is 2 quarter turns."
@@ -112,6 +125,9 @@
      "then": [
       "A quarter turn is a right angle.",
       "Now it faces right."
+     ],
+     "hint": [
+      "Press the blue clockwise button once."
      ]
     },
     {
@@ -123,6 +139,9 @@
      },
      "then": [
       "Back to facing up."
+     ],
+     "hint": [
+      "Press the pink anticlockwise button once."
      ]
     },
     {
@@ -134,6 +153,10 @@
      },
      "then": [
       "2 right angles make a half turn."
+     ],
+     "hint": [
+      "A half turn is 2 quarter turns.",
+      "Press clockwise 2 times."
      ]
     },
     {
@@ -152,6 +175,10 @@
      },
      "then": [
       "3 right angles! It faces left."
+     ],
+     "hint": [
+      "A three-quarter turn is 3 quarter turns.",
+      "Press clockwise 3 times."
      ]
     },
     {
@@ -172,6 +199,10 @@
      "then": [
       "A quarter turn anticlockwise.",
       "Same way, fewer turns!"
+     ],
+     "hint": [
+      "Which way is left from up?",
+      "Try the pink anticlockwise button."
      ]
     }
    ]
@@ -209,6 +240,10 @@
      },
      "then": [
       "{moves} moves in a straight line."
+     ],
+     "hint": [
+      "Press Forward until you reach the flag.",
+      "Count the squares as you go."
      ]
     },
     {
@@ -233,6 +268,10 @@
      "then": [
       "Brilliant driving!",
       "You made {moves} moves."
+     ],
+     "hint": [
+      "Drive up until you are level with the flag.",
+      "Then turn clockwise and drive forward."
      ]
     },
     {
@@ -265,6 +304,10 @@
      },
      "then": [
       "Safe at the flag!"
+     ],
+     "hint": [
+      "Turn to face up first.",
+      "Then go round the rocks, one square at a time."
      ]
     }
    ]
@@ -406,5 +449,12 @@
     "How many right angles make a whole turn?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "geometry.turns",
+  "level": 1,
+  "items": 3,
+  "mission": "l9",
+  "say": "First, a quick warm-up: quarter and half turns."
+ }
 }

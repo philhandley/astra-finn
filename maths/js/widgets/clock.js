@@ -2,7 +2,11 @@
 // Props: h (1-12), m (0-59), interactive (default true), snap (minutes the minute hand snaps to: 60, 30, 15, 5 or 1; default 5),
 //        digital (digital readout beside the face), minuteLabels (5, 10 ... 55 round the outside),
 //        pastTo (shade the "past" and "to" halves), dragHour (default true: the hour hand can be dragged too),
-//        hands ('both' | 'hour' | 'minute'; default 'both'), readonly.
+//        hands ('both' | 'hour' | 'minute'; default 'both'), readonly,
+//        sweep (shade how far the long hand has gone: blue from 12 for "past" times, orange back to 12 for "to" times;
+//        'past' always shades blue from 12, for minutes past the hour as in 7:40),
+//        ring (hour numbers to circle in blue, e.g. [6] "the long hand goes here"), ringHour (numbers to circle in red).
+// Hints use sweep, ring, ringHour, minuteLabels and pastTo through update(); they never move the hands.
 // Drag anywhere on the face: near the short hand moves the hour hand, anywhere else moves the minute hand.
 // The hands are geared like a real clock: turning the minute hand past 12 moves the hour on (or back).
 // State: { h, m, minutes, words }  minutes = (h % 12) * 60 + m; words is the UK phrase ("quarter past 3", "25 to 7").
@@ -21,6 +25,7 @@ const W = 800, H = 500;
 // Style v2 (white surface): a classroom clock. Short hour hand red, long minute hand blue, ink outlines.
 const INK = COL.ink, HOUR = PAL.red, MIN = PAL.blue;
 const PAST_SOFT = '#e3eeff', TO_SOFT = '#fff0d9', TO_INK = '#e8730c';
+const SWEEP_PAST = '#b9d3ff', SWEEP_TO = '#ffd09a';
 
 // UK words for a time.
 export function clockWords(h, m) {
@@ -83,7 +88,7 @@ export function mount(el, props = {}, ctx = {}) {
     return { x: cx + r * Math.sin(a), y: cy - r * Math.cos(a) };
   };
 
-  let handsG = null, readout = null;
+  let handsG = null, readout = null, sweepG = null;
 
   function draw() {
     root.replaceChildren();
@@ -102,14 +107,25 @@ export function mount(el, props = {}, ctx = {}) {
       face.appendChild(S('text', { x: cx + R * 0.37, y: cy + R * 0.5, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fsW, fill: PAL.blue }, ['past']));
       face.appendChild(S('text', { x: cx - R * 0.37, y: cy + R * 0.5, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fsW, fill: TO_INK }, ['to']));
     }
+    // The sweep of the long hand sits under the marks and numbers (filled in drawHands).
+    sweepG = S('g', { 'pointer-events': 'none' });
+    face.appendChild(sweepG);
     // Minute marks: every minute a fine tick, every 5 minutes a bold one.
     for (let i = 0; i < 60; i++) {
       const five = i % 5 === 0;
       const a = pol(cx, cy, R * (five ? 0.85 : 0.915), i * 6), b = pol(cx, cy, R * 0.975, i * 6);
       face.appendChild(S('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: five ? INK : COL.ink2, 'stroke-width': five ? 6 : 2.5, 'stroke-linecap': 'round' }));
     }
-    // Hour numbers.
+    // Hour numbers (with optional hint rings: blue for where the long hand goes, red for the hour).
     const fs = Math.round(R * 0.21);
+    const ringSet = (v, col, soft) => (Array.isArray(v) ? v : v === undefined || v === null ? [] : [v]).forEach(n => {
+      n = Math.round(Number(n));
+      if (!(n >= 1 && n <= 12)) return;
+      const q = pol(cx, cy, R * 0.68, n * 30);
+      face.appendChild(S('circle', { cx: q.x, cy: q.y, r: fs * 0.78, fill: soft, stroke: col, 'stroke-width': 5 }));
+    });
+    ringSet(p.ringHour, HOUR, '#fde2e2');
+    ringSet(p.ring, MIN, '#dbe8ff');
     for (let n = 1; n <= 12; n++) {
       const q = pol(cx, cy, R * 0.68, n * 30);
       face.appendChild(S('text', { x: q.x, y: q.y + fs * 0.36, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': fs, fill: INK }, [String(n)]));
@@ -157,8 +173,21 @@ export function mount(el, props = {}, ctx = {}) {
       handsG.appendChild(g);
     };
     const live = !ro();
-    if (which !== 'minute') hand(hourDeg, R * 0.54, 26, HOUR, live && p.dragHour !== false);
+    // The sweep: how far the long hand has gone past 12 (blue), or how far it still has to go to 12 (orange).
+    if (sweepG) {
+      sweepG.replaceChildren();
+      const mm = tt % 60;
+      if (p.sweep && which !== 'hour' && mm > 0.01) {
+        const toTime = p.sweep !== 'past' && Math.round(mm) > 30;
+        const r = R * 0.97, a0 = toTime ? minDeg : 0, a1 = toTime ? 360 : minDeg;
+        const s0 = pol(cx, cy, r, a0), s1 = pol(cx, cy, r, a1);
+        const big = a1 - a0 > 180 ? 1 : 0;
+        sweepG.appendChild(S('path', { d: `M${cx} ${cy}L${s0.x.toFixed(1)} ${s0.y.toFixed(1)}A${r} ${r} 0 ${big} 1 ${s1.x.toFixed(1)} ${s1.y.toFixed(1)}Z`, fill: toTime ? SWEEP_TO : SWEEP_PAST }));
+      }
+    }
+    // The long hand first, then the short hand on top, so both show even when they overlap (12 o'clock).
     if (which !== 'hour') hand(minDeg, R * 0.88, 14, MIN, live);
+    if (which !== 'minute') hand(hourDeg, R * 0.54, 26, HOUR, live && p.dragHour !== false);
     handsG.appendChild(S('circle', { cx, cy, r: 15, fill: INK }));
     handsG.appendChild(S('circle', { cx, cy, r: 5, fill: COL.surface }));
     if (readout) {
@@ -242,7 +271,7 @@ export function mount(el, props = {}, ctx = {}) {
   }
 
   // Visual only: sweep the hands from one dial position to another. The logical time (total) is already set.
-  let fallback = 0;
+  let fallback = 0, answerTimer = 0;
   function animateFrom(from, to, ms) {
     cancelAnimationFrame(anim); clearTimeout(fallback);
     if (reducedMotion() || ms <= 0 || Math.abs(to - from) < 0.01) { drawHands(to); return; }
@@ -263,24 +292,31 @@ export function mount(el, props = {}, ctx = {}) {
       const { h, m } = hm(dragging ? snapped(total) : Math.round(total));
       return { h, m, minutes: (h % 12) * 60 + m, words: clockWords(h, m) };
     },
-    update(np) { cancelAnimationFrame(anim); clearTimeout(fallback); setFromProps(np || {}); draw(); },
+    update(np) { cancelAnimationFrame(anim); clearTimeout(fallback); clearTimeout(answerTimer); setFromProps(np || {}); draw(); },
     showAnswer(answer) {
       let t = null;
-      if (answer && typeof answer === 'object' && ('h' in answer || 'm' in answer)) t = totalFrom(answer.h ?? 12, answer.m ?? 0);
+      // A goal may give only the minutes ({ m: 30 }): keep the hour the clock is on now.
+      const now = hm(Math.round(total));
+      if (answer && typeof answer === 'object' && ('h' in answer || 'm' in answer)) t = totalFrom(answer.h ?? now.h, answer.m ?? now.m);
       else if (typeof answer === 'string' && /^\d{1,2}:\d{2}$/.test(answer.trim())) { const [a, b] = answer.trim().split(':'); t = totalFrom(+a, +b); }
-      else if (typeof answer === 'number') t = norm720(answer);
+      // A plain number (minutes in an hour, a duration) is not a time on this clock: leave the hands alone.
       if (t === null) return;
       // Turn forwards (clockwise) like a real clock, at most one turn of the dial.
       const cur = norm720(total);
       let target = t;
       while (target < cur) target += 720;
       total = norm720(t);
-      animateFrom(cur, target, 900);
+      const ms = reducedMotion() ? 0 : 900;
+      animateFrom(cur, target, ms);
+      // Tell the runner the clock now shows the answer (so a hands-on step can move on after "Show me").
+      clearTimeout(answerTimer);
+      if (target !== cur) answerTimer = setTimeout(() => { ctx.onChange && ctx.onChange(api.getState()); }, ms + 120);
     },
-    destroy() { cancelAnimationFrame(anim); clearTimeout(fallback); if (unbindDrag) unbindDrag(); el.replaceChildren(); },
+    destroy() { cancelAnimationFrame(anim); clearTimeout(fallback); clearTimeout(answerTimer); if (unbindDrag) unbindDrag(); el.replaceChildren(); },
   };
   total = NaN;
   setFromProps(props);
   draw();
+  el.__dev = { api, ctx }; // test hook: dev pages can set a state and fire onChange
   return api;
 }

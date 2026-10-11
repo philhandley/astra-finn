@@ -16,6 +16,16 @@
     "ml for a cup or a spoon, litres for a bucket or a bath.",
     "Check what each small mark is worth before reading a thermometer: 1s, 2s, 5s or 10s."
   ],
+  "warmup": {
+    "gen": "measure.compareY1",
+    "level": 2,
+    "items": 3,
+    "params": {
+      "kind": "capacity"
+    },
+    "mission": "l11",
+    "say": "First, a quick warm-up: full, half full and empty."
+  },
   "steps": [
     {
       "type": "look",
@@ -23,7 +33,7 @@
         "This is a measuring jug.",
         "It measures liquid in millilitres. We write ml."
       ],
-      "question": "Where is the top of the water?",
+      "question": "How much water is in the jug?",
       "widget": "measure",
       "props": {
         "tool": "jug",
@@ -32,6 +42,19 @@
         "labels": 100,
         "marks": 100,
         "value": 300
+      },
+      "options": [
+        "200 ml",
+        "300 ml",
+        "400 ml"
+      ],
+      "answer": 1,
+      "reveal": [
+        "Look at the top of the water.",
+        "It is level with 300, so 300 ml."
+      ],
+      "revealProps": {
+        "readout": true
       }
     },
     {
@@ -84,13 +107,24 @@
             "value": 200
           },
           "hint": [
-            "Drag the orange handle up."
+            "Drag the orange handle up.",
+            "Stop when the water is level with 200."
           ],
           "then": [
             "200 ml. ml means millilitres."
+          ],
+          "hintProps": {
+            "target": 200
+          },
+          "explain": [
+            "Fill it so the water is level with 200.",
+            "That is 200 ml."
           ]
         },
         {
+          "set": {
+            "target": null
+          },
           "say": [
             "Fill it to 400 ml."
           ],
@@ -99,12 +133,24 @@
           },
           "then": [
             "400 ml. That is 200 ml more."
+          ],
+          "hint": [
+            "Drag the orange handle up.",
+            "Stop at the line marked 400."
+          ],
+          "hintProps": {
+            "target": 400
+          },
+          "explain": [
+            "The water goes up to 400.",
+            "400 ml is 200 ml more than before."
           ]
         },
         {
           "set": {
             "marks": 50,
-            "value": 0
+            "value": 0,
+            "target": null
           },
           "say": [
             "Now there are small marks too.",
@@ -114,10 +160,18 @@
             "value": 250
           },
           "hint": [
-            "250 is between 200 and 300."
+            "250 is between 200 and 300.",
+            "Find 200, in the blue ring. 250 is the small mark after it."
           ],
           "then": [
             "250 is halfway from 200 to 300."
+          ],
+          "hintProps": {
+            "target": 200
+          },
+          "explain": [
+            "200, then the small mark: 250.",
+            "250 is half way from 200 to 300."
           ]
         },
         {
@@ -127,10 +181,11 @@
             "labels": 1,
             "marks": 1,
             "value": 0,
-            "liquid": "fuel"
+            "liquid": "fuel",
+            "target": null
           },
           "say": [
-            "Big tanks use litres. We write l.",
+            "Big amounts use litres. We write l.",
             "Fill it to 3 l."
           ],
           "goal": {
@@ -138,6 +193,17 @@
           },
           "then": [
             "3 litres of rocket fuel!"
+          ],
+          "hint": [
+            "Find 3 on the side of the jug.",
+            "Drag the water up to it."
+          ],
+          "hintProps": {
+            "target": 3
+          },
+          "explain": [
+            "The water goes up to 3.",
+            "That is 3 litres."
           ]
         }
       ]
@@ -148,7 +214,7 @@
         "A thermometer shows how hot or cold it is.",
         "We measure in degrees Celsius."
       ],
-      "question": "Is 22 °C warm or cold?",
+      "question": "How does 22 °C feel?",
       "widget": "measure",
       "props": {
         "tool": "thermometer",
@@ -156,7 +222,20 @@
         "max": 40,
         "labels": 10,
         "marks": 2,
-        "value": 22,
+        "value": 22
+      },
+      "options": [
+        "Cold",
+        "Warm",
+        "Very hot"
+      ],
+      "answer": 1,
+      "reveal": [
+        "22 °C is warm, like a sunny day.",
+        "Near 0 °C it is cold enough for ice."
+      ],
+      "revealProps": {
+        "readout": true,
         "object": "sun"
       }
     },
@@ -182,16 +261,25 @@
             "value": 24
           },
           "hint": [
-            "Find 20. Then count on in 2s."
+            "Find 20, in the blue ring.",
+            "Then count on in 2s: 22, 24."
           ],
           "then": [
             "24 °C. 20, 22, 24."
+          ],
+          "hintProps": {
+            "target": 20
+          },
+          "explain": [
+            "20, then 2 small marks: 22, 24.",
+            "That is 24 °C."
           ]
         },
         {
           "set": {
             "object": "moon",
-            "value": 20
+            "value": 20,
+            "target": null
           },
           "say": [
             "Night time. It is colder.",
@@ -202,9 +290,23 @@
           },
           "then": [
             "6 °C is cold. Time for a coat!"
+          ],
+          "hint": [
+            "Drag the red line down to 0, in the blue ring.",
+            "Then count up in 2s: 2, 4, 6."
+          ],
+          "hintProps": {
+            "target": 0
+          },
+          "explain": [
+            "0, then 3 small marks: 2, 4, 6.",
+            "That is 6 °C."
           ]
         },
         {
+          "set": {
+            "target": null
+          },
           "say": [
             "Which is warmer, 24 °C or 6 °C?"
           ],
@@ -217,6 +319,10 @@
           "then": [
             "24 °C > 6 °C.",
             "Nights on the real Moon are colder than any freezer!"
+          ],
+          "hint": [
+            "Warmer means the red line goes higher.",
+            "Which number is bigger?"
           ]
         }
       ]
@@ -246,7 +352,7 @@
     {
       "type": "error",
       "intro": [
-        "{engineer} read this jug.",
+        "{engineer} read a jug.",
         "Can you spot the slip?"
       ],
       "lines": [

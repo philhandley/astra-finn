@@ -16,15 +16,50 @@
     "Only add or take away amounts in the same unit: pence with pence, pounds with pounds.",
     "Play shop at home with real coins and a few toys with price labels."
   ],
+  "warmup": {
+    "gen": "money.countCoins",
+    "level": 1,
+    "items": 3,
+    "mission": "m4",
+    "say": "First, a quick warm-up: count the coins."
+  },
   "steps": [
     {
       "type": "look",
-      "art": "astronaut",
       "lines": [
         "Welcome to the Space Shop!",
-        "Everything an astronaut needs."
+        "We have a 50p coin to spend."
       ],
-      "question": "What would you buy for a trip to the Moon?"
+      "question": "Which one can we buy?",
+      "widget": "coins",
+      "props": {
+        "purse": [
+          "50p"
+        ]
+      },
+      "options": [
+        {
+          "label": "Fuel 35p",
+          "art": "fuel"
+        },
+        {
+          "label": "Boots 80p",
+          "art": "boot"
+        },
+        {
+          "label": "Robot £2",
+          "art": "robot"
+        }
+      ],
+      "answer": 0,
+      "reveal": [
+        "The fuel! 35p is less than 50p.",
+        "The boots and the robot cost more."
+      ],
+      "revealProps": {
+        "price": 35,
+        "showTotal": true
+      }
     },
     {
       "type": "ask",
@@ -65,7 +100,8 @@
         ],
         "purse": [],
         "showTotal": true,
-        "price": 35
+        "price": 35,
+        "topUp": true
       },
       "script": [
         {
@@ -81,11 +117,23 @@
           ],
           "then": [
             "35p. That pays for the fuel."
+          ],
+          "hintProps": {
+            "point": [
+              "20p",
+              "10p",
+              "5p"
+            ]
+          },
+          "explain": [
+            "20p, 30p, 35p.",
+            "20p + 10p + 5p = 35p."
           ]
         },
         {
           "set": {
-            "price": 20
+            "price": 20,
+            "point": []
           },
           "say": [
             "A star map costs 20p.",
@@ -97,9 +145,25 @@
           "then": [
             "35p + 20p = 55p.",
             "Both cost 55p."
+          ],
+          "hint": [
+            "Tap a 20p coin once.",
+            "Or two 10p coins. Watch the total."
+          ],
+          "hintProps": {
+            "point": [
+              "20p"
+            ]
+          },
+          "explain": [
+            "Watch: one 20p coin goes in the purse."
           ]
         },
         {
+          "set": {
+            "purse": [],
+            "point": []
+          },
           "say": [
             "How much would 2 star maps cost?"
           ],
@@ -108,6 +172,10 @@
           "unit": "p",
           "then": [
             "20p + 20p = 40p."
+          ],
+          "hint": [
+            "Tap the 20p coin 2 times.",
+            "Look at the total."
           ]
         },
         {
@@ -135,12 +203,23 @@
           "then": [
             "Your change is 20p.",
             "30p + 20p = 50p."
+          ],
+          "hintProps": {
+            "point": [
+              "20p",
+              "10p"
+            ]
+          },
+          "explain": [
+            "30p, 40p, 50p: that is 20p.",
+            "Put in a 20p coin, or two 10p coins."
           ]
         },
         {
           "set": {
             "purse": [],
-            "price": 65
+            "price": 65,
+            "point": []
           },
           "say": [
             "A torch costs 65p. You pay with £1.",
@@ -214,11 +293,21 @@
           ],
           "then": [
             "{items}. Exactly £1!"
+          ],
+          "hintProps": {
+            "point": [
+              "50p"
+            ]
+          },
+          "explain": [
+            "50p + 20p + 20p + 10p = £1.",
+            "That is 4 coins."
           ]
         },
         {
           "set": {
-            "purse": []
+            "purse": [],
+            "point": []
           },
           "say": [
             "Now pay £1 with 5 coins."
@@ -229,19 +318,43 @@
           },
           "then": [
             "{items}. Another way!"
+          ],
+          "hint": [
+            "Try 5 coins that are all the same.",
+            "Which coin, 5 times, makes £1?"
+          ],
+          "hintProps": {
+            "point": [
+              "20p"
+            ]
+          },
+          "explain": [
+            "20p, 40p, 60p, 80p, £1.",
+            "Five 20p coins make £1."
           ]
         },
         {
           "set": {
-            "purse": []
+            "purse": [],
+            "point": []
           },
           "say": [
             "Can 3 of these coins make exactly £1?",
-            "Try it. Then tap Got it."
+            "Try it. Then tap Yes or No."
           ],
+          "input": "choice",
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "answer": "No",
           "then": [
             "No! 50p + 20p + 20p is only 90p.",
             "And 50p + 50p is already £1 with 2 coins."
+          ],
+          "hint": [
+            "Try it with the coins. Watch the total.",
+            "Can you find 3 coins that make exactly £1?"
           ]
         }
       ]
@@ -258,7 +371,7 @@
           "detail": "50p + 30p + 20p"
         },
         {
-          "label": "Water, badge, rope",
+          "label": "Fuel, badge, rope",
           "art": "fuel",
           "detail": "60p + 25p + 15p"
         },

@@ -16,6 +16,13 @@
     "Compare times with real things: a song is a few minutes, a film is a couple of hours.",
     "Swapping the hands is a very common slip. The short hand always gives the hour."
   ],
+  "warmup": {
+    "gen": "time.readClock",
+    "level": 2,
+    "items": 3,
+    "mission": "m6",
+    "say": "First, a quick warm-up: read the clock."
+  },
   "steps": [
     {
       "type": "look",
@@ -23,12 +30,27 @@
         "Time flies!",
         "The long hand goes round once every hour."
       ],
-      "question": "What takes about 1 hour in your day?",
+      "question": "Which takes about 1 hour?",
       "widget": "clock",
       "props": {
         "h": 12,
         "m": 0,
         "minuteLabels": true
+      },
+      "options": [
+        "Brushing teeth",
+        "Baking a cake",
+        "A night's sleep"
+      ],
+      "answer": 1,
+      "reveal": [
+        "A cake takes about 1 hour: 12 to 1 o'clock.",
+        "Teeth take 2 minutes. Sleep takes all night!"
+      ],
+      "revealProps": {
+        "h": 1,
+        "m": 0,
+        "digital": true
       }
     },
     {
@@ -77,9 +99,19 @@
           "then": [
             "That took 1 hour.",
             "The long hand went round in 60 minutes."
+          ],
+          "hintProps": {
+            "sweep": true
+          },
+          "explain": [
+            "The long hand goes all the way round, back to 12.",
+            "Now it is 10 o'clock: 1 hour later."
           ]
         },
         {
+          "set": {
+            "sweep": null
+          },
           "say": [
             "Now go half way round."
           ],
@@ -89,9 +121,27 @@
           },
           "then": [
             "Half an hour is 30 minutes."
+          ],
+          "hint": [
+            "Drag the long blue hand from 12 round to 6.",
+            "Half way round is half past."
+          ],
+          "hintProps": {
+            "ring": [
+              6
+            ],
+            "sweep": true
+          },
+          "explain": [
+            "Half way round, the long hand is on 6.",
+            "That is 30 minutes: half past 10."
           ]
         },
         {
+          "set": {
+            "ring": [],
+            "sweep": null
+          },
           "say": [
             "How many minutes in 1 hour?"
           ],
@@ -100,6 +150,10 @@
           "unit": "minutes",
           "then": [
             "60 minutes in 1 hour."
+          ],
+          "hint": [
+            "The long hand goes round once in 1 hour.",
+            "Count the blue numbers in 5s, all the way to 12."
           ]
         },
         {
@@ -115,6 +169,10 @@
           "answer": "2",
           "then": [
             "Twice! 12 hours, then 12 more."
+          ],
+          "hint": [
+            "The short hand goes round once in 12 hours.",
+            "A day has day time and night time."
           ]
         },
         {
@@ -127,6 +185,10 @@
           "then": [
             "12 + 12 = 24.",
             "24 hours in 1 day."
+          ],
+          "hint": [
+            "12 hours of day time, 12 hours of night.",
+            "What is 12 + 12?"
           ]
         }
       ]
@@ -176,9 +238,27 @@
           },
           "then": [
             "Quarter to 4."
+          ],
+          "hint": [
+            "Quarter to: the long blue hand goes on 9.",
+            "The short red hand is nearly at 4."
+          ],
+          "hintProps": {
+            "ring": [
+              9
+            ],
+            "sweep": "past"
+          },
+          "explain": [
+            "Quarter to 4 is 45 minutes after 3 o'clock.",
+            "The long hand goes on 9."
           ]
         },
         {
+          "set": {
+            "ring": [],
+            "sweep": null
+          },
           "say": [
             "How many minutes did the launch take?"
           ],
@@ -207,9 +287,24 @@
           },
           "then": [
             "That took 15 minutes."
+          ],
+          "hint": [
+            "Half past: the long blue hand goes on 6."
+          ],
+          "hintProps": {
+            "ring": [
+              6
+            ]
+          },
+          "explain": [
+            "Half past: the long hand on 6.",
+            "From 3 to 6 is 15 minutes."
           ]
         },
         {
+          "set": {
+            "ring": []
+          },
           "say": [
             "Which took longer?"
           ],
@@ -221,6 +316,10 @@
           "answer": "the launch",
           "then": [
             "45 minutes is longer than 15 minutes."
+          ],
+          "hint": [
+            "The launch took 45 minutes. The moon walk took 15.",
+            "Which is more?"
           ]
         }
       ]
@@ -228,7 +327,7 @@
     {
       "type": "error",
       "intro": [
-        "{engineer} read this clock.",
+        "{engineer} read a clock.",
         "Can you spot the slip?"
       ],
       "lines": [

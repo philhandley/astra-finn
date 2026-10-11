@@ -15,8 +15,20 @@
 //              left out for one thing); icons ([a, b]: object names for length, art or object names for height and mass);
 //              cubes: true shows cubes (non-standard units); max (capacity of the containers, default 10).
 //              mass with cubes and interactive: tap - / + to change the cubes on the right pan (b).
+//              mass also takes tags (["8 kg", "3 kg"]: a label under each pan) and sign (">", "<" or "=": shown
+//              big above the balance, for a reveal).
+// readout:     true (ruler, scales, jug, thermometer) shows the reading for a reveal: a green label with the value
+//              and unit; the ruler gets a green bracket from start to end, the dial a green ring at the needle,
+//              the jug and thermometer a green line at the level. showAnswer() turns it on.
+// Hint props (ruler, scales, jug, thermometer):
+//              target: a value on the scale to point at (a blue arrow and a blue ring round its number), e.g. the
+//              labelled number to start counting from; hops: a value to count on from, drawn as purple hops (dots on
+//              the dial) from there up to the reading, one per small mark (ruler: one per centimetre).
+// compare capacity also takes shapes (['tall'] or ['wide'] per container: a tall thin or short wide glass),
+//              liquid ('water', 'juice', ...), halfLine (a dashed "half" line) and guides (dashed lines at each level).
 // Style v2 (white surface): yellow school ruler, white dials with ink rims, red needle, clear jug with blue water,
 //              white thermometer with red liquid, orange drag handles, white press buttons.
+// showAnswer(value or goal) moves to the answer, shows the readout, then fires onChange (for hands-on steps).
 // State: { tool, value } (compare also gives a and b; value is b, or a when there is only one thing).
 // Debug: dev/harness.html?widget=measure&props={"tool":"scales","value":350,"max":1000,"labels":100,"marks":50}
 import { S, svgRoot, onTap, drag, injectCSS, clamp, reducedMotion } from '../core/dom.js';
@@ -35,10 +47,15 @@ const INK = COL.ink;
 const RULER = '#fde68a', RULER2 = '#fff6cc';          // classic yellow school ruler (metre stick alternates)
 const HANDLE = PAL.orange;                             // every drag handle is orange ("the orange handle")
 const NEEDLE = PAL.red;
+const TARGET = PAL.blue, TARGET_SOFT = '#dbe8ff';      // hint: "start here" / "find this number"
+const HOP = PAL.purple;                                // hint: count-on hops
 const METAL = '#d9dde4', METAL2 = '#b6bdc9';
 const GLASS = '#f5f9ff';
 const TOOLS = ['ruler', 'scales', 'jug', 'thermometer', 'compare'];
 const OBJECTS = ['pencil', 'rocket', 'crayon', 'key', 'worm', 'spoon', 'rover', 'bar'];
+// Top and bottom of the drawn part of some art icons (in their 100 by 100 box), so things of the same height
+// look the same height and all stand on the ground line.
+const ART_Y = { rocket: [6, 97], astronaut: [13, 96], alien: [3, 86], robot: [5, 94] };
 // Liquids: a flat fill and a darker surface line.
 const LIQUID = {
   water: ['#93c5fd', PAL.blue],
@@ -200,6 +217,19 @@ export function drawObject(name, L, h = 70) {
   return outlined(g);
 }
 
+// A green "answer" label (reveal readouts, tags): a rounded pill with big ink text, centred on x unless anchored.
+function pill(x, y, text, { anchor = 'middle', fs = 40, fill = COL.goodSoft, stroke = COL.good } = {}) {
+  const t = String(text);
+  const w = Math.round(fs * 0.85 + [...t].reduce((a, ch) => a + (ch === ' ' ? 0.3 : /[°.]/.test(ch) ? 0.4 : 0.64), 0) * fs);
+  const h = Math.round(fs * 1.6);
+  const x0 = anchor === 'start' ? x : anchor === 'end' ? x - w : x - w / 2;
+  const g = S('g', { 'pointer-events': 'none' });
+  g.appendChild(S('rect', { x: x0, y: y - h / 2 + 5, width: w, height: h, rx: h * 0.3, fill: stroke }));
+  g.appendChild(S('rect', { x: x0, y: y - h / 2, width: w, height: h, rx: h * 0.3, fill, stroke, 'stroke-width': 5 }));
+  g.appendChild(label({ x: x0 + w / 2, y: y + fs * 0.36, 'text-anchor': 'middle', 'font-size': fs }, t));
+  return g;
+}
+
 function artG(name, x, y, size) {
   const g = S('g', { transform: `translate(${x} ${y}) scale(${size / 100})` });
   g.innerHTML = artInner(name);
@@ -233,7 +263,7 @@ export function mount(el, props = {}, ctx = {}) {
   let value = 0;
   let unbindDrag = null;
   const unbinds = [];
-  let anim = 0, fallback = 0;
+  let anim = 0, fallback = 0, answerShown = false;
   const root = svgRoot(W, H, 'w-measure');
   el.appendChild(root);
   let bg, dyn, fg;
@@ -291,6 +321,22 @@ export function mount(el, props = {}, ctx = {}) {
       dyn.appendChild(S('line', { x1: xe, y1: 136, x2: xe, y2: RY - 2, stroke: HANDLE, 'stroke-width': 4 }));
       dyn.appendChild(handle(xe, 104, 'h', 32));
     } else dyn.appendChild(S('line', { x1: xe, y1: yc + oh / 2 + 6, x2: xe, y2: RY - 2, ...guide }));
+    // Hint: hops of 1 cm from a mark to the end, and a blue arrow at a target mark.
+    const hf = num(p.hops, null);
+    if (hf !== null) {
+      const e = round3(s + value);
+      for (let k = hf; k < e - 1e-6; k += 1) {
+        const x0 = rx(k), x1 = rx(Math.min(k + 1, e));
+        dyn.appendChild(S('path', { d: `M${x0 + 2} ${RY - 4}Q${(x0 + x1) / 2} ${RY - 34} ${x1 - 2} ${RY - 4}`, fill: 'none', stroke: HOP, 'stroke-width': 4, 'stroke-linecap': 'round', 'pointer-events': 'none' }));
+      }
+    }
+    const tg = num(p.target, null);
+    if (tg !== null && tg >= c.min && tg <= c.max) {
+      const x = rx(tg);
+      dyn.appendChild(S('line', { x1: x, y1: RY - 26, x2: x, y2: RY + 36, stroke: TARGET, 'stroke-width': 5, 'pointer-events': 'none' }));
+      dyn.appendChild(S('path', { d: `M${x - 15} ${RY - 44}H${x + 15}L${x} ${RY - 20}Z`, fill: TARGET, stroke: INK, 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'pointer-events': 'none' }));
+      if (isLabel(tg, c)) dyn.appendChild(S('circle', { cx: x, cy: RY + 62, r: 26, fill: 'none', stroke: TARGET, 'stroke-width': 5, 'pointer-events': 'none' }));
+    }
   }
   const rulerHit = q => q.y > 60 && q.y < RY + RH + 10 && q.x > R0 - 50 && q.x < R1 + 50;
   const rulerVal = q => c.min + ((q.x - R0) * (c.max - c.min)) / (R1 - R0) - start();
@@ -324,11 +370,26 @@ export function mount(el, props = {}, ctx = {}) {
     if (!ro()) plusMinus(105, 314, 695, 314, () => setValue(snapV(value - c.step)), () => setValue(snapV(value + c.step)));
   }
   function scalesDyn() {
+    const tg = num(p.target, null);
+    if (tg !== null && tg >= c.min && tg <= c.max) {
+      const lab = isLabel(tg, c), t = fmtNum(tg), q = pol(SC.r * (lab ? (t.length >= 4 ? 0.6 : 0.64) : 0.92), sAng(tg));
+      dyn.appendChild(S('circle', { cx: q.x, cy: q.y, r: lab ? Math.max(30, t.length * 11 + 8) : 16, fill: TARGET_SOFT, stroke: TARGET, 'stroke-width': 5, 'pointer-events': 'none' }));
+    }
     const a = sAng(value), tip = pol(SC.r * 0.9, a), tail = pol(-SC.r * 0.16, a);
     dyn.appendChild(S('line', { x1: tail.x, y1: tail.y, x2: tip.x, y2: tip.y, stroke: INK, 'stroke-width': 13, 'stroke-linecap': 'round' }));
     dyn.appendChild(S('line', { x1: tail.x, y1: tail.y, x2: tip.x, y2: tip.y, stroke: NEEDLE, 'stroke-width': 6, 'stroke-linecap': 'round' }));
     dyn.appendChild(S('circle', { cx: SC.x, cy: SC.y, r: 15, fill: INK }));
     dyn.appendChild(S('circle', { cx: SC.x, cy: SC.y, r: 5, fill: COL.surface }));
+    // Hint: purple count-on dots, one per small mark, from a labelled number up to the needle (on top of it).
+    const hf = num(p.hops, null);
+    if (hf !== null && value > hf) {
+      const r = SC.r * 0.75, a0 = sAng(hf), a1 = sAng(value), q0 = pol(r, a0), q1 = pol(r, a1);
+      dyn.appendChild(S('path', { d: `M${q0.x} ${q0.y}A${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${q1.x} ${q1.y}`, fill: 'none', stroke: HOP, 'stroke-width': 4, 'pointer-events': 'none' }));
+      for (let v = hf + c.marks; v <= value + 1e-6; v += c.marks) {
+        const q = pol(r, sAng(round3(v)));
+        dyn.appendChild(S('circle', { cx: q.x, cy: q.y, r: 9, fill: HOP, stroke: COL.surface, 'stroke-width': 2.5, 'pointer-events': 'none' }));
+      }
+    }
   }
   const scalesHit = q => Math.hypot(q.x - SC.x, q.y - SC.y) < SC.r + 36;
   function scalesVal(q) {
@@ -366,7 +427,25 @@ export function mount(el, props = {}, ctx = {}) {
       g.appendChild(S('rect', { x: J.l, y: y - 2, width: J.r - J.l, height: 5, fill: lq[1] }));
     }
     dyn.appendChild(g);
+    sideHints(jy, J.r - 72, J.r + 22, -1);
     if (!ro()) dyn.appendChild(handle(J.l + 50, y, 'v', 28));
+  }
+  // Hints beside an upright scale (jug, thermometer): purple hops from a mark up to the level, and a blue
+  // ring round a target number (or a blue arrow at an unlabelled mark). hx: where the hops sit; lx: label x.
+  function sideHints(yOf, hx, lx, dir) {
+    const hf = num(p.hops, null);
+    if (hf !== null && value > hf) {
+      for (let v = hf; v < value - 1e-6; v += c.marks) {
+        const y0 = yOf(round3(v)), y1 = yOf(round3(Math.min(v + c.marks, value)));
+        dyn.appendChild(S('path', { d: `M${hx} ${y0 - 2}Q${hx + dir * 26} ${(y0 + y1) / 2} ${hx} ${y1 + 2}`, fill: 'none', stroke: HOP, 'stroke-width': 4, 'stroke-linecap': 'round', 'pointer-events': 'none' }));
+      }
+    }
+    const tg = num(p.target, null);
+    if (tg !== null && tg >= c.min && tg <= c.max) {
+      const y = yOf(tg), t = fmtNum(tg);
+      if (isLabel(tg, c)) dyn.appendChild(S('rect', { x: lx - 10, y: y - 23, width: t.length * 19 + 22, height: 44, rx: 22, fill: TARGET_SOFT, stroke: TARGET, 'stroke-width': 5, 'pointer-events': 'none' }));
+      else dyn.appendChild(S('path', { d: `M${lx - 4} ${y}l26 -15v30z`, fill: TARGET, stroke: INK, 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'pointer-events': 'none' }));
+    }
   }
   const jugHit = q => q.x > J.l - 90 && q.x < J.r + 120 && q.y > 20 && q.y < H;
   const jugVal = q => c.min + ((J.y0 - q.y) * (c.max - c.min)) / (J.y0 - J.y1);
@@ -392,6 +471,7 @@ export function mount(el, props = {}, ctx = {}) {
     const y = ty(value);
     dyn.appendChild(S('rect', { x: T.x - 11, y, width: 22, height: T.bulb - y, fill: NEEDLE }));
     dyn.appendChild(S('circle', { cx: T.x, cy: T.bulb, r: 29, fill: NEEDLE }));
+    sideHints(ty, T.x - 34, T.x + 80, -1);
     if (!ro()) {
       dyn.appendChild(S('line', { x1: T.x - 40, y1: y, x2: T.x - 12, y2: y, stroke: HANDLE, 'stroke-width': 5 }));
       dyn.appendChild(handle(T.x - 66, y, 'v', 28));
@@ -426,20 +506,27 @@ export function mount(el, props = {}, ctx = {}) {
       });
     } else if (kind === 'height') {
       const things = hasB ? [a, b] : [a];
-      const u = Math.min(380 / Math.max(...things, 1), p.cubes ? 60 : 200);
+      // Two art icons side by side must not overlap, so the tallest is at most 300 high when there are two.
+      const u = Math.min((hasB ? 300 : 380) / Math.max(...things, 1), p.cubes ? 60 : 200);
       const xs = hasB ? [250, 560] : [400];
       const ground = 462;
       bg.appendChild(S('line', { x1: 40, y1: ground + 2, x2: 760, y2: ground + 2, stroke: INK, 'stroke-width': 5, 'stroke-linecap': 'round' }));
       things.forEach((ht, i) => {
         const hgt = ht * u, nm = icons[i] || 'rocket';
+        let cubeX = xs[i] + 80;
         if (OBJECTS.includes(nm)) {
           const og = drawObject(nm, hgt, Math.min(90, Math.max(50, hgt * 0.3)));
           og.setAttribute('transform', `translate(${xs[i]} ${ground}) rotate(-90)`);
           bg.appendChild(og);
         } else {
-          bg.appendChild(artG(artNames.includes(nm) ? nm : 'rocket', xs[i] - hgt / 2, ground - hgt, hgt));
+          // Scale the icon so its drawn part (not its empty margin) is exactly hgt tall and stands on the ground.
+          const name = artNames.includes(nm) ? nm : 'rocket';
+          const [t0, b0] = ART_Y[name] || [4, 96];
+          const size = (hgt * 100) / (b0 - t0);
+          bg.appendChild(artG(name, xs[i] - size / 2, ground - (b0 * size) / 100, size));
+          cubeX = xs[i] + size * 0.32 + 6;
         }
-        if (p.cubes) for (let k = 0; k < Math.round(ht); k++) bg.appendChild(cube(xs[i] + 80, ground - (k + 1) * u, u, cols[i]));
+        if (p.cubes) for (let k = 0; k < Math.round(ht); k++) bg.appendChild(cube(cubeX, ground - (k + 1) * u, u, cols[i]));
       });
     } else if (kind === 'mass') {
       const bb = hasB ? b : 0;
@@ -470,18 +557,37 @@ export function mount(el, props = {}, ctx = {}) {
           }
         }
       });
+      // Optional labels under the pans and a big comparison sign above the balance (for reveals).
+      const tags = Array.isArray(p.tags) ? p.tags : [];
+      ends.forEach((e, i) => { if (tags[i] !== undefined && tags[i] !== null && tags[i] !== '') bg.appendChild(pill(e.x, e.y + 150 + 58, tags[i], { fs: 34, fill: COL.surface, stroke: INK })); });
+      if (typeof p.sign === 'string' && p.sign.trim()) {
+        bg.appendChild(S('rect', { x: 345, y: 22, width: 110, height: 100, rx: 18, fill: COL.good }));
+        bg.appendChild(S('rect', { x: 345, y: 16, width: 110, height: 100, rx: 18, fill: COL.goodSoft, stroke: COL.good, 'stroke-width': 5 }));
+        bg.appendChild(label({ x: 400, y: 96, 'text-anchor': 'middle', 'font-size': 84 }, p.sign.trim().slice(0, 2)));
+      }
       if (!ro() && p.cubes && hasB) plusMinus(560, 452, 700, 452, () => setValue(Math.max(0, value - 1)), () => setValue(Math.min(30, value + 1)), 38);
     } else {
       const max = Math.max(num(p.max, 10), a, hasB ? b : 0, 1);
       const things = hasB ? [a, b] : [a];
       const xs = hasB ? [250, 550] : [400];
-      const top = 110, bot = 410, w = 190;
+      const shapes = Array.isArray(p.shapes) ? p.shapes : [];
+      const lq = LIQUID[p.liquid] || LIQUID.water;
+      const bot = 410;
+      const levels = [];
       things.forEach((lv, i) => {
+        // A tank, or a tall thin glass, or a short wide glass.
+        const { w, top } = shapes[i] === 'tall' ? { w: 130, top: 40 } : shapes[i] === 'wide' ? { w: 330, top: 250 } : { w: 190, top: 110 };
         const x = xs[i] - w / 2, y = bot - ((bot - top) * lv) / max;
+        levels.push(y);
         bg.appendChild(S('path', { d: `M${x} ${top - 14}V${bot - 18}q0 18 18 18H${x + w - 18}q18 0 18 -18V${top - 14}Z`, fill: GLASS }));
         if (lv > 0) {
-          bg.appendChild(S('path', { d: `M${x + 3} ${y}H${x + w - 3}V${bot - 18}q0 15 -15 15H${x + 18}q-15 0 -15 -15Z`, fill: LIQUID.water[0] }));
-          bg.appendChild(S('rect', { x: x + 3, y: y - 2, width: w - 6, height: 5, fill: LIQUID.water[1] }));
+          bg.appendChild(S('path', { d: `M${x + 3} ${y}H${x + w - 3}V${bot - 18}q0 15 -15 15H${x + 18}q-15 0 -15 -15Z`, fill: lq[0] }));
+          bg.appendChild(S('rect', { x: x + 3, y: y - 2, width: w - 6, height: 5, fill: lq[1] }));
+        }
+        if (p.halfLine) {
+          const yh = bot - (bot - top) / 2;
+          bg.appendChild(S('line', { x1: x - 16, y1: yh, x2: x + w + 16, y2: yh, stroke: TARGET, 'stroke-width': 4, 'stroke-dasharray': '12 8' }));
+          bg.appendChild(label({ x: x + w + 24, y: yh + 10, 'font-size': 28, fill: TARGET }, 'half'));
         }
         bg.appendChild(S('path', { d: `M${x} ${top - 14}V${bot - 18}q0 18 18 18H${x + w - 18}q18 0 18 -18V${top - 14}`, fill: 'none', stroke: INK, 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
         if (hasB) {
@@ -489,6 +595,8 @@ export function mount(el, props = {}, ctx = {}) {
           bg.appendChild(label({ x: xs[i], y: 468, 'text-anchor': 'middle', 'font-size': 28 }, i ? 'B' : 'A'));
         }
       });
+      // Hint: dashed lines across at each water level, so the two heights are easy to compare.
+      if (p.guides && hasB) levels.forEach(y => bg.appendChild(S('line', { x1: 60, y1: y, x2: 740, y2: y, stroke: TARGET, 'stroke-width': 3, 'stroke-dasharray': '10 8', 'pointer-events': 'none' })));
     }
   }
 
@@ -538,8 +646,36 @@ export function mount(el, props = {}, ctx = {}) {
   }
   function drawDyn(v) {
     dyn.replaceChildren();
-    if (v === undefined) TOOL[c.tool].dy();
+    if (v === undefined) { TOOL[c.tool].dy(); readoutDyn(); }
     else { const keep = value; value = v; TOOL[c.tool].dy(); value = keep; }
+  }
+
+  // Reveal readout (props.readout): show the reading in green so the picture gives the answer.
+  function readoutDyn() {
+    if (!p.readout || c.tool === 'compare') return;
+    const GOOD = COL.good, txt = `${fmtNum(value)} ${c.unit}`;
+    const ring = (x, y, w, h) => dyn.appendChild(S('rect', { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: h / 2, fill: 'none', stroke: GOOD, 'stroke-width': 5, 'pointer-events': 'none' }));
+    if (c.tool === 'ruler') {
+      const xs = rx(start()), xe = rx(start() + value), by = 146;
+      dyn.appendChild(S('path', { d: `M${xs} ${by + 22}V${by}H${xe}V${by + 22}`, fill: 'none', stroke: GOOD, 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+      for (const x of [xs, xe]) dyn.appendChild(S('line', { x1: x, y1: 266, x2: x, y2: RY - 2, stroke: GOOD, 'stroke-width': 6, 'stroke-linecap': 'round' }));
+      dyn.appendChild(pill(clamp((xs + xe) / 2, 110, W - 110), 92, txt));
+    } else if (c.tool === 'scales') {
+      const t = fmtNum(value), q = pol(SC.r * (t.length >= 4 ? 0.6 : 0.64), sAng(value));
+      ring(q.x, q.y, Math.max(64, t.length * 19 + 26), 50);
+      dyn.appendChild(pill(700, 190, txt, { fs: 38 }));
+    } else if (c.tool === 'jug') {
+      const y = jy(value);
+      dyn.appendChild(S('line', { x1: J.l + 6, y1: y, x2: J.r - 6, y2: y, stroke: GOOD, 'stroke-width': 6, 'stroke-linecap': 'round' }));
+      if (isLabel(value, c)) ring(J.r + 22 + fmtNum(value).length * 9.5, y, fmtNum(value).length * 19 + 30, 48);
+      dyn.appendChild(pill(616, clamp(y, 44, H - 44), txt, { anchor: 'start', fs: 38 }));
+    } else if (c.tool === 'thermometer') {
+      const y = ty(value);
+      fg.querySelector('.w-measure-read')?.remove();
+      fg.appendChild(S('line', { class: 'w-measure-read', x1: T.x + 16, y1: y, x2: isLabel(value, c) ? T.x + 72 : 584, y2: y, stroke: GOOD, 'stroke-width': 6, 'stroke-linecap': 'round', 'pointer-events': 'none' }));
+      if (isLabel(value, c)) ring(T.x + 80 + fmtNum(value).length * 9.5, y, fmtNum(value).length * 19 + 30, 48);
+      dyn.appendChild(pill(592, clamp(y, 44, H - 44), txt, { anchor: 'start', fs: 38 }));
+    }
   }
 
   function bindDrag() {
@@ -573,15 +709,28 @@ export function mount(el, props = {}, ctx = {}) {
       }
       return { tool: c.tool, value };
     },
-    update(np) { cancelAnimationFrame(anim); clearTimeout(fallback); setFromProps(np || {}); draw(); },
+    update(np) {
+      cancelAnimationFrame(anim); clearTimeout(fallback);
+      // A green answer label from showAnswer() goes away when the picture moves on (a new sub-step or item).
+      if (answerShown && !(np && 'readout' in np)) { p.readout = false; answerShown = false; }
+      setFromProps(np || {}); draw();
+    },
     showAnswer(answer) {
-      const t = typeof answer === 'number' ? answer : answer && typeof answer === 'object' ? num(answer.value, num(answer.b, null)) : num(answer, null);
+      // compare: only a goal object ({ b }) changes the picture; a counted number (cubes) leaves it as it is.
+      if (c.tool === 'compare') {
+        const t = answer && typeof answer === 'object' ? num(answer.b, num(answer.value, null)) : null;
+        if (t !== null && p.b !== undefined && p.b !== null && t !== value) { value = t; draw(); emit(); }
+        return;
+      }
+      const t = typeof answer === 'number' ? answer : answer && typeof answer === 'object' ? num(answer.value, null) : num(answer, null);
       if (t === null) return;
-      if (c.tool === 'compare') { value = t; draw(); return; }
       const target = snapV(t), from = value;
       value = target;
+      if (!p.readout) { p.readout = true; answerShown = true; }
       cancelAnimationFrame(anim); clearTimeout(fallback);
-      if (reducedMotion()) { drawDyn(); return; }
+      const moved = Math.abs(target - from) > 1e-9;
+      // After the answer is shown, tell the runner (so a hands-on step can move on after "Show me").
+      if (reducedMotion() || !moved) { drawDyn(); if (moved) emit(); return; }
       const t0 = performance.now(), ms = 700;
       const stepF = now => {
         const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
@@ -589,7 +738,7 @@ export function mount(el, props = {}, ctx = {}) {
         if (k < 1) anim = requestAnimationFrame(stepF);
       };
       anim = requestAnimationFrame(stepF);
-      fallback = setTimeout(() => { cancelAnimationFrame(anim); drawDyn(); }, ms + 80);
+      fallback = setTimeout(() => { cancelAnimationFrame(anim); drawDyn(); emit(); }, ms + 80);
     },
     destroy() { cancelAnimationFrame(anim); clearTimeout(fallback); unbinds.splice(0).forEach(u => u()); if (unbindDrag) unbindDrag(); el.replaceChildren(); },
   };
@@ -597,5 +746,6 @@ export function mount(el, props = {}, ctx = {}) {
   setFromProps(props);
   draw();
   bindDrag();
+  el.__dev = { api, ctx }; // test hook: dev pages can set a state and fire onChange
   return api;
 }

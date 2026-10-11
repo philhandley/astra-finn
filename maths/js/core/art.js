@@ -42,8 +42,9 @@ const ICONS = {
   ufo: `<ellipse cx="50" cy="44" rx="18" ry="17" fill="#bae6fd" ${O}/>
     <ellipse cx="50" cy="58" rx="44" ry="14" fill="${PURPLE}" ${O}/>
     <circle cx="26" cy="59" r="4" fill="${YEL}"/><circle cx="50" cy="63" r="4" fill="${YEL}"/><circle cx="74" cy="59" r="4" fill="${YEL}"/>`,
-  boot: `<path d="M28 10h30v48l26 10c8 3 10 10 10 20v4H18V18c0-5 4-8 10-8z" fill="${W}" ${O}/>
-    <path d="M18 84h76v10H18z" fill="#9aa1b1" ${O}/><path d="M28 28h30M28 42h30" stroke="${DARK}" stroke-width="3"/>`,
+  boot: `<path d="M28 10h30v48l26 10c8 3 10 10 10 20v4H18V18c0-5 4-8 10-8z" fill="${ORANGE}" ${O}/>
+    <path d="M30 14h24v40H30z" fill="#fff" opacity=".25"/>
+    <path d="M18 84h76v10H18z" fill="#475569" ${O}/><path d="M28 28h30M28 42h30" stroke="${DARK}" stroke-width="3"/>`,
   helmet: `<circle cx="50" cy="46" r="38" fill="${W}" ${O}/>
     <path d="M24 46c0-15 11-24 26-24s26 9 26 24-11 22-26 22-26-7-26-22z" fill="${BLUE}" ${O}/>
     <path d="M34 36c4-6 10-8 17-8" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>

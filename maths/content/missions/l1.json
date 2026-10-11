@@ -4,7 +4,7 @@
   "title": "Count the Stars",
   "tagline": "Count forwards and back to 100, one more and one less",
   "covers": ["Y1-NPV-1", "Y1-NPV-2", "Y1-NPV-3", "1NPV–1"],
-  "patch": { "name": "Count the Stars", "icon": "hundred" },
+  "patch": {"name": "Count the Stars", "icon": "hundred"},
   "dadNotes": [
     "Counting back across a ten is the tricky bit: 42, 41, 40, 39. Practise it out loud with no pictures.",
     "Ask: 'What comes after 39? What comes before 40? How do you know?'",
@@ -14,52 +14,116 @@
     {
       "type": "look",
       "lines": ["This is a 100 square.", "It has every number from 1 to 100."],
-      "question": "Can you find 100?",
+      "question": "How many squares in each row?",
+      "options": ["5", "10", "100"],
+      "answer": 1,
+      "reveal": ["Every row has 10 squares.", "Yellow: 1 to 10. Blue: 11 to 20."],
       "widget": "hundred",
-      "props": { "highlight": [100], "highlight2": [1] }
+      "props": {"highlight": [1, 100]},
+      "revealProps": {"highlight": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "highlight2": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]}
     },
-    { "type": "ask", "text": "Have you counted on a 100 square at school?" },
+    {"type": "ask", "text": "Have you counted on a 100 square at school?"},
     {
       "type": "guess",
       "prompt": "Count on: 37, 38, 39... What comes next?",
       "options": ["thirty-ten", "40", "49"],
       "answer": 1,
-      "reveal": ["40!", "After 9 ones, a new ten starts."],
+      "reveal": ["40!", "After 39 comes 40.", "A new ten starts."],
       "widget": "hundred",
-      "props": { "highlight": [37, 38, 39], "hide": [40] },
-      "revealProps": { "hide": [], "highlight2": [40] }
+      "props": {"highlight": [37, 38, 39], "hide": [40]},
+      "revealProps": {"hide": [], "highlight2": [40]}
     },
     {
       "type": "try",
       "widget": "hundred",
-      "props": { "mode": "tap" },
+      "props": {"mode": "tap"},
       "script": [
-        { "say": ["Let's count on from 23.", "Tap 23."], "goal": { "selected": 23 }, "then": ["You found {selected}."], "hint": ["23 is in the row that starts 21."] },
-        { "say": ["Now tap the number after 23."], "goal": { "selected": 24 }, "then": ["24 comes after 23."] },
-        { "say": ["Keep counting on.", "Tap the next 3 numbers."], "goal": { "taps": [23, 24, 25, 26, 27] }, "then": ["23, 24, 25, 26, 27.", "You counted on!"], "hint": ["Tap a blue square again to turn it off."] },
-        { "set": { "highlight": [] }, "say": ["Start at 37.", "Count on to 42.", "Tap every number."], "goal": { "taps": [37, 38, 39, 40, 41, 42] }, "then": ["After 39 comes 40.", "A new ten starts."], "hint": ["Tap 37 first.", "Tap a blue square again to undo it."] },
-        { "set": { "highlight": [] }, "say": ["Now count back from 52.", "Tap 52, then go back 3 more."], "goal": { "taps": [52, 51, 50, 49] }, "then": ["52, 51, 50, 49.", "Back across the ten!"], "hint": ["Back means smaller numbers.", "What comes before 50?"] }
+        {
+          "say": ["Let's count on from 23.", "Tap 23."],
+          "goal": {"selected": 23},
+          "then": ["You found {selected}."],
+          "hint": ["23 is in the blue row.", "That row starts with 21."],
+          "hintProps": {"highlight2": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]}
+        },
+        {
+          "say": ["Now tap the number after 23."],
+          "goal": {"selected": 24},
+          "then": ["24 comes after 23."],
+          "hint": ["After means 1 more.", "Look just to the right of 23."]
+        },
+        {
+          "say": ["Keep counting on.", "Tap the next 3 numbers."],
+          "goal": {"taps": [23, 24, 25, 26, 27]},
+          "then": ["23, 24, 25, 26, 27.", "You counted on!"],
+          "hint": ["Start just after 24.", "Say each number as you tap it."]
+        },
+        {
+          "set": {"highlight": [], "highlight2": []},
+          "say": ["Start at 37.", "Count on to 42.", "Tap every number."],
+          "goal": {"taps": [37, 38, 39, 40, 41, 42]},
+          "then": ["After 39 comes 40.", "A new ten starts."],
+          "hint": ["Tap 37 first, then keep going.", "Tap a blue square again to undo it."],
+          "explain": ["37, 38, 39, then a new ten: 40.", "41, 42."]
+        },
+        {
+          "set": {"highlight": []},
+          "say": ["Now count back from 52.", "Tap 52, then go back 3 more."],
+          "goal": {"taps": [52, 51, 50, 49]},
+          "then": ["52, 51, 50, 49.", "Back across the ten!"],
+          "hint": ["Back means smaller numbers.", "Tap 52, then the square before it."]
+        }
       ]
     },
     {
       "type": "try",
       "widget": "objects",
-      "props": { "n": 14, "icon": "star", "arrange": "scatter", "tappable": true },
+      "props": {"n": 14, "icon": "star", "arrange": "scatter", "tappable": true},
       "script": [
-        { "say": ["How many stars?", "Tap each star as you count."], "goal": { "tapped": 14 }, "then": ["You tapped {tapped} stars.", "The last number tells us how many."], "hint": ["Touch each star once.", "Say a number for each one."] },
-        { "set": { "n": 15 }, "say": ["1 more star arrived!", "How many stars now?"], "input": "numpad", "answer": "{n}", "then": ["1 more than 14 is 15."] },
-        { "set": { "n": 14 }, "say": ["1 star zoomed away.", "How many now?"], "input": "numpad", "answer": "{n}", "then": ["1 less than 15 is 14."] }
+        {
+          "say": ["How many stars?", "Tap each star as you count."],
+          "goal": {"tapped": 14},
+          "then": ["You tapped {tapped} stars.", "The last number tells us how many."],
+          "hint": ["Touch each star once.", "Say a number for each one."]
+        },
+        {
+          "set": {"n": 15, "arrange": "rows", "perRow": 5, "tappable": false},
+          "say": ["1 more star arrived!", "Now they are in rows of 5.", "How many stars now?"],
+          "input": "numpad",
+          "answer": 15,
+          "hint": ["There were 14 stars.", "1 more than 14 is the next number."],
+          "then": ["1 more than 14 is 15.", "3 rows of 5 make 15 too!"]
+        },
+        {
+          "set": {"crossed": 1},
+          "say": ["1 star zoomed away.", "How many now?"],
+          "input": "numpad",
+          "answer": 14,
+          "hint": ["The crossed-out star has gone.", "Count back 1 from 15."],
+          "then": ["1 less than 15 is 14."]
+        }
       ]
     },
     {
       "type": "try",
       "tiers": [2, 3],
       "widget": "hundred",
-      "props": { "mode": "tap" },
+      "props": {"mode": "tap"},
       "script": [
-        { "say": ["Tap 34."], "goal": { "selected": 34 } },
-        { "say": ["Now tap the number 10 more than 34."], "goal": { "selected": 44 }, "then": ["44 is just below 34.", "10 more is one row down."], "hint": ["10 more: the tens digit goes up by 1."] },
-        { "set": { "highlight": [] }, "say": ["Tap 71.", "Then tap 10 less than 71."], "goal": { "taps": [71, 61] }, "then": ["10 less is one row up.", "71, then 61."] }
+        {"say": ["Tap 34."], "goal": {"selected": 34}, "hint": ["34 is in the row that starts 31."]},
+        {
+          "say": ["Now tap the number 10 more than 34."],
+          "goal": {"selected": 44},
+          "then": ["44 is just below 34.", "10 more is one row down."],
+          "hint": ["10 more is one row down.", "Look just below 34."],
+          "explain": ["34 is in the row that starts 31.", "44 is right below it: 10 more."]
+        },
+        {
+          "set": {"highlight": []},
+          "say": ["Tap 71.", "Then tap 10 less than 71."],
+          "goal": {"taps": [71, 61]},
+          "then": ["10 less is one row up.", "71, then 61."],
+          "hint": ["Tap 71 first.", "10 less is one row up."]
+        }
       ]
     },
     {
@@ -83,9 +147,6 @@
       "steps": ["Count each step on the way up.", "Count back on the way down.", "Next time, start at 37!"],
       "why": "Counting back is harder than counting on. Saying it out loud builds it."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "What comes after 39? How do you know?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "What comes after 39? How do you know?"]}
   ]
 }

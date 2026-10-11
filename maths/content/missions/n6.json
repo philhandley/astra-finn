@@ -4,20 +4,33 @@
   "title": "Partition Lab",
   "tagline": "Split numbers in more than one way",
   "covers": ["Y2-NPV-6", "2NPV–1"],
-  "patch": { "name": "Partition Lab", "icon": "blocks" },
+  "patch": {"name": "Partition Lab", "icon": "blocks"},
   "dadNotes": [
     "68 = 60 + 8 = 50 + 18 = 40 + 28. All the same number, split different ways.",
     "Ask: 'Can you make it with one fewer ten?' Then: 'How many ones do you need now?'",
     "Splitting like this is what makes 45 + 23 or 63 − 17 easier later."
   ],
+  "warmup": {
+    "gen": "number.readTensOnes",
+    "level": 1,
+    "items": 3,
+    "mission": "n1",
+    "say": "First, a quick warm-up: tens and ones."
+  },
   "steps": [
     {
       "type": "look",
-      "lines": ["This is 68.", "68 = 60 + 8.", "That's the tens and the ones."],
+      "lines": ["This is 68.", "Here are its tens and ones."],
+      "question": "What is the 6 worth?",
+      "options": ["6", "60", "68"],
+      "answer": 1,
+      "reveal": ["The 6 is 6 tens. That's 60.", "68 = 60 + 8."],
+      "caption": "68",
       "widget": "placevalue",
-      "props": { "tens": 6, "ones": 8, "showExpanded": true, "interactive": false }
+      "props": {"tens": 6, "ones": 8, "interactive": false},
+      "revealProps": {"showDigits": true, "showExpanded": true}
     },
-    { "type": "ask", "text": "Have you split numbers into tens and ones at school?" },
+    {"type": "ask", "text": "Have you split numbers into tens and ones at school?"},
     {
       "type": "guess",
       "prompt": "Can you make 68 with only 5 tens?",
@@ -25,19 +38,48 @@
       "answer": 0,
       "reveal": ["Yes! 5 tens and 18 ones.", "68 = 50 + 18."],
       "widget": "placevalue",
-      "props": { "tens": 5, "ones": 0, "interactive": false },
-      "revealProps": { "ones": 18, "showExpanded": true, "showValue": true }
+      "props": {"tens": 5, "ones": 0, "interactive": false},
+      "revealProps": {"ones": 18, "showExpanded": true, "showValue": true}
     },
     {
       "type": "try",
       "widget": "placevalue",
-      "props": { "tens": 6, "ones": 8, "showExpanded": true, "showValue": true },
+      "props": {"tens": 6, "ones": 8, "showExpanded": true, "showValue": true, "swapUp": false},
       "script": [
-        { "say": ["This is 68.", "Tap a ten.", "Swap it for 10 ones."], "goal": { "tens": 5, "ones": 18 }, "then": ["{tens} tens and {ones} ones.", "68 = 50 + 18."], "hint": ["Tap a green rod.", "Then tap the swap button."] },
-        { "say": ["Do it again!"], "goal": { "tens": 4, "ones": 28 }, "then": ["68 = 40 + 28.", "Still {value}!"] },
-        { "say": ["Make 68 with just 3 tens."], "goal": { "tens": 3, "ones": 38 }, "then": ["68 = 30 + 38.", "Lots of ways to make 68!"] },
-        { "set": { "tens": 4, "ones": 7 }, "say": ["Here is 47.", "Make it with 3 tens."], "goal": { "tens": 3, "value": 47 }, "then": ["47 = 30 + 17."] },
-        { "caption": "47 = 20 + ?", "say": ["Now think it.", "What goes with 20 to make 47?"], "input": "numpad", "answer": 27, "then": ["47 = 20 + 27."], "hint": ["Imagine one more ten as ones."] }
+        {
+          "say": ["This is 68.", "Tap a ten.", "Swap it for 10 ones."],
+          "goal": {"tens": 5, "ones": 18},
+          "then": ["{tens} tens and {ones} ones.", "68 = 50 + 18."],
+          "hint": ["Tap a green rod.", "Then tap the swap button."],
+          "explain": ["Tap a green rod, then the swap button.", "1 ten becomes 10 ones. Still 68."]
+        },
+        {
+          "say": ["Do it again!"],
+          "goal": {"tens": 4, "ones": 28},
+          "then": ["68 = 40 + 28.", "Still {value}!"],
+          "hint": ["Tap another green rod.", "Then tap the blue swap button."]
+        },
+        {
+          "say": ["Make 68 with just 3 tens."],
+          "goal": {"tens": 3, "ones": 38},
+          "then": ["68 = 30 + 38.", "Lots of ways to make 68!"],
+          "hint": ["Swap one more ten for ones.", "Stop when there are 3 green rods."]
+        },
+        {
+          "set": {"tens": 4, "ones": 7},
+          "say": ["Here is 47.", "Make it with 3 tens."],
+          "goal": {"tens": 3, "value": 47},
+          "then": ["47 = 30 + 17."],
+          "hint": ["Tap a green rod.", "Swap it for 10 ones."]
+        },
+        {
+          "caption": "47 = 20 + ?",
+          "say": ["Now think it.", "What goes with 20 to make 47?"],
+          "input": "numpad",
+          "answer": 27,
+          "then": ["47 = 20 + 27."],
+          "hint": ["Imagine swapping 1 more ten for ones.", "17 ones and 10 more ones is how many?"]
+        }
       ]
     },
     {
@@ -52,8 +94,13 @@
       "format": "wodb",
       "title": "Which one doesn't belong?",
       "prompt": "Pick one. Then say why.",
-      "options": [{ "label": "25" }, { "label": "52" }, { "label": "50" }, { "label": "15" }],
-      "reveal": ["Every one can be the odd one out!", "52 is the only one not in the 5s. 50 has no ones.", "15 is the only one under 20.", "25 has the same digits as 52."],
+      "options": [{"label": "25"}, {"label": "52"}, {"label": "50"}, {"label": "15"}],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "52 is the only one not in the 5s. 50 has no ones.",
+        "15 is the only one under 20.",
+        "25 has the same digits as 52."
+      ],
       "followUp": "Can you find a reason for every single one?"
     },
     {
@@ -63,8 +110,8 @@
       "title": "Would you rather?",
       "prompt": "Would you rather have 6 tens or 58 ones of moon crystals?",
       "options": [
-        { "label": "6 tens", "widget": "placevalue", "props": { "tens": 6, "ones": 0, "interactive": false } },
-        { "label": "58 ones", "widget": "placevalue", "props": { "tens": 0, "ones": 58, "interactive": false } }
+        {"label": "6 tens", "widget": "placevalue", "props": {"tens": 6, "ones": 0, "interactive": false}},
+        {"label": "58 ones", "widget": "placevalue", "props": {"tens": 0, "ones": 58, "interactive": false}}
       ],
       "reveal": ["6 tens is 60. That's 2 more than 58.", "58 ones would take ages to count!", "But ones are easy to share out."],
       "followUp": "What would change your mind?"
@@ -76,9 +123,6 @@
       "steps": ["Make 35p with 10p and 1p coins.", "Now make 35p a different way.", "How many ways can you find?"],
       "why": "Splitting numbers different ways helps with adding and taking away."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "Can you split 47 in 2 different ways?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "Can you split 47 in 2 different ways?"]}
   ]
 }

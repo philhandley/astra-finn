@@ -10,6 +10,7 @@
 //                   Its answer row fills in only when the calculation is finished.
 //   combined        '+': start already put together.     exchanged ('+'): start already exchanged (needs combined).
 //   taken           '-': start with this many already subtracted.
+//   pulse           true: the button on show (Put together, Swap) pulses. A one-off Help hint: it keeps the blocks as they are.
 //   readonly
 // '+': a's blocks on the top row, b's below. "Put together" slides them into one row (tens with tens, then ones
 //      with ones). With 10 or more ones, "Swap 10 ones for 1 ten" fuses ten cubes into a rod.
@@ -21,7 +22,9 @@
 //      breaks a rod into 10 cubes (tapping a rod that would go past b makes that button pulse).
 //      State { tens, ones, value, taken, takenTens, takenOnes, exchanged, a, b }
 //        tens / ones / value = what is left; taken = how much has been subtracted so far.
-// showAnswer() animates the whole calculation.
+// showAnswer(goal) animates the calculation: the whole of it, or just as far as a try-step goal asks
+// ({ combined }, { exchanged }, { takenTens }, { taken }), tens before ones. It then reports the state with onChange,
+// so a try step's "Show me" also completes the step. update({ showColumns }) or update({ pulse }) alone keeps the blocks.
 // Debug: dev/harness.html?widget=blocks&props={"a":36,"b":27,"op":"+","showColumns":true}
 //        dev/harness.html?widget=blocks&props={"a":52,"b":27,"op":"-","showColumns":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
@@ -422,27 +425,60 @@ export function mount(el, props = {}, ctx = {}) {
   const api = {
     getState: state,
     update(np) {
-      p = { ...p, ...np };
-      build();
+      const keys = Object.keys(np);
+      const pulse = !!np.pulse;
+      const rest = { ...np }; delete rest.pulse;
+      // Cosmetic changes keep Finn's blocks where they are.
+      if (keys.every(k => k === 'pulse' || k === 'showColumns') && gAll) {
+        p = { ...p, ...rest };
+        const dx = p.showColumns ? 0 : Math.round((W - (G.right - 20)) / 2 - 20);
+        gAll.setAttribute('transform', `translate(${dx} 0)`);
+        gPanel.setAttribute('transform', `translate(${-dx} 0)`);
+        render();
+      } else {
+        p = { ...p, ...rest };
+        build();
+      }
+      if (pulse) pulseSwap();
     },
-    showAnswer() {
+    showAnswer(goal) {
       clearTimers();
+      const g = goal && typeof goal === 'object' && !Array.isArray(goal) ? goal : {};
+      const done = () => { if (!busy) { render(); ctx.onChange && ctx.onChange(state()); } else later(200, done); };
       if (op === '+') {
-        if (!combined) { combine(false); later(1000, () => { if (cubes.length >= 10) exchangePlus(false); }); }
-        else if (cubes.length >= 10) exchangePlus(false);
+        const wantSwap = !('combined' in g) || 'exchanged' in g || 'value' in g || 'tens' in g;
+        if (!combined) {
+          combine(false);
+          later(1000, () => { if (wantSwap && cubes.length >= 10) exchangePlus(false); later(500, done); });
+        } else if (wantSwap && cubes.length >= 10) { exchangePlus(false); later(500, done); } else done();
         return;
       }
       if (B <= 0) return;
+      const takenTens = () => rods.length - rodsLeft;
+      // Just a swap, or just some tens: stop there.
+      if ('exchanged' in g && !('taken' in g)) {
+        if (exchanged < 1 && rodsLeft > 0) exchangeMinus(false);
+        later(700, done);
+        return;
+      }
+      if ('takenTens' in g && !('taken' in g)) {
+        const want = typeof g.takenTens === 'number' ? g.takenTens : Math.floor(B / 10);
+        const tens = () => {
+          if (takenTens() >= want || rodsLeft <= 0) { done(); return; }
+          rodsLeft--; sfx('pop'); render(); later(320, tens);
+        };
+        tens();
+        return;
+      }
+      // The whole subtraction: tens first, then swap a ten if the ones run out, then the ones.
       const step = () => {
         const n = need();
-        if (n <= 0) return;
+        if (n <= 0) { done(); return; }
         if (busy) { later(200, step); return; }
-        if (n % 10 > 0) {
-          if (cubesLeft < n % 10 && rodsLeft > 0) { exchangeMinus(false); later(750, step); return; }
-          if (cubesLeft > 0) { cubesLeft--; sfx('pop'); render(); later(220, step); return; }
-        }
-        if (rodsLeft > 0 && n >= 10) { rodsLeft--; sfx('pop'); render(); later(320, step); return; }
-        if (cubesLeft > 0) { cubesLeft--; render(); later(220, step); }
+        if (n >= 10 && rodsLeft > 0) { rodsLeft--; sfx('pop'); render(); later(320, step); return; }
+        if (cubesLeft < n && rodsLeft > 0) { exchangeMinus(false); later(750, step); return; }
+        if (cubesLeft > 0) { cubesLeft--; sfx('pop'); render(); later(220, step); return; }
+        done();
       };
       step();
     },

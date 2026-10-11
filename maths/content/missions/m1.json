@@ -16,6 +16,16 @@
     "cm for small things, m for big things. A metre is about one big stride.",
     "When it does not start at 0, count the gaps (or take away), not the marks."
   ],
+  "warmup": {
+    "gen": "measure.compareY1",
+    "level": 1,
+    "items": 3,
+    "params": {
+      "kind": "length"
+    },
+    "mission": "l11",
+    "say": "First, a quick warm-up: longer, shorter and taller."
+  },
   "steps": [
     {
       "type": "look",
@@ -31,6 +41,19 @@
         "labels": 1,
         "value": 9,
         "object": "pencil"
+      },
+      "options": [
+        "At 0",
+        "At 1",
+        "At 9"
+      ],
+      "answer": 0,
+      "reveal": [
+        "At 0, not at the edge of the ruler.",
+        "It ends at 9, so it is 9 cm long."
+      ],
+      "revealProps": {
+        "readout": true
       }
     },
     {
@@ -39,17 +62,17 @@
     },
     {
       "type": "guess",
-      "prompt": "How long do you think your hand is?",
-      "art": "astronaut",
+      "prompt": "About how long is an astronaut's boot?",
+      "art": "boot",
       "options": [
-        "About 2 cm",
-        "About 12 cm",
-        "About 2 m"
+        "About 3 cm",
+        "About 30 cm",
+        "About 3 m"
       ],
       "answer": 1,
       "reveal": [
-        "Most hands are between 10 and 15 cm.",
-        "Measure yours at home to check!"
+        "About 30 cm.",
+        "That is as long as a big school ruler."
       ]
     },
     {
@@ -79,9 +102,19 @@
           "then": [
             "It starts at 0 and ends at 8.",
             "It is {value} cm long."
+          ],
+          "hintProps": {
+            "target": 8
+          },
+          "explain": [
+            "The pencil starts at 0.",
+            "So the end goes on 8: 8 cm long."
           ]
         },
         {
+          "set": {
+            "target": null
+          },
           "say": [
             "Make it 13 cm long."
           ],
@@ -90,6 +123,17 @@
           },
           "then": [
             "{value} cm. That is longer."
+          ],
+          "hint": [
+            "Drag the orange handle to the right.",
+            "Stop the end of the pencil on 13."
+          ],
+          "hintProps": {
+            "target": 13
+          },
+          "explain": [
+            "It starts at 0 and ends on 13.",
+            "That is 13 cm long."
           ]
         },
         {
@@ -97,7 +141,8 @@
             "object": "worm",
             "value": 5,
             "max": 20,
-            "labels": 2
+            "labels": 2,
+            "target": null
           },
           "say": [
             "A worm on a longer ruler.",
@@ -108,17 +153,25 @@
           },
           "hint": [
             "11 has no number.",
-            "It is the mark between 10 and 12."
+            "Find 10, by the blue arrow. 11 is the next mark."
           ],
           "then": [
             "11 is between 10 and 12.",
             "The worm is 11 cm."
+          ],
+          "hintProps": {
+            "target": 10
+          },
+          "explain": [
+            "11 is the mark just after 10.",
+            "The worm is 11 cm long."
           ]
         },
         {
           "set": {
             "value": 14,
-            "interactive": false
+            "interactive": false,
+            "target": null
           },
           "say": [
             "How long is the worm now?"
@@ -128,6 +181,10 @@
           "unit": "cm",
           "then": [
             "14 cm. It ends on the 14 mark."
+          ],
+          "hint": [
+            "Follow the dashed line down from the end of the worm.",
+            "Which number is it on?"
           ]
         },
         {
@@ -141,8 +198,11 @@
           ],
           "answer": "14 cm",
           "then": [
-            "14 cm > 11 cm.",
-            "The open side faces the bigger length."
+            "14 cm is longer than 11 cm.",
+            "We write 14 cm > 11 cm."
+          ],
+          "hint": [
+            "Which number is bigger, 11 or 14?"
           ]
         }
       ]
@@ -174,7 +234,8 @@
           "answer": 6,
           "unit": "cm",
           "hint": [
-            "Count the centimetres from 3."
+            "It starts at 3, not 0.",
+            "Count the gaps from 3 to the end: 4, 5, 6..."
           ],
           "then": [
             "From 3 to 9 is 6 cm.",
@@ -197,6 +258,10 @@
           "then": [
             "It ends at 14.",
             "14 − 5 = 9. It is 9 cm."
+          ],
+          "hint": [
+            "Find where it starts and where it ends.",
+            "Count the gaps in between, not the marks."
           ]
         },
         {
@@ -214,12 +279,19 @@
             "value": 7
           },
           "hint": [
-            "4 + 7 = ?",
-            "Put the end there."
+            "It starts at 4. Drag the end and count the purple jumps.",
+            "Stop when there are 7 jumps."
           ],
           "then": [
             "It ends at 11.",
             "4 + 7 = 11."
+          ],
+          "hintProps": {
+            "hops": 4
+          },
+          "explain": [
+            "Count on 7 from 4: 4 + 7 = 11.",
+            "The end goes on 11."
           ]
         }
       ]
@@ -238,6 +310,19 @@
         "max": 5,
         "value": 3,
         "object": "rover"
+      },
+      "options": [
+        "3 m",
+        "4 m",
+        "5 m"
+      ],
+      "answer": 0,
+      "reveal": [
+        "It starts at 0 and ends at 3.",
+        "So the rover is 3 m long."
+      ],
+      "revealProps": {
+        "readout": true
       }
     },
     {

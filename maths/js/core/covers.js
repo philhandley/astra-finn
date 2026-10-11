@@ -84,6 +84,16 @@ const COVERS = {
     <path d="M24 146H296" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>
     ${[0, 1, 2, 3, 4].map(i => `<path d="M${40 + i * 60} 134v24" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`).join('')}
     ${icon('rocket', 168, 22, 90)}<path d="M206 118 L206 136" stroke="#3b82f6" stroke-width="5" stroke-dasharray="6 6"/>`),
+  crush: () => frame('#f0abfc', '#7c3aed', `
+    ${[[0, 0, '#ef4444', '3'], [1, 0, '#3b82f6', '7'], [2, 0, '#22c55e', '5'], [0, 1, '#fbbf24', '6'], [1, 1, '#ec4899', '4'], [2, 1, '#8b5cf6', '2']].map(([c, r, col, n]) => `<g transform="translate(${72 + c * 62} ${30 + r * 62})"><path d="M27 0l27 18v24L27 56 0 42V18z" fill="${col}" ${O}/><path d="M27 6l20 14H7z" fill="#fff" opacity=".35"/>${num(27, 38, n, 24, '#fff', INK)}</g>`).join('')}
+    <rect x="270" y="20" width="40" height="40" rx="10" fill="#fff" ${O}/>${num(290, 49, '10', 18, '#7c3aed', '#fff')}
+    <path d="M128 59 L162 59" stroke="#fff" stroke-width="8" stroke-linecap="round"/>`),
+  drop: () => frame('#1e293b', '#0b1020', `
+    <rect x="96" y="14" width="128" height="156" rx="10" fill="#111827" stroke="#334155" stroke-width="4"/>
+    ${[[0, 4, '#3b82f6', '6'], [1, 4, '#ef4444', '2'], [2, 4, '#22c55e', '9'], [3, 4, '#fbbf24', '5'], [0, 3, '#8b5cf6', '1'], [3, 3, '#ec4899', '3']].map(([c, r, col, n]) => `<g transform="translate(${104 + c * 29} ${22 + r * 29})"><rect width="26" height="26" rx="6" fill="${col}" stroke="#0b1020" stroke-width="2"/>${num(13, 19, n, 15, '#fff', '#0b1020')}</g>`).join('')}
+    <g transform="translate(162 36)"><rect width="26" height="26" rx="6" fill="#14b8a6" stroke="#fff" stroke-width="2"/>${num(13, 19, '4', 15, '#fff', '#0b1020')}</g>
+    <path d="M175 66v40" stroke="#fff" stroke-width="3" stroke-dasharray="5 5" opacity=".6"/>
+    <rect x="236" y="30" width="62" height="44" rx="10" fill="#fff" ${O}/>${num(267, 60, '10', 22, '#1b1e2e', '#fff')}`),
   shoprun: () => frame('#fef3c7', '#fbbf24', `
     <circle cx="90" cy="100" r="40" fill="#c27a3e" stroke="#8a4f22" stroke-width="5"/>${num(90, 112, '2p', 30, '#4a2a10', '#c27a3e')}
     <path d="M210 52l26 12 6 28-17 22h-30l-17-22 6-28z" fill="#d9dde4" stroke="#8b93a3" stroke-width="5"/>${num(210, 96, '50p', 22, '#1b1e2e', '#d9dde4')}

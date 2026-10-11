@@ -14,19 +14,50 @@
   "Every answer in the 2 times table is even. Doubling is the same as × 2.",
   "Count in 2s out loud together, then try it backwards from 20."
  ],
+ "warmup": {
+  "gen": "muldiv.countInMultiples",
+  "level": 1,
+  "items": 3,
+  "params": {
+   "tables": [
+    2
+   ]
+  },
+  "mission": "l3",
+  "say": "First, a quick warm-up: counting in 2s."
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
-    "Six astronauts step out of the rocket.",
-    "Each one has 2 boots."
+    "6 astronauts line up their boots in pairs.",
+    "Every astronaut has 2 boots."
    ],
    "question": "How many boots?",
-   "widget": "objects",
+   "widget": "blaster",
    "props": {
-    "n": 6,
-    "icon": "astronaut",
-    "arrange": "row"
+    "size": 2,
+    "rows": 6,
+    "readonly": true,
+    "lockSize": true,
+    "bar": false,
+    "icon": "boot",
+    "highlightRows": true,
+    "mirror": "alternate"
+   },
+   "options": [
+    "8",
+    "12",
+    "14"
+   ],
+   "answer": 1,
+   "reveal": [
+    "12 boots. There are 6 groups of 2.",
+    "Count in 2s: 2, 4, 6, 8, 10, 12."
+   ],
+   "revealProps": {
+    "caption": "6 × 2 = 12",
+    "rowLabels": true
    }
   },
   {
@@ -43,7 +74,7 @@
    ],
    "answer": 1,
    "reveal": [
-    "20 boots.",
+    "20 boots. There are 10 groups of 2.",
     "10 × 2 = 20."
    ],
    "widget": "objects",
@@ -52,6 +83,24 @@
     "icon": "astronaut",
     "arrange": "rows",
     "perRow": 5
+   },
+   "revealProps": {
+    "n": 20,
+    "icon": "boot",
+    "arrange": "groups",
+    "groups": [
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "mirror": "alternate"
    }
   },
   {
@@ -62,7 +111,10 @@
     "rows": 0,
     "lockSize": true,
     "highlightRows": true,
-    "maxRows": 10
+    "maxRows": 10,
+    "icon": "boot",
+    "mirror": "alternate",
+    "rowLabels": true
    },
    "script": [
     {
@@ -75,6 +127,13 @@
      },
      "then": [
       "3 pairs. Count in 2s: 2, 4, 6."
+     ],
+     "hint": [
+      "Tap the dark grid 3 times.",
+      "Each tap adds a pair of boots."
+     ],
+     "explain": [
+      "3 pairs of boots. Count in 2s: 2, 4, 6."
      ]
     },
     {
@@ -86,6 +145,13 @@
      },
      "then": [
       "6 × 2 = {total}."
+     ],
+     "hint": [
+      "Keep tapping the grid.",
+      "Stop at 6 pairs."
+     ],
+     "explain": [
+      "6 pairs. Count in 2s: 2, 4, 6, 8, 10, 12."
      ]
     },
     {
@@ -97,12 +163,20 @@
      },
      "then": [
       "10 × 2 = {total}."
+     ],
+     "hint": [
+      "Keep tapping until there are 10 rows.",
+      "Look at the numbers: they count in 2s."
+     ],
+     "explain": [
+      "10 pairs make 20 boots.",
+      "10 × 2 = 20."
      ]
     },
     {
      "say": [
       "Count in 2s together.",
-      "2, 4, 6, 8, 10, 12, 14, 16, 18, 20."
+      "Read the yellow numbers: 2, 4, 6, all the way to 20."
      ]
     }
    ]
@@ -129,6 +203,14 @@
      "then": [
       "2 rows of 7 is double 7.",
       "Double 7 is {total}."
+     ],
+     "hint": [
+      "Tap the right arrow until the blaster shows 7.",
+      "Then tap the grid 2 times."
+     ],
+     "explain": [
+      "Set the blaster to 7, then blast twice.",
+      "7 + 7 = 14. Double 7 is 14."
      ]
     },
     {
@@ -144,7 +226,23 @@
      "then": [
       "Double 8 is 16.",
       "2 × 8 = 16."
-     ]
+     ],
+     "hint": [
+      "Double 8 is 2 rows of 8.",
+      "Set the blaster to 8 and blast twice."
+     ],
+     "explain": [
+      "2 rows of 8: 8 + 8 = 16.",
+      "Double 8 is 16."
+     ],
+     "hintProps": {
+      "size": 8,
+      "rows": 2,
+      "rowLabels": [
+       "8",
+       "?"
+      ]
+     }
     }
    ]
   },
@@ -165,7 +263,14 @@
      2,
      2
     ],
-    "icon": "dot"
+    "icon": "dot",
+    "groupLabels": [
+     "2",
+     "4",
+     "6",
+     "8",
+     "10"
+    ]
    }
   },
   {

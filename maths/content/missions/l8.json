@@ -27,7 +27,21 @@
    "props": {
     "readonly": true,
     "shape": "circle",
-    "parts": 1
+    "parts": 1,
+    "shaded": 1,
+    "colour": "orange"
+   },
+   "show": {
+    "label": "Cut the pizza",
+    "props": {
+     "parts": 2,
+     "shaded": 2,
+     "labels": true
+    },
+    "lines": [
+     "2 equal parts, one for each astronaut.",
+     "Each part is a half. Fair!"
+    ]
    }
   },
   {
@@ -78,6 +92,13 @@
      "then": [
       "You made 2 equal parts.",
       "Each part is a half."
+     ],
+     "hint": [
+      "The hammers are on the right.",
+      "Tap the hammer with a 2 on it."
+     ],
+     "explain": [
+      "The hammer with a 2 splits the square into 2 equal parts."
      ]
     },
     {
@@ -92,6 +113,14 @@
      "then": [
       "1 of 2 equal parts.",
       "That is 1/2."
+     ],
+     "hint": [
+      "Tap one of the 2 white parts.",
+      "It turns purple."
+     ],
+     "explain": [
+      "Tap one part to colour it.",
+      "1 of 2 equal parts is 1/2."
      ]
     },
     {
@@ -104,6 +133,14 @@
      "then": [
       "Now there are 4 equal parts.",
       "Each part is a quarter."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 again.",
+      "Each half splits in 2."
+     ],
+     "explain": [
+      "Each half splits into 2.",
+      "Now there are 4 equal parts: quarters."
      ]
     },
     {
@@ -114,6 +151,13 @@
      "answer": "{shaded}",
      "then": [
       "Your half is now {shaded} quarters."
+     ],
+     "hint": [
+      "Count the purple parts."
+     ],
+     "explain": [
+      "Count the coloured parts: 2.",
+      "1 half is the same as 2 quarters."
      ]
     },
     {
@@ -125,6 +169,13 @@
       "parts": 2
      },
      "then": [
+      "2 quarters make 1 half."
+     ],
+     "hint": [
+      "Tap the Glue button under the hammer."
+     ],
+     "explain": [
+      "Glue sticks 2 quarters together.",
       "2 quarters make 1 half."
      ]
     }
@@ -150,6 +201,13 @@
      "caption": "1/4",
      "then": [
       "1 of 4 equal parts is 1/4."
+     ],
+     "hint": [
+      "Tap one slice of the pizza."
+     ],
+     "explain": [
+      "Tap any one slice.",
+      "1 of 4 equal slices is 1/4."
      ]
     },
     {
@@ -161,6 +219,14 @@
      },
      "then": [
       "4 quarters make 1 whole."
+     ],
+     "hint": [
+      "Tap each white slice.",
+      "Stop when all 4 are coloured."
+     ],
+     "explain": [
+      "Colour every slice.",
+      "4 quarters make 1 whole pizza."
      ]
     }
    ]
@@ -175,12 +241,13 @@
     "tools": [
      "2"
     ],
-    "labels": true
+    "labels": true,
+    "icon": "star"
    },
    "script": [
     {
      "say": [
-      "8 dots.",
+      "8 stars.",
       "Smash them into 2 equal groups."
      ],
      "goal": {
@@ -189,6 +256,13 @@
      "then": [
       "4 in each group.",
       "Half of 8 is 4."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 on it."
+     ],
+     "explain": [
+      "The 2 hammer makes 2 equal groups.",
+      "There are 4 stars in each group."
      ]
     },
     {
@@ -201,6 +275,14 @@
      "then": [
       "2 in each group.",
       "A quarter of 8 is 2."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 again.",
+      "Each group splits in 2."
+     ],
+     "explain": [
+      "Each group splits in 2.",
+      "4 equal groups of 2 stars."
      ]
     }
    ]
@@ -291,14 +373,15 @@
       "shape": "set",
       "setSize": 8,
       "parts": 2,
-      "shaded": 1
+      "shaded": 1,
+      "icon": "star"
      }
     }
    ],
    "reveal": [
     "Every one can be the odd one out!",
     "A has nothing coloured. B has 4 parts.",
-    "C has unequal parts. D is made of dots."
+    "C has unequal parts. D is a set of stars."
    ],
    "followUp": "Can you find a reason for every single one?"
   },

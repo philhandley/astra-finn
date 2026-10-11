@@ -16,6 +16,16 @@
     "One part-whole picture gives four facts: two adding, two subtracting.",
     "Tens facts: 3 + 4 = 7, so 3 tens + 4 tens = 7 tens, which is 70."
   ],
+  "warmup": {
+    "gen": "addsub.bondsTo",
+    "level": 2,
+    "items": 3,
+    "params": {
+      "target": 10
+    },
+    "mission": "l4",
+    "say": "First, a quick warm-up: missing parts of 10."
+  },
   "steps": [
     {
       "type": "look",
@@ -32,6 +42,16 @@
           4
         ],
         "counters": "both"
+      },
+      "show": {
+        "label": "Show the facts",
+        "props": {
+          "facts": true
+        },
+        "lines": [
+          "3 + 4 and 4 + 3 both make 7.",
+          "7 − 3 = 4 and 7 − 4 = 3."
+        ]
       }
     },
     {
@@ -60,6 +80,9 @@
           "answer": 7,
           "then": [
             "3 + 4 = 7."
+          ],
+          "hint": [
+            "Count all the counters in the two parts."
           ]
         },
         {
@@ -72,6 +95,10 @@
           "answer": 7,
           "then": [
             "Same parts, same whole."
+          ],
+          "hint": [
+            "The same two parts, swapped round.",
+            "Do they make the same whole?"
           ]
         },
         {
@@ -87,6 +114,10 @@
           "answer": 4,
           "then": [
             "7 − 3 = 4. The other part!"
+          ],
+          "hint": [
+            "Start with the whole: 7.",
+            "Take away the 3 part. What is left?"
           ]
         },
         {
@@ -100,6 +131,20 @@
           "input": "numpad",
           "answer": 3,
           "then": [
+            "7 − 4 = 3."
+          ],
+          "hint": [
+            "Start with the whole: 7.",
+            "Take away the 4 part. What is left?"
+          ]
+        },
+        {
+          "set": {
+            "hide": null,
+            "facts": true
+          },
+          "caption": "",
+          "say": [
             "That is the whole family:",
             "3 + 4, 4 + 3, 7 − 3 and 7 − 4."
           ]
@@ -140,7 +185,8 @@
         "parts": [
           30,
           40
-        ]
+        ],
+        "hide": 1
       },
       "script": [
         {
@@ -154,6 +200,10 @@
           "then": [
             "7 tens − 3 tens = 4 tens.",
             "70 − 30 = 40."
+          ],
+          "hint": [
+            "7 tens take away 3 tens.",
+            "How many tens are left?"
           ]
         },
         {
@@ -175,6 +225,9 @@
           "then": [
             "3 tens + 7 tens = 10 tens.",
             "10 tens is 100."
+          ],
+          "hint": [
+            "3 tens and how many tens make 10 tens?"
           ]
         },
         {
@@ -195,6 +248,10 @@
           "answer": 60,
           "then": [
             "100 − 40 = 60."
+          ],
+          "hint": [
+            "10 tens take away 4 tens.",
+            "How many tens are left?"
           ]
         }
       ]

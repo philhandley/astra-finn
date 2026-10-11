@@ -23,7 +23,26 @@
     "The crew voted on where to fly next.",
     "Each block is 1 vote."
    ],
-   "question": "Which place is winning?",
+   "question": "Which place got the most votes?",
+   "options": [
+    {
+     "label": "Moon",
+     "art": "moon"
+    },
+    {
+     "label": "Saturn",
+     "art": "planet"
+    },
+    {
+     "label": "Comet",
+     "art": "comet"
+    }
+   ],
+   "answer": 1,
+   "reveal": [
+    "Saturn: 9 votes.",
+    "The tallest column has the most."
+   ],
    "widget": "charts",
    "props": {
     "kind": "block",
@@ -36,7 +55,7 @@
       "value": 6
      },
      {
-      "label": "Mars",
+      "label": "Saturn",
       "icon": "planet",
       "value": 9
      },
@@ -51,6 +70,9 @@
       "value": 5
      }
     ]
+   },
+   "revealProps": {
+    "highlight": 1
    }
   },
   {
@@ -79,7 +101,7 @@
       "value": 0
      },
      {
-      "label": "Mars",
+      "label": "Saturn",
       "icon": "planet",
       "value": 0
      },
@@ -128,8 +150,8 @@
        "label": "Moon"
       },
       {
-       "value": "Mars",
-       "label": "Mars"
+       "value": "Saturn",
+       "label": "Saturn"
       },
       {
        "value": "Sun",
@@ -140,19 +162,26 @@
        "label": "Comet"
       }
      ],
-     "answer": "Mars",
+     "answer": "Saturn",
      "then": [
-      "Mars has the tallest column."
+      "Saturn has the tallest column."
+     ],
+     "hint": [
+      "Which column is the tallest?"
      ]
     },
     {
      "say": [
-      "How many more votes for Mars than the Moon?"
+      "How many more votes for Saturn than the Moon?"
      ],
      "input": "numpad",
      "answer": 3,
      "then": [
       "7 take away 4 is 3."
+     ],
+     "hint": [
+      "Saturn has 7. The Moon has 4.",
+      "Count on from 4 to 7."
      ]
     },
     {
@@ -163,6 +192,10 @@
      "answer": 18,
      "then": [
       "4 + 7 + 2 + 5 = 18."
+     ],
+     "hint": [
+      "Moon 4, Saturn 7, Sun 2, Comet 5.",
+      "Add 2 at a time: 4 + 7 is 11."
      ]
     },
     {
@@ -259,5 +292,12 @@
     "What question would you ask about the votes?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "stats.readPictogram",
+  "level": 1,
+  "items": 3,
+  "mission": "d2",
+  "say": "First, a quick warm-up: read a pictogram."
+ }
 }

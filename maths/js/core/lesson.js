@@ -176,8 +176,9 @@ export class Numpad {
 /* ---------------- Console (right panel) ---------------- */
 const widgetMods = {};
 export async function loadWidget(name) {
-  if (!widgetMods[name]) widgetMods[name] = import(`../widgets/${name}.js`);
-  return widgetMods[name];
+  // One retry, in case the network hiccups while loading a part of the app.
+  if (!widgetMods[name]) widgetMods[name] = import(`../widgets/${name}.js`).catch(() => new Promise(r => setTimeout(r, 700)).then(() => import(`../widgets/${name}.js?retry=1`)));
+  try { return await widgetMods[name]; } catch (e) { delete widgetMods[name]; throw e; }
 }
 
 export class Console {
@@ -240,6 +241,16 @@ export class Console {
   showBig(text, cls = '') {
     this.clearWidget();
     this.wbox.innerHTML = `<div class="bigcap ${cls}">${esc(text)}</div>`;
+    const b = this.wbox.querySelector('.bigcap');
+    const fit = () => {
+      if (!b.isConnected) return;
+      b.style.fontSize = '';
+      let size = parseFloat(getComputedStyle(b).fontSize) || 100;
+      const room = this.wbox.clientWidth - 24;
+      while (b.scrollWidth > room && size > 30) { size -= 4; b.style.fontSize = `${size}px`; }
+    };
+    requestAnimationFrame(fit);
+    setTimeout(fit, 120);
   }
   clearInputs() {
     this.inrow.replaceChildren();
@@ -260,9 +271,11 @@ export class Console {
   // options: values or {label, value, art, widget, props}. Returns { buttons, find(value) }.
   choices(options, onPick) {
     this.clearInputs();
+    // One text size for the whole set, so a longer (or shorter) answer never stands out.
+    const longSet = options.some(o => String(optLabel(o) ?? '').length > 9);
     const btns = options.map(o => {
       const label = String(optLabel(o) ?? '');
-      const b = h(`<button class="opt ${label.length > 9 ? 'long' : ''}" type="button"></button>`);
+      const b = h(`<button class="opt ${longSet ? 'long' : ''}" type="button"></button>`);
       if (o && typeof o === 'object' && o.art) b.insertAdjacentHTML('beforeend', `<span class="oart">${art(o.art, 72)}</span>`);
       if (o && typeof o === 'object' && o.widget) {
         const mini = h('<div class="mini"></div>');

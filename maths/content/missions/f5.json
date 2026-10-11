@@ -14,11 +14,18 @@
   "This is from the Year 2 guidance (non-statutory): count in halves and quarters past 1.",
   "Say 'one and two quarters is one and a half' to link 2/4 and 1/2."
  ],
+ "warmup": {
+  "gen": "fractions.equivalence",
+  "level": 1,
+  "items": 3,
+  "mission": "f2",
+  "say": "First, a quick warm-up: is it a half?"
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
-    "The rover moves half a step each hop.",
+    "The rocket hops half a step each time.",
     "Halves keep going past 1."
    ],
    "question": "Where will it be after 2 hops?",
@@ -61,6 +68,29 @@
     "readonly": true,
     "markerArt": "rocket",
     "value": 0
+   },
+   "options": [
+    "½",
+    "1",
+    "2"
+   ],
+   "answer": 1,
+   "reveal": [
+    "At 1. 2 halves make 1 whole.",
+    "Hop, hop: 1/2, then 1."
+   ],
+   "revealProps": {
+    "value": 1,
+    "hops": [
+     {
+      "from": 0,
+      "to": 0.5
+     },
+     {
+      "from": 0.5,
+      "to": 1
+     }
+    ]
    }
   },
   {
@@ -79,7 +109,120 @@
    "reveal": [
     "2.",
     "1 and 1/2, then 1/2 more, makes 2."
-   ]
+   ],
+   "widget": "numberline",
+   "props": {
+    "min": 0,
+    "max": 3,
+    "step": 0.5,
+    "minor": 0,
+    "labels": [
+     {
+      "at": 0.0,
+      "text": "0"
+     },
+     {
+      "at": 0.5,
+      "text": "½"
+     },
+     {
+      "at": 1.0,
+      "text": "1"
+     },
+     {
+      "at": 1.5,
+      "text": "1½"
+     },
+     {
+      "at": 2.5,
+      "text": "2½"
+     },
+     {
+      "at": 3.0,
+      "text": "3"
+     }
+    ],
+    "readonly": true,
+    "marks": [
+     0.5,
+     1,
+     1.5
+    ],
+    "hops": [
+     {
+      "from": 0,
+      "to": 0.5
+     },
+     {
+      "from": 0.5,
+      "to": 1
+     },
+     {
+      "from": 1,
+      "to": 1.5
+     }
+    ],
+    "hide": [
+     2
+    ]
+   },
+   "revealProps": {
+    "marks": [
+     0.5,
+     1,
+     1.5,
+     2
+    ],
+    "hops": [
+     {
+      "from": 0,
+      "to": 0.5
+     },
+     {
+      "from": 0.5,
+      "to": 1
+     },
+     {
+      "from": 1,
+      "to": 1.5
+     },
+     {
+      "from": 1.5,
+      "to": 2
+     }
+    ],
+    "labels": [
+     {
+      "at": 0.0,
+      "text": "0"
+     },
+     {
+      "at": 0.5,
+      "text": "½"
+     },
+     {
+      "at": 1.0,
+      "text": "1"
+     },
+     {
+      "at": 1.5,
+      "text": "1½"
+     },
+     {
+      "at": 2.0,
+      "text": "2"
+     },
+     {
+      "at": 2.5,
+      "text": "2½"
+     },
+     {
+      "at": 3.0,
+      "text": "3"
+     }
+    ],
+    "hide": []
+   }
   },
   {
    "type": "try",
@@ -136,6 +279,13 @@
      "then": [
       "2 halves make 1 whole.",
       "You are at 1."
+     ],
+     "hint": [
+      "Tap the blue Hop button 2 times."
+     ],
+     "explain": [
+      "Hop, hop: 1/2, then 1.",
+      "2 halves make 1 whole."
      ]
     },
     {
@@ -148,6 +298,14 @@
      "then": [
       "5 halves.",
       "You are at 2 and a half."
+     ],
+     "hint": [
+      "Tap Hop 3 more times.",
+      "Count the hops as you go."
+     ],
+     "explain": [
+      "1 and 1/2, 2, 2 and 1/2.",
+      "5 halves make 2 and a half."
      ]
     },
     {
@@ -160,6 +318,14 @@
      "then": [
       "6 halves make 3.",
       "Fractions can add up to more than 1!"
+     ],
+     "hint": [
+      "Keep hopping until the rocket reaches 3.",
+      "Count all the hops."
+     ],
+     "explain": [
+      "2 halves make each whole.",
+      "3 wholes is 6 halves."
      ]
     }
    ]
@@ -226,6 +392,13 @@
      },
      "then": [
       "4 quarters make 1 whole."
+     ],
+     "hint": [
+      "Tap the blue Hop button 4 times."
+     ],
+     "explain": [
+      "1/4, 1/2, 3/4, 1.",
+      "4 quarters make 1 whole."
      ]
     },
     {
@@ -238,6 +411,13 @@
      "then": [
       "1 and 2/4.",
       "That is the same as 1 and 1/2!"
+     ],
+     "hint": [
+      "Tap Hop 2 more times."
+     ],
+     "explain": [
+      "1 and 1/4, 1 and 2/4.",
+      "1 and 2/4 is the same as 1 and 1/2."
      ]
     }
    ]

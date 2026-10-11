@@ -40,6 +40,16 @@
       "colour": "pink"
      }
     ]
+   },
+   "show": {
+    "label": "Count the sides",
+    "props": {
+     "showAll": "sides"
+    },
+    "lines": [
+     "Each window has 6 straight sides.",
+     "So they are all hexagons!"
+    ]
    }
   },
   {
@@ -87,6 +97,10 @@
      "then": [
       "{sides} sides.",
       "This shape is a pentagon because it has exactly 5 straight sides."
+     ],
+     "hint": [
+      "Start at the top and go round one way.",
+      "Each side you tap turns blue with a number."
      ]
     },
     {
@@ -103,6 +117,10 @@
      "then": [
       "{vertices} vertices.",
       "The same as the number of sides!"
+     ],
+     "hint": [
+      "A vertex is a pointy corner.",
+      "Tap right on each corner."
      ]
     },
     {
@@ -120,6 +138,10 @@
      "then": [
       "6 straight sides, so it is a hexagon.",
       "A hexagon does not have to look neat."
+     ],
+     "hint": [
+      "Go round one way, like a clock hand.",
+      "Tap each straight edge once."
      ]
     },
     {
@@ -135,6 +157,10 @@
      },
      "then": [
       "6 vertices. Another hexagon!"
+     ],
+     "hint": [
+      "Do not miss the corner that points inwards.",
+      "It counts as a vertex too."
      ]
     },
     {
@@ -150,6 +176,10 @@
      "answer": 8,
      "then": [
       "8 sides. Octo means 8, like an octopus."
+     ],
+     "hint": [
+      "Tap each side. The blue numbers count for you.",
+      "Then type the last number."
      ]
     }
    ]
@@ -174,6 +204,10 @@
      "then": [
       "The halves match!",
       "The dashed line is a line of symmetry."
+     ],
+     "hint": [
+      "Tap the blue Fold button.",
+      "Watch the left half flip over."
      ]
     },
     {
@@ -191,6 +225,10 @@
      "then": [
       "The halves do not match.",
       "It has no vertical line of symmetry."
+     ],
+     "hint": [
+      "Tap the blue Fold button.",
+      "Does the left half land on the right half?"
      ]
     },
     {
@@ -207,6 +245,10 @@
      },
      "then": [
       "They match. A vertical line of symmetry!"
+     ],
+     "hint": [
+      "Tap Fold.",
+      "Watch where the left half lands."
      ]
     },
     {
@@ -232,6 +274,10 @@
      "answer": "no",
      "then": [
       "No. The two halves are different."
+     ],
+     "hint": [
+      "Imagine folding it along the dashed line.",
+      "Would the halves match? Tap Fold to check."
      ]
     }
    ]
@@ -324,7 +370,7 @@
     "Circle: the only one with a curved side.",
     "Triangle: the only one with 3 sides.",
     "Rectangle: the only one with long and short sides.",
-    "Square: the only one that looks the same turned a quarter turn."
+    "Square: the only one with 4 sides all the same length."
    ],
    "followUp": "Every one can be the odd one out! Can you find another reason?"
   },
@@ -372,5 +418,12 @@
     "How can you check if a shape has a line of symmetry?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "geometry.name2d",
+  "level": 1,
+  "items": 3,
+  "mission": "l9",
+  "say": "First, a quick warm-up: name some shapes."
+ }
 }

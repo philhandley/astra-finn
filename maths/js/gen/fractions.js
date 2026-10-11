@@ -3,6 +3,8 @@
 // sets and amounts; 1/2 of 6 = 3; 2/4 is the same as 1/2; counting in halves and quarters past 1.
 // Debug: dev/gen.html?gen=fractions&all=1   or   dev/gen.html?gen=fractions.shadeFraction&level=3&n=12
 // Fractions in lines are written "1/2" so the read-aloud says "a half".
+// Sets always draw real things (crystals, apples, biscuits) named in the words, never empty circles.
+// params.parts (nameFraction, shadeFraction): limit the denominators, e.g. { parts: [2] } for a halves-only warm-up.
 
 const SHAPES = ['square', 'circle', 'rect'];
 const NAME = { square: 'square', circle: 'circle', rect: 'rectangle', bar: 'strip', set: 'set' };
@@ -13,6 +15,16 @@ const ITEMS = [
 ];
 
 const frac = (k, n) => `${k}/${n}`;
+const WORDS = { 2: 'halves', 3: 'thirds', 4: 'quarters' };
+// A set of real things for a set picture: { item, icon }.
+const setOf = R => R.pick(ITEMS);
+// DfE stems (2F-1): "The whole is divided into _ equal parts. _ of them are shaded."
+const wholeIs = (n, what = 'The whole') => `${what} is divided into ${n} equal parts.`;
+const only = (params, list) => {
+  const want = Array.isArray(params && params.parts) ? params.parts.map(Number) : null;
+  const out = want ? list.filter(x => want.includes(Array.isArray(x) ? x[0] : x)) : list;
+  return out.length ? out : list;
+};
 const fval = f => { const [a, b] = String(f).split('/').map(Number); return a / b; };
 // Distractors that are never equal in value to the answer (so 1/2 is never offered beside 2/4).
 const notSame = (ans, list) => {
@@ -72,17 +84,31 @@ export const isEqualParts = {
     const shape = level <= 1 ? R.pick(SHAPES) : level === 2 ? R.pick([...SHAPES, 'bar']) : R.pick([...SHAPES, 'bar', 'set']);
     const unequal = R.chance(0.5);
     const props = { shape, parts: n, unequal, shaded: 1 };
-    if (shape === 'set') props.setSize = n * R.int(2, 3) + (n === 2 ? 0 : 0);
     const f = frac(1, n);
-    const word = { 2: 'halves', 3: 'thirds', 4: 'quarters' }[n];
+    const word = WORDS[n];
+    if (shape === 'set') {
+      const c = setOf(R);
+      props.setSize = n * R.int(2, 3);
+      props.icon = c.icon;
+      return {
+        lines: [`Is the coloured ring ${f} of the ${c.item}?`],
+        ...fr(props),
+        input: 'choice', answer: unequal ? 'No' : 'Yes', options: ['Yes', 'No'],
+        hint: [`Count the ${c.item} in each ring.`, 'Does every ring have the same number?'],
+        explain: unequal
+          ? ['The rings do not have the same number.', `So they are not ${word}.`]
+          : [`The ${c.item} are in ${n} equal groups.`, `1 of ${n} equal groups is ${f}.`],
+        reteach: isEqualParts.make(1, R),
+      };
+    }
     return {
-      lines: [`Is the coloured part ${f}?`],
+      lines: [`Is the coloured part ${f} of the ${NAME[shape]}?`],
       ...fr(props),
       input: 'choice', answer: unequal ? 'No' : 'Yes', options: ['Yes', 'No'],
-      hint: [`${f} is 1 of ${n} equal parts.`, 'Are all the parts the same size?'],
+      hint: [`${f} is 1 of ${n} equal parts.`, n === 2 ? 'Is the coloured part the same size as the white part?' : 'Is every part the same size?'],
       explain: unequal
-        ? ['The parts are not the same size.', `So they are not ${word}.`]
-        : [`All ${n} parts are the same size.`, `The coloured part is ${f}.`],
+        ? ['The parts are not the same size.', `So they are not ${word}, and the coloured part is not ${f}.`]
+        : [wholeIs(n), `Each part is ${f} of the whole. The coloured part is ${f}.`],
       reteach: level > 1 ? isEqualParts.make(1, R) : undefined,
     };
   },
@@ -91,35 +117,40 @@ export const isEqualParts = {
 export const nameFraction = {
   about: 'Name the coloured fraction of a shape, strip or set',
   levels: 3,
-  make(level, R) {
+  make(level, R, params = {}) {
     let n, k, shape;
-    if (level <= 1) { n = R.pick([2, 4]); k = 1; shape = R.pick(SHAPES); }
-    else if (level === 2) { [n, k] = R.pick([[2, 1], [3, 1], [4, 1], [4, 2], [4, 3]]); shape = R.pick([...SHAPES, 'bar']); }
-    else { [n, k] = R.pick([[3, 1], [4, 2], [4, 3], [3, 2], [4, 1]]); shape = R.pick(['bar', 'set', 'circle', 'rect']); }
+    if (level <= 1) { n = R.pick(only(params, [2, 4])); k = 1; shape = R.pick(SHAPES); }
+    else if (level === 2) { [n, k] = R.pick(only(params, [[2, 1], [3, 1], [4, 1], [4, 2], [4, 3]])); shape = R.pick([...SHAPES, 'bar']); }
+    else { [n, k] = R.pick(only(params, [[3, 1], [4, 2], [4, 3], [3, 2], [4, 1]])); shape = R.pick(['bar', 'set', 'circle', 'rect']); }
     const ans = frac(k, n);
     const props = { shape, parts: n, shadedIdx: level <= 1 ? [0] : pickIdx(R, n, k) };
-    if (shape === 'set') props.setSize = n * R.int(2, 3);
+    const c = shape === 'set' ? setOf(R) : null;
+    if (c) { props.setSize = n * R.int(2, 3); props.icon = c.icon; }
+    const of = c ? ` of the ${c.item}` : '';
+    const part = c ? 'group' : 'part';
+    const whole = c ? `The ${c.item} are split into ${n} equal groups.` : wholeIs(n);
     if (level >= 3 && R.chance(0.35)) {
       // Name the part that is NOT coloured.
       const un = frac(n - k, n);
       return {
-        lines: ['What fraction is not coloured?'],
+        lines: [`What fraction${of} is not coloured?`],
         ...fr(props),
         input: 'choice', answer: un, options: opts(R, un, notSame(un, [ans, frac(1, n), ...POOL]).slice(0, 4)),
-        hint: [`Count the parts that are not coloured.`, `There are ${n} parts altogether.`],
-        explain: [`${n - k} of the ${n} equal parts are not coloured.`, `That is ${un}.`],
-        reteach: nameFraction.make(2, R),
+        hint: [`Count the ${part}s that are not coloured.`, `There are ${n} equal ${part}s altogether.`],
+        hintProps: { labels: true },
+        explain: [whole, `${n - k} of the ${n} ${part}s are not coloured. That is ${un}.`],
+        reteach: nameFraction.make(2, R, params),
       };
     }
     const cands = notSame(ans, [frac(n - k, n), frac(1, n), ...R.shuffle(POOL)]);
     return {
-      lines: ['What fraction is coloured?'],
+      lines: [`What fraction${of} is coloured?`],
       ...fr(props),
       input: 'choice', answer: ans, options: opts(R, ans, cands.slice(0, 4)),
-      hint: [`How many equal parts are there?`, 'How many are coloured?'],
-      hintProps: { labels: shape !== 'set' },
-      explain: [`There are ${n} equal parts.`, `${k} ${k === 1 ? 'is' : 'are'} coloured. That is ${ans}.`],
-      reteach: level > 1 ? nameFraction.make(1, R) : undefined,
+      hint: [`How many equal ${part}s are there?`, 'How many are coloured?'],
+      hintProps: { labels: true },
+      explain: [whole, `${k} ${k === 1 ? `${part} is` : `${part}s are`} coloured. That is ${ans}.`],
+      reteach: level > 1 ? nameFraction.make(1, R, params) : undefined,
     };
   },
 };
@@ -127,32 +158,32 @@ export const nameFraction = {
 export const shadeFraction = {
   about: 'Colour a fraction of a shape; at level 3 smash it into parts first',
   levels: 3,
-  make(level, R) {
+  make(level, R, params = {}) {
     let n, k, shape;
-    if (level <= 1) { n = R.pick([2, 4]); k = 1; shape = R.pick(SHAPES); }
-    else if (level === 2) { [n, k] = R.pick([[4, 3], [4, 2], [3, 1], [3, 2], [4, 1]]); shape = R.pick([...SHAPES, 'bar']); }
-    else { [n, k] = R.pick([[4, 3], [4, 2], [3, 1], [2, 1], [4, 1]]); shape = R.pick(['square', 'circle', 'rect', 'bar']); }
+    if (level <= 1) { n = R.pick(only(params, [2, 4])); k = 1; shape = R.pick(SHAPES); }
+    else if (level === 2) { [n, k] = R.pick(only(params, [[4, 3], [4, 2], [3, 1], [3, 2], [4, 1]])); shape = R.pick([...SHAPES, 'bar']); }
+    else { [n, k] = R.pick(only(params, [[4, 3], [4, 2], [3, 1], [2, 1], [4, 1]])); shape = R.pick(['square', 'circle', 'rect', 'bar']); }
     const f = frac(k, n);
-    const word = { 2: 'halves', 3: 'thirds', 4: 'quarters' }[n];
+    const word = WORDS[n];
     if (level >= 3) {
       return {
         lines: [`Smash the ${NAME[shape]} into ${word}.`, `Then colour ${f}.`],
         widget: 'fractions', props: { shape, parts: 1, tools: n === 3 ? ['2', '3', 'glue'] : ['2', '3', '4', 'glue'] },
         input: 'widget', goal: { parts: n, shaded: k },
-        hint: [`Use the hammer to make ${n} equal parts.`, `Then tap ${k} of them.`],
+        hint: [n === 4 ? 'Tap the hammer with a 4, or the 2 twice.' : `Tap the hammer with a ${n}.`, `Then tap ${k} of the ${n} parts.`],
         hintProps: { labels: true },
-        explain: [`${f} means ${k} of ${n} equal parts.`, `Make ${n} parts, then colour ${k}.`],
-        reteach: { lines: [`Colour ${f} of the ${NAME[shape]}.`], widget: 'fractions', props: { shape, parts: n, labels: true }, input: 'widget', goal: { parts: n, shaded: k }, hint: [`Tap ${k} parts.`], explain: [`${k} of the ${n} parts.`] },
+        explain: [`${f} means ${k} of ${n} equal parts.`, `Smash it into ${word}, then colour ${k}.`],
+        reteach: { lines: [`Colour ${f} of the ${NAME[shape]}.`], widget: 'fractions', props: { shape, parts: n, labels: true }, input: 'widget', goal: { parts: n, shaded: k }, hint: [`Tap ${k} of the ${n} parts.`], explain: [`${f} is ${k} of the ${n} equal parts.`] },
       };
     }
     return {
       lines: [`Colour ${f} of the ${NAME[shape]}.`, 'Tap the parts to colour them.'],
       widget: 'fractions', props: { shape, parts: n },
       input: 'widget', goal: { parts: n, shaded: k },
-      hint: [`There are ${n} equal parts.`, `Colour ${k} of them.`],
+      hint: [`There are ${n} equal parts.`, `Tap ${k} of them.`],
       hintProps: { labels: true },
-      explain: [`${f} means ${k} of ${n} equal parts.`],
-      reteach: level > 1 ? shadeFraction.make(1, R) : undefined,
+      explain: [wholeIs(n, `The ${NAME[shape]}`), `${f} means ${k} of the ${n} equal parts.`],
+      reteach: level > 1 ? shadeFraction.make(1, R, params) : undefined,
     };
   },
 };
@@ -167,12 +198,15 @@ export const fractionOfSet = {
     else if (level === 2) { n = R.pick([2, 4]); k = 1; each = pickEach(R, 2, n === 4 ? 4 : 6, n, k); }
     else { [n, k] = R.pick([[4, 3], [4, 2], [3, 1], [3, 2], [4, 3]]); each = pickEach(R, 2, 4, n, k); }
     const total = n * each, ans = k * each, f = frac(k, n);
-    const props = { shape: 'set', setSize: total, parts: n, shaded: level <= 1 ? 1 : 0 };
+    const c = setOf(R);
+    // Level 1 shows the equal groups (one coloured). Higher levels start as one whole set; the hint smashes it into groups.
+    const props = level <= 1 ? { shape: 'set', setSize: total, parts: n, shaded: 1, icon: c.icon } : { shape: 'set', setSize: total, parts: 1, icon: c.icon };
     const item = {
-      lines: [`What is ${f} of ${total}?`],
+      lines: [`What is ${f} of ${total} ${c.item}?`],
       ...fr(props),
-      hint: [`Split ${total} into ${n} equal groups.`, `Count ${k === 1 ? 'one group' : k + ' groups'}.`],
-      explain: [`${total} split into ${n} equal groups is ${each} in each.`, `${f} of ${total} is ${ans}.`],
+      hint: [`Look: the ${c.item} are in ${n} equal groups now.`, `Count the ${c.item} in ${k === 1 ? 'the coloured ring' : `the ${k} coloured rings`}.`],
+      hintProps: { parts: n, shaded: k, labels: true },
+      explain: [`${total} split into ${n} equal groups is ${each} in each group.`, k === 1 ? `${f} of ${total} is ${ans}.` : `${k} groups of ${each} is ${ans}. So ${f} of ${total} is ${ans}.`],
     };
     if (level <= 1) return { ...item, input: 'choice', answer: ans, options: opts(R, ans, [total, n, ans + 1, ans - 1]) };
     return { ...item, input: 'numpad', answer: ans, reteach: fractionOfSet.make(level - 1, R) };
@@ -192,8 +226,8 @@ export const fractionOfAmount = {
         lines: [`Find ${frac(1, n)} of ${total} ${c.item}.`, `Share them into ${n} equal groups.`],
         widget: 'groups', props: { total, mode: 'share', bowls: n, icon: c.icon, interactive: true },
         input: 'choice', answer: each, options: opts(R, each, [total, n, each + 1, each - 1]),
-        hint: ['Tap Deal one each until they are all shared.', 'Count one group.'],
-        explain: [`${total} shared into ${n} is ${each} each.`, `${frac(1, n)} of ${total} is ${each}.`],
+        hint: ['Tap Deal one each until they are all shared.', 'Then count one group.'],
+        explain: [`${total} shared into ${n} equal groups is ${each} in each group.`, `${frac(1, n)} of ${total} = ${each}.`],
       };
     }
     if (level === 2) {
@@ -204,9 +238,9 @@ export const fractionOfAmount = {
         lines: ['Find the fraction of the number.'],
         caption: `${frac(1, n)} of ${total} = ?`,
         input: 'numpad', answer: each,
-        hint: [`Share ${total} into ${n} equal groups.`],
-        hintWidget: { widget: 'groups', props: { total, mode: 'share', bowls: n, icon: 'dot', interactive: true } },
-        explain: [`${total} ÷ ${n} = ${each}.`, `${frac(1, n)} of ${total} = ${each}.`],
+        hint: [`Share ${total} into ${n} equal groups.`, 'Tap Deal one each, then count one group.'],
+        hintWidget: { widget: 'groups', props: { total, mode: 'share', bowls: n, icon: c.icon, interactive: true } },
+        explain: [`${total} shared into ${n} equal groups is ${each} in each group.`, `${frac(1, n)} of ${total} = ${each}.`],
         reteach: fractionOfAmount.make(1, R),
       };
     }
@@ -217,9 +251,9 @@ export const fractionOfAmount = {
       lines: [k > 1 ? `First find ${frac(1, n)}. Then ${k} lots of it.` : 'Find the fraction of the number.'],
       caption: `${frac(k, n)} of ${total} = ?`,
       input: 'numpad', answer: ans,
-      hint: [`${frac(1, n)} of ${total} is ${total} shared into ${n}.`],
+      hint: [`${frac(1, n)} of ${total} is ${total} shared into ${n}.`, k > 1 ? `Then add ${k} of the groups.` : 'Count one group.'],
       hintWidget: shareHint(total, n),
-      explain: [`${frac(1, n)} of ${total} is ${each}.`, `${frac(k, n)} of ${total} is ${ans}.`],
+      explain: [`${total} shared into ${n} equal groups is ${each} in each group, so ${frac(1, n)} of ${total} is ${each}.`, k > 1 ? `${k} groups of ${each} is ${ans}. So ${frac(k, n)} of ${total} = ${ans}.` : `${frac(1, n)} of ${total} = ${ans}.`],
       reteach: fractionOfAmount.make(2, R),
     };
   },
@@ -235,10 +269,12 @@ export const fractionOfLength = {
     else { [n, k] = R.pick([[4, 3], [3, 1], [3, 2], [4, 2]]); each = pickEach(R, 2, 5, n, k); }
     const len = n * each, ans = k * each, f = frac(k, n);
     const item = {
-      lines: [`The rocket strip is ${len} cm long.`, `How long is ${f} of it?`],
+      lines: [`This strip is ${len} cm long.`, `How long is ${f} of it?`],
+      caption: `${len} cm`,
       ...fr({ shape: 'bar', parts: n, shaded: k, labels: level <= 1 }),
-      hint: [`Split ${len} cm into ${n} equal parts.`],
-      explain: [`Each part is ${each} cm.`, `${f} of ${len} cm is ${ans} cm.`],
+      hint: [`Split ${len} cm into ${n} equal parts.`, n === 2 ? `Which number and the same again make ${len}?` : n === 4 ? 'Halve it, then halve it again.' : `Which number, 3 times, makes ${len}?`],
+      hintProps: { labels: true },
+      explain: [`${len} cm split into ${n} equal parts is ${each} cm each.`, k === 1 ? `${f} of ${len} cm is ${ans} cm.` : `${k} parts of ${each} cm is ${ans} cm. So ${f} of ${len} cm is ${ans} cm.`],
     };
     if (level <= 1) return { ...item, input: 'choice', answer: ans, options: opts(R, ans, [len, ans + 1, ans + 2, n]), unit: 'cm' };
     return { ...item, input: 'numpad', answer: ans, unit: 'cm', reteach: fractionOfLength.make(level - 1, R) };
@@ -259,8 +295,8 @@ export const equivalence = {
         lines: [`${shown} is coloured.`, 'Is that the same as 1/2?'],
         ...fr({ shape, parts: 4, shadedIdx: idx, labels: true }),
         input: 'choice', answer: same ? 'Yes' : 'No', options: ['Yes', 'No'],
-        hint: ['Is half of the shape coloured?'],
-        explain: same ? ['2 quarters fill half the shape.', '2/4 is the same as 1/2.'] : ['1 quarter is smaller than a half.', '1/4 is not the same as 1/2.'],
+        hint: ['Imagine a line down the middle.', 'Is one whole side coloured?'],
+        explain: same ? ['2 quarters fill half the shape.', '2/4 is the same as 1/2.'] : ['1 quarter fills only half of a half.', '1/4 is not the same as 1/2.'],
       };
     }
     if (level === 2) {
@@ -270,7 +306,7 @@ export const equivalence = {
         lines: ['2/4 is coloured.', 'Glue the quarters into halves.'],
         widget: 'fractions', props: { shape, parts: 4, shadedIdx: idx, labels: true, tools: ['glue'] },
         input: 'widget', goal: { parts: 2, shaded: 1 },
-        hint: ['Tap the Glue button.'],
+        hint: ['Tap the Glue button.', 'Watch the 2 coloured quarters.'],
         explain: ['2 quarters glue into 1 half.', '2/4 is the same as 1/2.'],
         reteach: equivalence.make(1, R),
       };
@@ -280,7 +316,7 @@ export const equivalence = {
       return {
         lines: ['Which fraction is the same as 1/2?'],
         input: 'choice', answer: ans, options: R.shuffle([ans, '1/4', '3/4']),
-        hint: ['How many quarters fill half a square?'],
+        hint: ['How many quarters fill half a square?', 'Count the coloured quarters.'],
         hintWidget: fr({ shape: 'square', parts: 4, shadedIdx: [0, 2], labels: true }),
         explain: ['2 quarters make a half.', '2/4 is the same as 1/2.'],
         reteach: equivalence.make(1, R),
@@ -292,9 +328,9 @@ export const equivalence = {
       lines: ['2/4 is the same as 1/2.', 'Use that to find the answer.'],
       caption: `2/4 of ${total} = ?`,
       input: 'numpad', answer: 2 * each,
-      hint: [`Find 1/2 of ${total}.`],
+      hint: [`2/4 is the same as 1/2, so find 1/2 of ${total}.`, 'Deal them into 2 equal groups.'],
       hintWidget: { widget: 'groups', props: { total, mode: 'share', bowls: 2, icon: 'dot', interactive: true } },
-      explain: [`1/2 of ${total} is ${2 * each}.`, `So 2/4 of ${total} is ${2 * each} too.`],
+      explain: [`${total} shared into 2 equal groups is ${2 * each} in each, so 1/2 of ${total} is ${2 * each}.`, `So 2/4 of ${total} is ${2 * each} too.`],
       reteach: equivalence.make(2, R),
     };
   },
@@ -329,8 +365,9 @@ export const countInFractions = {
       caption: seq.map((v, i) => (i === miss ? '?' : fw(v))).join(', '),
       widget: 'numberline',
       props: { min: lo, max, step: d, minor: 0, labels: labels.filter(l => Math.abs(l.at - ans) > 1e-6), hide: [ans], readonly: true },
-      hint: [d === 0.5 ? 'Two halves make 1 whole.' : 'Four quarters make 1 whole.', '2/4 is the same as 1/2.'],
-      explain: [`${seq.map(fw).join(', ')}.`],
+      hint: [d === 0.5 ? 'Each hop is 1/2. Two halves make 1 whole.' : 'Each hop is 1/4. Four quarters make 1 whole.', 'Where does the hop to the ? land?'],
+      hintProps: { hops: seq.slice(1).map((v, i) => ({ from: seq[i], to: v })) },
+      explain: [`${back ? 'Count back' : 'Count on'} 1/${d === 0.5 ? 2 : 4} each time.`, `${seq.map(fw).join(', ')}.`],
     };
     if (Number.isInteger(ans) && level >= 2) return { ...item, input: 'numpad', answer: ans, reteach: countInFractions.make(1, R) };
     const cands = [ans + d, ans + 1, ans - d, ans + 2 * d].filter(v => v >= 0).map(v => fw(v));
@@ -346,15 +383,17 @@ export const halvesMakeWholes = {
     const w = level <= 1 ? R.int(1, 3) : R.int(2, 5);
     const what = d === 2 ? 'halves' : 'quarters';
     const ans = d * w;
+    // Long lines label only the whole numbers, so the labels never crowd (the ticks still show every part).
     const labels = [];
-    for (let v = 0; v <= w + 1e-9; v += 1 / d) labels.push({ at: +v.toFixed(2), text: fw(v) });
+    for (let v = 0; v <= w + 1e-9; v += 1 / d) if (w * d <= 10 || Number.isInteger(+v.toFixed(2))) labels.push({ at: +v.toFixed(2), text: fw(v) });
     return {
       lines: [`How many ${what} make ${w}?`],
       widget: 'numberline', props: { min: 0, max: w, step: 1 / d, minor: 0, labels, readonly: true },
       ...(level <= 1 ? { input: 'choice', options: opts(R, ans, [w, ans + 1, ans + d]) } : { input: 'numpad' }),
       answer: ans,
-      hint: [`${d} ${what} make 1 whole.`, 'Count the jumps on the line.'],
-      explain: [`${d} ${what} in each whole.`, `${w} wholes is ${ans} ${what}.`],
+      hint: [`${d} ${what} make 1 whole.`, `Count the hops from 0 to ${w}.`],
+      hintProps: { hops: Array.from({ length: ans }, (_, i) => ({ from: +(i / d).toFixed(2), to: +((i + 1) / d).toFixed(2), label: '' })) },
+      explain: [`There are ${d} ${what} in each whole.`, `${w} wholes is ${w} lots of ${d}: ${ans} ${what}.`],
       reteach: level > 1 ? halvesMakeWholes.make(1, R) : undefined,
     };
   },

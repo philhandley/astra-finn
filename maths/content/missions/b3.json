@@ -16,6 +16,13 @@
     "30 − 3: think 10 − 3 = 7, so 30 − 3 = 27.",
     "Adding ones changes the ones. Adding tens changes the tens."
   ],
+  "warmup": {
+    "gen": "number.readTensOnes",
+    "level": 1,
+    "items": 3,
+    "mission": "n1",
+    "say": "First, a quick warm-up: tens and ones."
+  },
   "steps": [
     {
       "type": "look",
@@ -23,13 +30,27 @@
         "64 and 3 more.",
         "Green rods are tens. Blue cubes are ones."
       ],
-      "question": "Which blocks will change?",
+      "question": "Which will change: rods or cubes?",
       "widget": "blocks",
       "props": {
         "a": 64,
         "b": 3,
         "op": "+",
         "interactive": false
+      },
+      "options": [
+        "Rods",
+        "Cubes",
+        "Both"
+      ],
+      "answer": 1,
+      "reveal": [
+        "Only the blue cubes change.",
+        "4 ones and 3 ones make 7 ones."
+      ],
+      "revealProps": {
+        "combined": true,
+        "showColumns": true
       }
     },
     {
@@ -57,6 +78,16 @@
           "then": [
             "{tens} tens and {ones} ones.",
             "That is {value}."
+          ],
+          "hint": [
+            "Tap the blue Put together button."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "The blocks go together:",
+            "tens with tens, ones with ones."
           ]
         },
         {
@@ -72,7 +103,12 @@
           "then": [
             "4 + 3 = 7.",
             "So 64 + 3 = 67."
-          ]
+          ],
+          "hint": [
+            "3 is just ones.",
+            "Did the green rods change?"
+          ],
+          "caption": "64 + 3 = 67"
         },
         {
           "set": {
@@ -91,6 +127,16 @@
           "then": [
             "4 tens + 3 tens = 7 tens.",
             "So 45 + 30 = {value}."
+          ],
+          "hint": [
+            "Tap the blue Put together button."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "The tens go together.",
+            "The 5 ones stay the same."
           ]
         },
         {
@@ -124,6 +170,12 @@
           ],
           "then": [
             "Now {tens} tens and {ones} ones."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "One green rod becomes 10 blue cubes."
           ]
         },
         {
@@ -134,11 +186,14 @@
             "taken": 3
           },
           "hint": [
-            "Tap the blue cubes."
+            "Tap 3 blue cubes."
           ],
           "then": [
             "{tens} tens and {ones} ones are left.",
             "30 − 3 = {value}."
+          ],
+          "explain": [
+            "Take away 3 blue cubes."
           ]
         },
         {
@@ -167,6 +222,9 @@
           "then": [
             "7 tens − 3 tens = 4 tens.",
             "75 − 30 = {value}."
+          ],
+          "explain": [
+            "Take away 3 green rods."
           ]
         }
       ]
@@ -199,6 +257,13 @@
           "then": [
             "47 + 5 = {value}.",
             "We went past 50."
+          ],
+          "hint": [
+            "Tap the Hop button 5 times.",
+            "Say the numbers as you hop."
+          ],
+          "explain": [
+            "Hop 5 times: 48, 49, 50, 51, 52."
           ]
         },
         {
@@ -220,6 +285,13 @@
           "then": [
             "47 + 30 = {value}.",
             "Only the tens changed."
+          ],
+          "hint": [
+            "Each hop jumps 10.",
+            "Tap the Hop button 3 times."
+          ],
+          "explain": [
+            "Hop 10 three times: 57, 67, 77."
           ]
         }
       ]

@@ -4,21 +4,26 @@
   "title": "Skip-count Rockets",
   "tagline": "Count in 2s, 5s and 10s",
   "covers": ["Y1-NPV-2", "1NF–2"],
-  "patch": { "name": "Skip-count Rockets", "icon": "rocket" },
+  "patch": {"name": "Skip-count Rockets", "icon": "rocket"},
   "dadNotes": [
     "DfE sentence: 'The cans are in groups of 10, so we will count in tens.'",
     "Count in 2s, 5s and 10s out loud with no pictures, forwards and backwards.",
     "Odd numbers: 1, 3, 5, 7, 9. Count them forwards and back too."
   ],
+  "warmup": {"gen": "number.countOn", "level": 1, "items": 3, "mission": "l1", "say": "First, a quick warm-up: counting on."},
   "steps": [
     {
       "type": "look",
-      "lines": ["4 packs of fuel cans.", "Each pack has 10 cans.", "The cans are in groups of 10, so we count in tens."],
+      "lines": ["4 packs of fuel cans.", "Each pack has 10 cans."],
       "question": "How many cans altogether?",
+      "options": ["14", "40", "44"],
+      "answer": 1,
+      "reveal": ["They are in groups of 10, so we count in tens.", "Red 10, yellow 20, blue 30, green 40 cans."],
       "widget": "objects",
-      "props": { "n": 40, "icon": "fuel", "arrange": "groups", "groups": [10, 10, 10, 10] }
+      "props": {"n": 40, "icon": "fuel", "arrange": "groups", "groups": [10, 10, 10, 10]},
+      "revealProps": {"colours": [10, 10, 10, 10], "groupLabels": ["10", "20", "30", "40"]}
     },
-    { "type": "ask", "text": "Have you counted in 2s, 5s and 10s at school?" },
+    {"type": "ask", "text": "Have you counted in 2s, 5s and 10s at school?"},
     {
       "type": "guess",
       "prompt": "How many hops of 5 get from 0 to 20?",
@@ -26,39 +31,106 @@
       "answer": 1,
       "reveal": ["4 hops of 5.", "5, 10, 15, 20."],
       "widget": "numberline",
-      "props": { "min": 0, "max": 20, "step": 5, "minor": 1, "labels": "all" },
-      "revealProps": { "hops": [{ "from": 0, "to": 5 }, { "from": 5, "to": 10 }, { "from": 10, "to": 15 }, { "from": 15, "to": 20 }] }
+      "props": {"min": 0, "max": 20, "step": 5, "minor": 1, "labels": "all"},
+      "revealProps": {"hops": [{"from": 0, "to": 5}, {"from": 5, "to": 10}, {"from": 10, "to": 15}, {"from": 15, "to": 20}]}
     },
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 0, "max": 20, "mode": "hop", "hopSize": 2, "start": 0 },
+      "props": {"min": 0, "max": 20, "mode": "hop", "hopSize": 2, "start": 0, "step": 2, "minor": 1},
       "script": [
-        { "say": ["Let's count in 2s.", "Tap Hop."], "goal": { "hops": 1 }, "then": ["Hop! You landed on {value}."] },
-        { "say": ["Keep hopping to 10."], "goal": { "value": 10 }, "then": ["2, 4, 6, 8, 10.", "That's {hops} hops of 2."], "hint": ["Back undoes a hop."] },
-        { "say": ["Keep going to 20."], "goal": { "value": 20 }, "then": ["{hops} hops of 2 make 20."] },
-        { "set": { "min": 0, "max": 50, "step": 5, "hopSize": 5, "start": 0 }, "say": ["Now hop in 5s.", "Land on 30."], "goal": { "value": 30 }, "then": ["5, 10, 15, 20, 25, 30.", "{hops} hops of 5."] },
-        { "set": { "min": 0, "max": 100, "step": 10, "hopSize": 10, "start": 0 }, "say": ["Now 10s!", "Hop to 70."], "goal": { "value": 70 }, "then": ["{hops} tens is 70."] }
+        {
+          "say": ["Let's count in 2s.", "Tap Hop."],
+          "goal": {"hops": 1},
+          "then": ["Hop! You landed on {value}."],
+          "hint": ["The Hop button is blue.", "Each tap hops 2 along the line."]
+        },
+        {
+          "say": ["Keep hopping to 10."],
+          "goal": {"value": 10},
+          "then": ["2, 4, 6, 8, 10.", "That's {hops} hops of 2."],
+          "hint": ["Tap Hop until you reach 10.", "Back undoes a hop."]
+        },
+        {
+          "say": ["Keep going to 20."],
+          "goal": {"value": 20},
+          "then": ["{hops} hops of 2 make 20."],
+          "hint": ["Keep tapping Hop.", "Count: 12, 14, 16..."]
+        },
+        {
+          "set": {"min": 0, "max": 50, "step": 5, "minor": 0, "hopSize": 5, "start": 0},
+          "say": ["Now hop in 5s.", "Land on 30."],
+          "goal": {"value": 30},
+          "then": ["5, 10, 15, 20, 25, 30.", "{hops} hops of 5."],
+          "hint": ["Tap Hop and count in 5s.", "5, 10, 15... stop on 30."],
+          "explain": ["Each hop is 5.", "5, 10, 15, 20, 25, 30: 6 hops."]
+        },
+        {
+          "set": {"min": 0, "max": 100, "step": 10, "minor": 5, "hopSize": 10, "start": 0},
+          "say": ["Now 10s!", "Hop to 70."],
+          "goal": {"value": 70},
+          "then": ["{hops} tens is 70."],
+          "hint": ["Tap Hop and count in 10s.", "10, 20, 30... stop on 70."],
+          "explain": ["Each hop is 10.", "10, 20, 30, 40, 50, 60, 70: 7 hops."]
+        }
       ]
     },
     {
       "type": "try",
       "widget": "hundred",
-      "props": { "mode": "tap" },
+      "props": {"mode": "tap"},
       "script": [
-        { "say": ["Count in 10s on the 100 square.", "Tap each number up to 50."], "goal": { "taps": [10, 20, 30, 40, 50] }, "then": ["10, 20, 30, 40, 50.", "They make a column!"], "hint": ["Start with 10.", "Tap a blue square again to undo it."] },
-        { "set": { "pattern": { "every": 5, "from": 5 } }, "say": ["These are the 5s.", "What pattern can you see?"], "then": ["They all end in 5 or 0.", "Two stripes down the square!"] },
-        { "set": { "pattern": { "every": 2, "from": 2 } }, "say": ["These are the 2s.", "Count them: 2, 4, 6..."], "then": ["They end in 2, 4, 6, 8 or 0.", "These are even numbers."] }
+        {
+          "say": ["Count in 10s on the 100 square.", "Tap each number up to 50."],
+          "goal": {"taps": [10, 20, 30, 40, 50]},
+          "then": ["10, 20, 30, 40, 50.", "They make a column!"],
+          "hint": ["Start with 10, the blue square.", "Then go straight down: 20, 30..."],
+          "hintProps": {"highlight2": [10]}
+        },
+        {
+          "set": {"rows": 5, "highlight2": [], "pattern": {"every": 5, "from": 5}},
+          "say": ["The green squares are the 5s.", "Which of these is in the 5s?"],
+          "input": "choice",
+          "options": [62, 65, 68],
+          "answer": 65,
+          "then": ["65 ends in 5, like the green ones.", "The 5s always end in 5 or 0."],
+          "hint": ["Look at how the green numbers end.", "They all end in 5 or 0."]
+        },
+        {
+          "set": {"rows": 10, "pattern": {"every": 2, "from": 2}},
+          "say": ["These are the 2s.", "Count them: 2, 4, 6..."],
+          "then": ["They end in 2, 4, 6, 8 or 0.", "These are even numbers."]
+        }
       ]
     },
     {
       "type": "try",
       "tiers": [2, 3],
       "widget": "numberline",
-      "props": { "min": 0, "max": 20, "mode": "hop", "hopSize": 2, "start": 1 },
+      "props": {
+        "min": 0,
+        "max": 20,
+        "mode": "hop",
+        "hopSize": 2,
+        "start": 1,
+        "step": 20,
+        "minor": 1,
+        "labels": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+      },
       "script": [
-        { "say": ["Start at 1.", "Hop in 2s to 11."], "goal": { "value": 11 }, "then": ["1, 3, 5, 7, 9, 11.", "These are odd numbers."] },
-        { "set": { "start": 19, "hopSize": -2 }, "say": ["Now hop back in 2s from 19.", "Stop on 9."], "goal": { "value": 9 }, "then": ["19, 17, 15, 13, 11, 9.", "Odd numbers, going back."] }
+        {
+          "say": ["Start at 1.", "Hop in 2s to 11."],
+          "goal": {"value": 11},
+          "then": ["1, 3, 5, 7, 9, 11.", "These are odd numbers."],
+          "hint": ["Tap Hop.", "You will land on 3, 5, 7..."]
+        },
+        {
+          "set": {"start": 19, "hopSize": -2},
+          "say": ["Now hop back in 2s from 19.", "Stop on 9."],
+          "goal": {"value": 9},
+          "then": ["19, 17, 15, 13, 11, 9.", "Odd numbers, going back."],
+          "hint": ["Each hop goes back 2.", "19, 17, 15..."]
+        }
       ]
     },
     {

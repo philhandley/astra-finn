@@ -17,21 +17,44 @@
     "When one part goes up by 1, the other goes down by 1. Ask Finn to spot it.",
     "Odd numbers leave one counter without a partner."
   ],
+  "warmup": {
+    "gen": "number.countObjects",
+    "level": 1,
+    "items": 3,
+    "mission": "l1",
+    "say": "First, a quick warm-up: counting to 10."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
-        "A full tens frame.",
-        "7 red counters and 3 yellow."
+        "7 red counters in a tens frame.",
+        "Some spaces are empty."
       ],
-      "question": "How many counters altogether?",
+      "question": "How many more to fill the frame?",
       "widget": "tensframe",
       "props": {
         "colours": [
           7,
-          3
+          0
         ],
         "frames": 1
+      },
+      "options": [
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 1,
+      "reveal": [
+        "3 yellow counters fill it.",
+        "10 is made of 7 and 3."
+      ],
+      "revealProps": {
+        "colours": [
+          7,
+          3
+        ]
       }
     },
     {
@@ -58,8 +81,12 @@
           3,
           4
         ],
-        "hide": 0
-      }
+        "counters": "both"
+      },
+      "lines": [
+        "7 can split into 3 and 4.",
+        "That is one way."
+      ]
     },
     {
       "type": "try",
@@ -82,6 +109,10 @@
           "hint": [
             "Tap the frame once for each counter.",
             "Tap a counter to take it off."
+          ],
+          "explain": [
+            "5 red counters fill the top row.",
+            "1 more goes below. That makes 6."
           ]
         },
         {
@@ -99,6 +130,9 @@
           "then": [
             "{a} red and {b} yellow make 10.",
             "10 is made of {a} and {b}."
+          ],
+          "explain": [
+            "4 yellow counters fill the gaps."
           ]
         },
         {
@@ -125,6 +159,10 @@
           "hint": [
             "Use the yellow brush.",
             "Tap a counter to take it off."
+          ],
+          "explain": [
+            "7 yellow counters fill the frame.",
+            "3 and 7 make 10."
           ]
         },
         {
@@ -135,6 +173,9 @@
           "answer": "{b}",
           "then": [
             "3 and {b} make 10."
+          ],
+          "hint": [
+            "Count the yellow counters in the frame."
           ]
         }
       ]
@@ -160,6 +201,12 @@
           ],
           "then": [
             "7 is made of {a} and {b}."
+          ],
+          "hintProps": {
+            "pulse": 0
+          },
+          "explain": [
+            "One counter moves across to the other part."
           ]
         },
         {
@@ -172,6 +219,15 @@
           "then": [
             "Now {a} and {b}.",
             "One part went down by 1. The other went up by 1."
+          ],
+          "hint": [
+            "Tap the circle with the red counters again."
+          ],
+          "hintProps": {
+            "pulse": 0
+          },
+          "explain": [
+            "One more counter moves across."
           ]
         },
         {
@@ -184,10 +240,18 @@
             "b": 4
           },
           "hint": [
-            "Tap the part with more counters."
+            "Tap the red part until it has 3.",
+            "Tap the yellow part to move one back."
           ],
           "then": [
             "7 is made of 3 and 4."
+          ],
+          "hintProps": {
+            "pulse": 0
+          },
+          "explain": [
+            "Move them one at a time.",
+            "Stop at 3 and 4."
           ]
         },
         {
@@ -207,6 +271,10 @@
           "then": [
             "You found all 8 ways!",
             "7 and 0 counts too."
+          ],
+          "explain": [
+            "Watch: 7 and 0, 6 and 1, 5 and 2…",
+            "…all the way to 0 and 7."
           ]
         }
       ]
@@ -222,7 +290,13 @@
           2,
           2
         ],
-        "icon": "boot"
+        "icon": "boot",
+        "mirror": "alternate",
+        "colours": [
+          2,
+          2,
+          2
+        ]
       },
       "script": [
         {
@@ -239,12 +313,22 @@
           "then": [
             "6 is even.",
             "It makes pairs with none left over."
+          ],
+          "hint": [
+            "Look at each pair.",
+            "Is any boot on its own?"
           ]
         },
         {
           "set": {
             "n": 7,
             "groups": [
+              2,
+              2,
+              2,
+              1
+            ],
+            "colours": [
               2,
               2,
               2,
@@ -264,12 +348,22 @@
           "then": [
             "1 boot is left over.",
             "7 is odd."
+          ],
+          "hint": [
+            "Look for a boot with no partner."
           ]
         },
         {
           "set": {
             "n": 10,
             "groups": [
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "colours": [
               2,
               2,
               2,
@@ -289,6 +383,10 @@
           "then": [
             "10 is even.",
             "5 pairs, none left over."
+          ],
+          "hint": [
+            "Look at the pairs.",
+            "Is one boot left over?"
           ]
         }
       ]

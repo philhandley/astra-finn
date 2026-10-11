@@ -23,13 +23,26 @@
       "type": "look",
       "lines": [
         "This is the clock on the launch tower.",
-        "It has a short hand and a long hand."
+        "It has a short red hand and a long blue hand."
       ],
-      "question": "What do you think the hands tell us?",
+      "question": "What time does it show?",
       "widget": "clock",
       "props": {
         "h": 7,
         "m": 0
+      },
+      "options": [
+        "6 o'clock",
+        "7 o'clock",
+        "8 o'clock"
+      ],
+      "answer": 1,
+      "reveal": [
+        "The short red hand points to 7.",
+        "The long blue hand is on 12: 7 o'clock."
+      ],
+      "revealProps": {
+        "digital": true
       }
     },
     {
@@ -39,7 +52,7 @@
     {
       "type": "guess",
       "prompt": "How many days are in 1 week?",
-      "art": "planet",
+      "art": "sun",
       "options": [
         "5 days",
         "7 days",
@@ -76,15 +89,27 @@
             "m": 0
           },
           "hint": [
-            "Put your finger near the middle.",
-            "Drag the short hand round to 3."
+            "The short red hand is on 12 now.",
+            "Drag it round to the 3."
           ],
           "then": [
             "The long hand is on 12.",
             "The short hand is on 3. It is {words}."
+          ],
+          "hintProps": {
+            "ringHour": [
+              3
+            ]
+          },
+          "explain": [
+            "The long hand stays on 12.",
+            "The short hand points to 3: 3 o'clock."
           ]
         },
         {
+          "set": {
+            "ringHour": []
+          },
           "say": [
             "Now drag the long hand all the way round once."
           ],
@@ -99,9 +124,19 @@
           "then": [
             "One hour went by.",
             "Look: the short hand moved on to 4."
+          ],
+          "hintProps": {
+            "sweep": true
+          },
+          "explain": [
+            "The long hand goes all the way round, back to 12.",
+            "The short hand moves on from 3 to 4."
           ]
         },
         {
+          "set": {
+            "sweep": null
+          },
           "say": [
             "Drag the long hand to 6."
           ],
@@ -111,12 +146,28 @@
           "then": [
             "The long hand is on 6.",
             "That is half past. It is {words}."
+          ],
+          "hint": [
+            "Drag the long blue hand round to 6, at the bottom.",
+            "Half way round is half past."
+          ],
+          "hintProps": {
+            "ring": [
+              6
+            ],
+            "sweep": true
+          },
+          "explain": [
+            "The long hand goes half way round, to 6.",
+            "That is half past 4."
           ]
         },
         {
           "set": {
             "h": 9,
-            "m": 30
+            "m": 30,
+            "ring": [],
+            "sweep": null
           },
           "say": [
             "Here is a new time.",
@@ -131,7 +182,11 @@
           "answer": "half past 9",
           "then": [
             "Long hand on 6, so half past.",
-            "Short hand just past 9: half past 9."
+            "Short hand half way from 9 to 10: half past 9."
+          ],
+          "hint": [
+            "Look at the long blue hand first. Is it on 12 or 6?",
+            "Which number has the short red hand just passed?"
           ]
         },
         {
@@ -147,11 +202,24 @@
             "m": 30
           },
           "hint": [
-            "Long hand on 6.",
-            "Short hand halfway from 2 to 3."
+            "Long blue hand on 6.",
+            "Short red hand half way from 2 to 3."
           ],
           "then": [
             "Half past 2! Well set."
+          ],
+          "hintProps": {
+            "ring": [
+              6
+            ],
+            "ringHour": [
+              2,
+              3
+            ]
+          },
+          "explain": [
+            "The long hand goes on 6: half past.",
+            "The short hand goes half way from 2 to 3."
           ]
         }
       ]
@@ -210,9 +278,21 @@
           ],
           "then": [
             "That is 10p. It is silver and round."
+          ],
+          "hintProps": {
+            "point": [
+              "10p"
+            ]
+          },
+          "explain": [
+            "This is the 10p coin: silver and round.",
+            "It goes in the purse."
           ]
         },
         {
+          "set": {
+            "point": []
+          },
           "say": [
             "Now add a 5p coin."
           ],
@@ -224,6 +304,19 @@
           },
           "then": [
             "10p and 5p make 15p."
+          ],
+          "hint": [
+            "Find the small silver coin that says 5p.",
+            "Tap it once."
+          ],
+          "hintProps": {
+            "point": [
+              "5p"
+            ]
+          },
+          "explain": [
+            "The 5p coin is small and silver.",
+            "10p and 5p make 15p."
           ]
         },
         {
@@ -231,7 +324,9 @@
             "purse": [
               "2p",
               "5p"
-            ]
+            ],
+            "showTotal": false,
+            "point": []
           },
           "say": [
             "Which is worth more, 2p or 5p?"
@@ -245,11 +340,16 @@
           "then": [
             "5p is worth more.",
             "Even though the 2p coin is bigger!"
+          ],
+          "hint": [
+            "Read the number on each coin.",
+            "The size of a coin does not tell you!"
           ]
         },
         {
           "set": {
-            "purse": []
+            "purse": [],
+            "showTotal": true
           },
           "say": [
             "Make 20p with 2 coins."
@@ -259,24 +359,32 @@
             "count": 2
           },
           "hint": [
-            "Try two coins that are the same."
+            "Try two coins that are the same.",
+            "Which coin, two times, makes 20p?"
           ],
           "then": [
             "{items} make 20p."
+          ],
+          "hintProps": {
+            "point": [
+              "10p"
+            ]
+          },
+          "explain": [
+            "10p and 10p make 20p.",
+            "That is 2 coins."
           ]
         },
         {
           "set": {
-            "tray": [
-              "£5",
-              "£10",
-              "£20"
-            ],
+            "tray": [],
             "purse": [
               "£5",
               "£10",
               "£20"
-            ]
+            ],
+            "showTotal": false,
+            "point": []
           },
           "say": [
             "Notes are worth even more.",
@@ -292,6 +400,10 @@
           "then": [
             "£20 is worth the most.",
             "£ means pounds."
+          ],
+          "hint": [
+            "Read the number on each note.",
+            "Which number is the biggest?"
           ]
         }
       ]
@@ -336,12 +448,22 @@
     },
     {
       "type": "look",
-      "art": "sun",
+      "caption": "Today is",
+      "big": "Monday",
       "lines": [
-        "A week has 7 days. A year has 12 months.",
-        "Morning, afternoon and evening make up a day."
+        "A week has 7 days.",
+        "Let's say today is Monday."
       ],
-      "question": "What did you do yesterday?"
+      "question": "What day was yesterday?",
+      "show": {
+        "label": "Go back 1 day",
+        "caption": "Yesterday was",
+        "big": "Sunday",
+        "lines": [
+          "Sunday is the day before Monday.",
+          "Tell {engineer} one thing you did yesterday."
+        ]
+      }
     },
     {
       "type": "practise",

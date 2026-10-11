@@ -111,8 +111,30 @@ export function mount(el, props = {}, ctx = {}) {
       return { count: cells.length, a, b: cells.length - a, frames: frames() };
     },
     update(np) { setFromProps(np); draw(); },
+    // "Show me": a number fills that many red counters; a goal such as { count: 10, a: 6 } or { a: 6, b: 7 }
+    // is built exactly (red first, then yellow). A count on its own keeps the colours already there.
     showAnswer(answer) {
-      if (typeof answer === 'number') { cells = Array(clamp(answer, 0, capacity())).fill('a'); draw(); }
+      const val = x => {
+        if (x && typeof x === 'object') x = x.eq ?? x.gte ?? x.lte ?? (Array.isArray(x.in) ? x.in[0] : undefined);
+        return Number.isFinite(Number(x)) && x !== null && x !== undefined ? Math.round(Number(x)) : null;
+      };
+      if (typeof answer === 'number') { cells = Array(clamp(answer, 0, 20)).fill('a'); }
+      else if (answer && typeof answer === 'object') {
+        const count = val(answer.count), a = val(answer.a), b = val(answer.b);
+        const curA = cells.filter(c => c === 'a').length, curB = cells.length - curA;
+        let na, nb;
+        if (a !== null && b !== null) { na = a; nb = b; }
+        else if (a !== null) { na = a; nb = count !== null ? count - a : curB; }
+        else if (b !== null) { nb = b; na = count !== null ? count - b : curA; }
+        else if (count !== null) {
+          if (count <= cells.length) { const keep = cells.slice(0, count); na = keep.filter(c => c === 'a').length; nb = keep.length - na; }
+          else { const pad = count - cells.length; const twoCol = p.twoColour && cells.length > 0; na = curA + (twoCol ? 0 : pad); nb = curB + (twoCol ? pad : 0); }
+        } else return;
+        na = clamp(na, 0, 20); nb = clamp(nb, 0, 20 - na);
+        cells = [...Array(na).fill('a'), ...Array(nb).fill('b')];
+      } else return;
+      cells = cells.slice(0, capacity());
+      changed();
     },
     destroy() { unbinds.splice(0).forEach(u => u()); el.replaceChildren(); },
   };

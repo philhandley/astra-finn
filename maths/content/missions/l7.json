@@ -16,6 +16,13 @@
     "Read '=' as 'is the same as'. Avoid 'makes' or 'the answer is'.",
     "Missing numbers: use the inverse. 7 = ? − 9, so ? = 7 + 9."
   ],
+  "warmup": {
+    "gen": "addsub.factsWithin10",
+    "level": 2,
+    "items": 3,
+    "mission": "l6",
+    "say": "First, a quick warm-up: facts within 10."
+  },
   "steps": [
     {
       "type": "look",
@@ -28,6 +35,17 @@
       "props": {
         "left": "3 + 4",
         "right": "7"
+      },
+      "show": {
+        "label": "Work out 3 + 4",
+        "props": {
+          "left": "7"
+        },
+        "caption": "3 + 4 = 7",
+        "lines": [
+          "3 + 4 is the same as 7.",
+          "Both sides are 7, so it is level."
+        ]
       }
     },
     {
@@ -82,6 +100,10 @@
           "then": [
             "5 + 4 = 9.",
             "Both sides are the same."
+          ],
+          "hint": [
+            "Both sides must be the same.",
+            "What goes with 4 to make 9?"
           ]
         },
         {
@@ -122,6 +144,10 @@
           "then": [
             "Yes! 8 is the same as 8.",
             "Equals means 'is the same as'."
+          ],
+          "hint": [
+            "Look at both sides.",
+            "Are they the same number?"
           ]
         },
         {
@@ -142,6 +168,10 @@
           "then": [
             "Both sides make 7.",
             "We can have sums on both sides."
+          ],
+          "hint": [
+            "Work out 3 + 4.",
+            "Then work out 5 + 2. Are they the same?"
           ]
         }
       ]
@@ -190,7 +220,17 @@
             "15 − ? = 8."
           ],
           "then": [
-            "15 − 7 = 8 and 4 + 4 = 8."
+            "15 − 7 = 8."
+          ]
+        },
+        {
+          "set": {
+            "left": "15 − 7"
+          },
+          "caption": "15 − 7 = 4 + 4",
+          "say": [
+            "15 − 7 = 8 and 4 + 4 = 8.",
+            "Both sides are the same, so it balances."
           ]
         }
       ]

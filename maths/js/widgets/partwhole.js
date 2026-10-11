@@ -5,7 +5,13 @@
 //   hide                  'whole' | 0 | 1 | 2 | null: that circle shows a blue "?" instead of its number.
 //   counters              'digits' (default) | 'dots' | 'both'. Dots are drawn only for numbers up to 20.
 //   mode                  'display' (default) | 'split'.
+//   facts                 true: write the fact family beside the picture (two parts only): the two adding
+//                         facts top left, the two subtracting facts top right (for a "Show the facts" reveal).
+//   pulse                 'whole' | 0 | 1 | 2: that circle pulses blue (a Help hint: "tap this one"). Cosmetic: keeps the counters.
 //   readonly              no interaction.
+// showAnswer(answer): a number or nothing reveals the hidden circle; in split mode an array of parts, or a goal
+//   object ({ a, b }, { parts }, { ways: { gte: n } }) moves the counters to match (every split, one at a time, for
+//   ways) and then reports the new state with onChange, so a try step's "Show me" also completes the step.
 // Style v2: white circles with an ink outline (the whole on a soft grey fill), ink joining lines, big ink numbers.
 //   Counters: part 0 red, part 1 yellow, part 2 blue (as the tens frame); the whole's counters are grey.
 // Split mode: the whole's counters sit in the part circles (all in part 0 unless valid parts are given).
@@ -41,13 +47,23 @@ function geometry(n, split) {
   return { whole: { x: 400, y: 116, r: 92 }, parts: [{ x: 215, y: 352, r: 110 }, { x: 585, y: 352, r: 110 }] };
 }
 
+function grid(n) {
+  if (n <= 4) return [n, 1];
+  if (n <= 6) return [3, 2];
+  if (n <= 8) return [4, 2];
+  if (n <= 10) return [5, 2];
+  if (n <= 12) return [4, 3];
+  if (n <= 15) return [5, 3];
+  return [5, 4];
+}
+const fitSpacing = (n, r) => { const [cols, rows] = grid(n); return Math.min((0.9 * r) / (Math.hypot((cols - 1) / 2, (rows - 1) / 2) + 0.45), 0.62 * r); };
+
 // Dot slots for n counters inside a circle of radius r, centred on 0,0.
-function dotLayout(n, r) {
+// spacing: a fixed spacing (split mode keeps the counters one size while they move between parts).
+function dotLayout(n, r, spacing) {
   if (n <= 0) return { pts: [], dr: 0 };
-  let cols, rows;
-  if (n <= 4) { cols = n; rows = 1; } else if (n <= 6) { cols = 3; rows = 2; } else if (n <= 8) { cols = 4; rows = 2; } else if (n <= 10) { cols = 5; rows = 2; } else if (n <= 12) { cols = 4; rows = 3; } else if (n <= 15) { cols = 5; rows = 3; } else { cols = 5; rows = 4; }
-  const dist = Math.hypot((cols - 1) / 2, (rows - 1) / 2);
-  const s = Math.min((0.9 * r) / (dist + 0.45), 0.62 * r);
+  const [cols, rows] = grid(n);
+  const s = spacing || fitSpacing(n, r);
   const pts = [];
   for (let i = 0; i < n; i++) {
     const row = Math.floor(i / cols), col = i % cols;
@@ -67,14 +83,19 @@ export function mount(el, props = {}, ctx = {}) {
     .w-partwhole .hit { cursor: pointer; }
     .w-partwhole.ro .hit { cursor: default; }
     .w-partwhole .glow { animation: w-partwhole-glow 1.2s ease-in-out 2; }
+    .w-partwhole .pulse { animation: w-partwhole-pulse 1s ease-in-out 4; }
+    @keyframes w-partwhole-pulse { 50% { stroke-width: 11; stroke: ${COL.focus}; } }
+    .w-partwhole .fact { animation: w-partwhole-in .35s ease-out both; }
+    @keyframes w-partwhole-in { from { opacity: 0; } }
     @keyframes w-partwhole-glow { 50% { stroke-width: 10; } }
-    @media (prefers-reduced-motion: reduce) { .w-partwhole .ctr { transition: none; } .w-partwhole .glow { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .w-partwhole .ctr { transition: none; } .w-partwhole .glow, .w-partwhole .pulse, .w-partwhole .fact { animation: none; } }
   `);
   let p = {};
   let whole = 0, parts = [0, 0], nParts = 2, split = false;
   let ctrs = []; // split mode: [{ el, part }]
   let ways = new Set();
   let revealed = null;
+  let pulseKey = null;
   const root = svgRoot(W, H, 'w-partwhole');
   el.appendChild(root);
   const unbinds = [];
@@ -116,10 +137,11 @@ export function mount(el, props = {}, ctx = {}) {
   function circle(g, c, key, i) {
     const isHidden = hidden(key);
     const isRevealed = revealed === key;
+    const pulsing = pulseKey !== null && String(pulseKey) === String(key);
     const fill = isHidden || isRevealed ? QSOFT : key === 'whole' ? COL.surface2 : COL.surface;
     g.appendChild(S('circle', {
       cx: c.x, cy: c.y, r: c.r, fill, stroke: isHidden || isRevealed ? Q : COL.ink, 'stroke-width': 4,
-      'stroke-dasharray': isHidden ? '16 11' : null, 'stroke-linecap': 'round', class: isRevealed ? 'glow' : null,
+      'stroke-dasharray': isHidden ? '16 11' : null, 'stroke-linecap': 'round', class: isRevealed ? 'glow' : pulsing ? 'pulse' : null,
     }));
   }
 
@@ -150,7 +172,9 @@ export function mount(el, props = {}, ctx = {}) {
     }
     if (dotsHere) {
       if (!split) {
-        const { pts, dr } = dotLayout(v, c.r);
+        // Parts share one counter size, so a bigger part never looks smaller.
+        const shared = key === 'whole' ? undefined : Math.min(...parts.filter(x => x > 0 && x <= 20).map(x => fitSpacing(x, c.r)));
+        const { pts, dr } = dotLayout(v, c.r, Number.isFinite(shared) ? shared : undefined);
         pts.forEach(q => g.appendChild(S('circle', { cx: c.x + q.x, cy: c.y + q.y, r: dr, fill: key === 'whole' ? WHOLE_DOT : PART_COL[i], stroke: key === 'whole' ? WHOLE_DOT_DARK : PART_DARK[i], 'stroke-width': 3 })));
       }
       if (useDigits(v) && (p.counters === 'both' || split)) badge(g, c, key, i, v);
@@ -160,9 +184,16 @@ export function mount(el, props = {}, ctx = {}) {
     bigText(g, c.x, c.y, s, c.r * (s.length > 2 ? 0.62 : 0.86), COL.ink);
   }
 
-  function slotsFor(i) {
+  // Split mode: each part's counters sit centred in their circle, in the tens-frame-like grid for that count,
+  // at one fixed size (the size that lets the whole fit in one part).
+  function slotsFor(i, count) {
     const geo = geometry(nParts, split);
-    return dotLayout(whole, geo.parts[i].r);
+    const r = geo.parts[i].r;
+    let s = Infinity;
+    for (let n = 1; n <= Math.max(whole, 1); n++) s = Math.min(s, fitSpacing(n, r));
+    const n = count ?? ctrs.filter(c => c.part === i).length;
+    const L = dotLayout(n, r, s);
+    return { pts: L.pts, dr: s * 0.42 };
   }
 
   function placeCounters() {
@@ -188,7 +219,26 @@ export function mount(el, props = {}, ctx = {}) {
     label(gLab, geo.whole, 'whole', -1, whole);
     geo.parts.forEach((c, i) => label(gLab, c, i, i, parts[i]));
     placeCounters();
+    drawFacts(gLab);
     // Hidden circles: redraw strokes (hide can change with reveal).
+  }
+
+  // The fact family as four white cards: adding facts top left, subtracting facts top right.
+  function drawFacts(g) {
+    if (!p.facts || nParts !== 2) return;
+    const [a, b] = parts;
+    const cols = [
+      { x: 22, anchor: 'start', facts: [`${a} + ${b} = ${whole}`, `${b} + ${a} = ${whole}`] },
+      { x: 778, anchor: 'end', facts: [`${whole} − ${a} = ${b}`, `${whole} − ${b} = ${a}`] },
+    ];
+    cols.forEach((c, ci) => c.facts.forEach((t, k) => {
+      const y = 40 + k * 74, size = t.length > 11 ? 30 : 36, w = t.length * size * 0.5 + 34;
+      const x = c.anchor === 'start' ? c.x : c.x - w;
+      const f = S('g', { class: 'fact' });
+      f.appendChild(S('rect', { x, y: y - 31, width: w, height: 62, rx: 16, fill: COL.surface, stroke: COL.lineStrong, 'stroke-width': 3 }));
+      f.appendChild(S('text', { x: x + w / 2, y: y + 1, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': FONT.display, 'font-weight': 700, 'font-size': size, fill: COL.ink }, [t]));
+      g.appendChild(f);
+    }));
   }
 
   function partAt(pt) {
@@ -213,6 +263,7 @@ export function mount(el, props = {}, ctx = {}) {
   }
 
   function moveTo(c, target) {
+    stopShow();
     // Moved counters join the end of their new part.
     ctrs = ctrs.filter(x => x !== c);
     c.part = target;
@@ -277,25 +328,30 @@ export function mount(el, props = {}, ctx = {}) {
   const api = {
     getState: state,
     update(np) {
-      const reset = ['whole', 'parts', 'mode', 'hide'].some(k => k in np);
-      if (reset) setFromProps(np); else p = { ...p, ...np };
+      stopShow();
+      // pulse is a one-off hint: it animates this drawing and is not kept in the props.
+      pulseKey = np.pulse === undefined || np.pulse === null || np.pulse === '' ? null : np.pulse;
+      const rest = { ...np }; delete rest.pulse;
+      const reset = ['whole', 'parts', 'mode', 'hide'].some(k => k in rest);
+      if (reset) setFromProps(rest); else p = { ...p, ...rest };
       build();
+      pulseKey = null;
     },
     showAnswer(answer) {
+      stopShow();
+      // A try-step goal: { a, b, c }, { parts }, or { ways: { gte: n } }.
+      if (split && answer && typeof answer === 'object' && !Array.isArray(answer)) {
+        if (answer.ways !== undefined) { showAllWays(); return; }
+        const want = Array.isArray(answer.parts) ? answer.parts.map(num) : ['a', 'b', 'c'].slice(0, nParts).map(k => (typeof answer[k] === 'number' ? num(answer[k]) : null));
+        const free = want.filter(v => v === null).length;
+        const known = want.reduce((s, v) => s + (v ?? 0), 0);
+        if (free === 1) want[want.indexOf(null)] = Math.max(0, whole - known);
+        if (want.some(v => v === null)) return;
+        answer = want;
+      }
       if (split && Array.isArray(answer) && answer.length === nParts && answer.reduce((s, v) => s + num(v), 0) === whole) {
-        // Move counters until the parts match the answer.
-        const want = answer.map(num);
-        let guard = 100;
-        while (guard-- > 0) {
-          const now = Array(nParts).fill(0); ctrs.forEach(c => now[c.part]++);
-          const from = now.findIndex((v, i) => v > want[i]);
-          const to = now.findIndex((v, i) => v < want[i]);
-          if (from < 0 || to < 0) break;
-          const c = [...ctrs].reverse().find(x => x.part === from);
-          ctrs = ctrs.filter(x => x !== c); c.part = to; ctrs.push(c);
-        }
-        ways.add(want.join(','));
-        refresh();
+        moveToParts(answer.map(num));
+        changed();
         return;
       }
       if (p.hide !== null && p.hide !== undefined && p.hide !== '') {
@@ -303,8 +359,41 @@ export function mount(el, props = {}, ctx = {}) {
         build();
       }
     },
-    destroy() { unbinds.splice(0).forEach(u => u()); el.replaceChildren(); },
+    destroy() { stopShow(); unbinds.splice(0).forEach(u => u()); el.replaceChildren(); },
   };
+
+  // Move counters until the parts match `want` (they slide across with the CSS transition).
+  function moveToParts(want) {
+    let guard = 100;
+    while (guard-- > 0) {
+      const now = Array(nParts).fill(0); ctrs.forEach(c => now[c.part]++);
+      const from = now.findIndex((v, i) => v > want[i]);
+      const to = now.findIndex((v, i) => v < want[i]);
+      if (from < 0 || to < 0) break;
+      const c = [...ctrs].reverse().find(x => x.part === from);
+      ctrs = ctrs.filter(x => x !== c); c.part = to; ctrs.push(c);
+    }
+  }
+
+  // "Show me" for "find every way": all the counters to the first part, then one at a time across.
+  let showTimer = null;
+  function stopShow() { clearTimeout(showTimer); showTimer = null; }
+  function showAllWays() {
+    if (nParts !== 2) return;
+    moveToParts([whole, 0]);
+    changed();
+    const stepMs = matchMedia('(prefers-reduced-motion: reduce)').matches ? 60 : 420;
+    const next = () => {
+      if (parts[0] <= 0) { showTimer = null; return; }
+      const c = [...ctrs].reverse().find(x => x.part === 0);
+      ctrs = ctrs.filter(x => x !== c); c.part = 1; ctrs.push(c);
+      sfx('pop');
+      changed();
+      showTimer = setTimeout(next, stepMs);
+    };
+    showTimer = setTimeout(next, stepMs);
+  }
+
   setFromProps(props);
   build();
   return api;

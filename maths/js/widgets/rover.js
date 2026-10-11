@@ -6,7 +6,10 @@
 //        controls (array from 'forward', 'back', 'left' (quarter turn anticlockwise), 'right' (quarter turn clockwise), 'half'),
 //        program (true: taps queue arrow cards and Go! runs them from the start; otherwise each tap moves at once),
 //        showTurnArc (draw each turn as a curved arrow from the old heading to the new one, with a right-angle mark
-//            and a small "clockwise" / "anticlockwise" label), trail (default true: dots where it has been), readonly.
+//            and a small "clockwise" / "anticlockwise" label), trail (default true: dots where it has been),
+//        ahead (true: light the squares in front of the rover with a dashed blue arrow, the way Forward would take it),
+//        answerCmds (array of commands that showAnswer acts out from the start when there is no flag, e.g. ['right', 'right']
+//            for "a half turn"), readonly.
 // Driving off the grid or into a rock gives a gentle bump and no move.
 // State: { x, y, dir, turns, moves, atTarget, queued }  (turns = quarter turns clockwise minus anticlockwise since the start;
 //         moves = squares moved; queued = cards waiting in program mode)
@@ -200,6 +203,7 @@ export function mount(el, props = {}, ctx = {}) {
     if (p.trail !== false) {
       trail.slice(0, -1).forEach(([x, y]) => root.appendChild(S('circle', { class: 'deco', cx: f1(L.cx(x)), cy: f1(L.cy(y)), r: Math.max(5, cell * 0.09), fill: PAL.blue, 'fill-opacity': 0.3 })));
     }
+    if (p.ahead) drawAhead();
     // Rocks and flag.
     const art = (name, x, y, size) => {
       const g = S('g', { class: 'deco', transform: `translate(${f1(L.cx(x) - size / 2)} ${f1(L.cy(y) - size / 2)}) scale(${size / 100})` });
@@ -219,16 +223,38 @@ export function mount(el, props = {}, ctx = {}) {
     placeRover();
 
     if (L.showCtl) {
-      // Reset (home) button beside the grid.
-      const rx = Math.min(gx + cell * C + 18, W - 78), ry = gy;
-      const rb = ctlButton({ x: rx, y: ry, w: 68, h: 68, aria: 'Back to start', off: running }, [
-        S('path', { d: `M${rx + 34} ${ry + 15}L${rx + 55} ${ry + 34}H${rx + 49}V${ry + 53}H${rx + 19}V${ry + 34}H${rx + 13}Z`, fill: COL.ink, stroke: COL.ink, 'stroke-width': 2, 'stroke-linejoin': 'round' }),
+      // "Start again" button beside the grid (words, not a house: the app's own Home button is a house).
+      const rw = 104, rx = Math.min(gx + cell * C + 16, W - rw - 6), ry = gy;
+      const rb = ctlButton({ x: rx, y: ry, w: rw, h: 72, aria: 'Start again', off: running }, [
+        S('text', { x: rx + rw / 2, y: ry + 31, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 22, fill: COL.ink }, ['Start']),
+        S('text', { x: rx + rw / 2, y: ry + 56, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 22, fill: COL.ink }, ['again']),
       ]);
       unbinds.push(onTap(rb, () => { if (running) return; resetPos(); ranIdx = -1; sfx('click'); draw(); changed(); }));
       root.appendChild(rb);
       drawButtons();
       if (L.prog) drawProgram();
     }
+  }
+
+  // The squares the rover would drive over going forward (until a rock or the edge), with a dashed arrow.
+  function drawAhead() {
+    const [dx, dy] = DV[st.dir];
+    let n = 0;
+    while (n < 12 && !blocked(st.x + dx * (n + 1), st.y + dy * (n + 1))) n++;
+    if (!n) return;
+    const { cell, gx, gy } = L;
+    const g = S('g', { class: 'deco' });
+    for (let k = 1; k <= n; k++) {
+      const x = st.x + dx * k, y = st.y + dy * k;
+      g.appendChild(S('rect', { x: f1(gx + x * cell + 5), y: f1(gy + y * cell + 5), width: f1(cell - 10), height: f1(cell - 10), rx: 10, fill: COL.focusSoft }));
+    }
+    const hd = Math.max(18, cell * 0.3), sw = Math.max(6, cell * 0.08);
+    const x0 = L.cx(st.x) + dx * cell * 0.55, y0 = L.cy(st.y) + dy * cell * 0.55;
+    const xe = L.cx(st.x + dx * n), ye = L.cy(st.y + dy * n);
+    g.appendChild(S('path', { d: `M${f1(x0)} ${f1(y0)}L${f1(xe - dx * hd * 0.4)} ${f1(ye - dy * hd * 0.4)}`, stroke: COL.focus, 'stroke-width': f1(sw), 'stroke-dasharray': `${f1(sw * 1.6)} ${f1(sw * 1.4)}`, 'stroke-linecap': 'round', fill: 'none' }));
+    const tip = [xe + dx * hd * 0.6, ye + dy * hd * 0.6], b = [xe - dx * hd * 0.5, ye - dy * hd * 0.5];
+    g.appendChild(S('path', { d: `M${f1(tip[0])} ${f1(tip[1])}L${f1(b[0] - dy * hd * 0.7)} ${f1(b[1] + dx * hd * 0.7)}L${f1(b[0] + dy * hd * 0.7)} ${f1(b[1] - dx * hd * 0.7)}Z`, fill: COL.focus, stroke: COL.focus, 'stroke-width': 3, 'stroke-linejoin': 'round' }));
+    root.appendChild(g);
   }
 
   function drawButtons() {
@@ -408,7 +434,24 @@ export function mount(el, props = {}, ctx = {}) {
     showAnswer(answer) {
       if (running) return;
       const t = target();
-      const cmds = Array.isArray(answer) ? answer.filter(c => CMDS.includes(c)) : t ? roverRoute(cols(), rows(), startOf(), t, rocks()) : null;
+      // A turning goal such as { turns: 2 }, { dir: 'E', turns: 1 } or { turns: { gte: 4 } } is acted out from the start.
+      let turnCmds = null;
+      if (answer && typeof answer === 'object' && !Array.isArray(answer) && !answer.atTarget && ('turns' in answer || 'dir' in answer)) {
+        let tv = answer.turns;
+        if (tv && typeof tv === 'object') tv = tv.eq ?? tv.gte ?? tv.lte;
+        if (tv !== undefined && tv !== null && Number.isFinite(+tv)) {
+          const n = clamp(Math.round(+tv), -8, 8);
+          turnCmds = Array(Math.abs(n)).fill(n >= 0 ? 'right' : 'left');
+        } else if (DIRS.includes(answer.dir)) {
+          const q = (((DIRS.indexOf(answer.dir) - DIRS.indexOf(startOf().dir)) % 4) + 4) % 4;
+          turnCmds = q === 3 ? ['left'] : Array(q).fill('right');
+        }
+      }
+      if (turnCmds && !turnCmds.length) { resetPos(); draw(); changed(); return; } // { turns: 0 }: back to the start
+      const cmds = turnCmds ? turnCmds
+        : Array.isArray(answer) ? answer.filter(c => CMDS.includes(c))
+        : Array.isArray(p.answerCmds) ? p.answerCmds.filter(c => CMDS.includes(c))
+        : t ? roverRoute(cols(), rows(), startOf(), t, rocks()) : null;
       if (!cmds || !cmds.length) return;
       if (L && L.prog) queue = cmds.slice(0, 12);
       play(cmds, false);

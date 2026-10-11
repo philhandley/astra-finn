@@ -16,6 +16,13 @@
   "One array gives four facts: 4 × 5, 5 × 4, 20 ÷ 5 and 20 ÷ 4.",
   "Ask Finn to say the number sentence before he works it out."
  ],
+ "warmup": {
+  "gen": "muldiv.sharing",
+  "level": 1,
+  "items": 3,
+  "mission": "a6",
+  "say": "First, a quick warm-up: sharing fairly."
+ },
  "steps": [
   {
    "type": "look",
@@ -27,6 +34,20 @@
    "widget": "objects",
    "props": {
     "n": 20,
+    "icon": "fuel",
+    "arrange": "scatter"
+   },
+   "options": [
+    "4",
+    "5",
+    "10"
+   ],
+   "answer": 0,
+   "reveal": [
+    "4 boxes. 20 divided into groups of 5 is 4.",
+    "Count in 5s: 5, 10, 15, 20."
+   ],
+   "revealProps": {
     "arrange": "groups",
     "groups": [
      5,
@@ -34,7 +55,12 @@
      5,
      5
     ],
-    "icon": "fuel"
+    "groupLabels": [
+     "5",
+     "10",
+     "15",
+     "20"
+    ]
    }
   },
   {
@@ -48,7 +74,8 @@
     "size": 5,
     "rows": 0,
     "highlightRows": true,
-    "maxRows": 8
+    "maxRows": 8,
+    "rowLabels": true
    },
    "script": [
     {
@@ -61,6 +88,14 @@
      },
      "then": [
       "4 × 5 = {total}."
+     ],
+     "hint": [
+      "Tap the dark grid 4 times.",
+      "Each tap adds a row of 5."
+     ],
+     "explain": [
+      "Blast 4 times with the blaster on 5.",
+      "4 rows of 5. 4 × 5 = 20."
      ]
     },
     {
@@ -77,6 +112,14 @@
      "then": [
       "20 ÷ 5 = 4.",
       "The 4 is the number of rows."
+     ],
+     "hint": [
+      "Count the rows of 5.",
+      "How many rows make 20?"
+     ],
+     "explain": [
+      "4 rows of 5 make 20.",
+      "So 20 ÷ 5 = 4."
      ]
     },
     {
@@ -90,6 +133,14 @@
      "then": [
       "20 ÷ 4 = 5.",
       "One array, four facts!"
+     ],
+     "hint": [
+      "Look at one row.",
+      "How many dots are in it?"
+     ],
+     "explain": [
+      "There are 4 rows with 5 in each row.",
+      "So 20 ÷ 4 = 5."
      ]
     },
     {
@@ -110,6 +161,14 @@
      "then": [
       "{rows} × 5 = 30.",
       "The missing number is {rows}."
+     ],
+     "hint": [
+      "Blast rows of 5.",
+      "Stop when the last number says 30."
+     ],
+     "explain": [
+      "Count in 5s: 5, 10, 15, 20, 25, 30.",
+      "That is 6 rows. 6 × 5 = 30."
      ]
     }
    ]
@@ -139,6 +198,14 @@
      "then": [
       "Sharing is dividing.",
       "18 ÷ 2 = 9."
+     ],
+     "hint": [
+      "Sharing out is dividing.",
+      "Look for the sign that means share."
+     ],
+     "explain": [
+      "Sharing equally is dividing.",
+      "18 ÷ 2 = 9."
      ]
     },
     {
@@ -150,6 +217,13 @@
      },
      "then": [
       "Each astronaut gets {groupSize}."
+     ],
+     "hint": [
+      "Tap Deal one each until the pile is empty."
+     ],
+     "explain": [
+      "Deal one each until the pile is empty.",
+      "18 shared equally between 2 is 9 each."
      ]
     }
    ]

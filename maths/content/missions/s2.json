@@ -21,13 +21,45 @@
    "type": "look",
    "lines": [
     "Space supply crates are often cubes.",
-    "A cube is a 3-D shape."
+    "Look at the flat sides of this one."
    ],
-   "question": "What can you see on it?",
+   "question": "What shape is each flat side?",
+   "options": [
+    {
+     "label": "Circle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "circle"
+     }
+    },
+    {
+     "label": "Square",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "square"
+     }
+    },
+    {
+     "label": "Triangle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "triangle"
+     }
+    }
+   ],
+   "answer": 1,
+   "reveal": [
+    "Squares! The yellow one has 4 equal sides.",
+    "A flat side is called a face."
+   ],
    "widget": "shapes3d",
    "props": {
     "shape": "cube",
     "autoRotate": true
+   },
+   "revealProps": {
+    "highlight": "top",
+    "autoRotate": false
    }
   },
   {
@@ -111,6 +143,10 @@
      },
      "then": [
       "{vertices} vertices: 4 on top, 4 underneath."
+     ],
+     "hint": [
+      "Tap each pointy corner.",
+      "Spin it to find the corners at the back."
      ]
     }
    ]
@@ -133,6 +169,10 @@
      },
      "then": [
       "{faces} faces: 1 square and 4 triangles."
+     ],
+     "hint": [
+      "Tap each flat side. It turns yellow.",
+      "Spin it to find the square underneath."
      ]
     },
     {
@@ -147,6 +187,10 @@
      },
      "then": [
       "{vertices} vertices. 1 is right at the top."
+     ],
+     "hint": [
+      "Tap each corner. Spin it to see them all.",
+      "Look at the very top too."
      ]
     },
     {
@@ -161,6 +205,10 @@
      "answer": 8,
      "then": [
       "8 edges: 4 round the base, 4 up to the point."
+     ],
+     "hint": [
+      "Tap each edge. A blue number counts it.",
+      "Then type the last number."
      ]
     }
    ]
@@ -187,6 +235,10 @@
      },
      "then": [
       "2 triangles and 3 rectangles."
+     ],
+     "hint": [
+      "Tap each flat side.",
+      "Spin it to see both triangle ends."
      ]
     },
     {
@@ -201,6 +253,10 @@
      },
      "then": [
       "{edges} edges: 3 on each triangle and 3 joining them."
+     ],
+     "hint": [
+      "Tap each edge where 2 faces meet.",
+      "Spin it to find the edges at the back."
      ]
     },
     {
@@ -217,6 +273,10 @@
      },
      "then": [
       "2 flat circles and 1 curved face."
+     ],
+     "hint": [
+      "The curved face goes all the way round.",
+      "Spin it to find the circle underneath."
      ]
     }
    ]
@@ -280,5 +340,12 @@
     "What is the difference between a face and an edge?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "geometry.name3d",
+  "level": 1,
+  "items": 3,
+  "mission": "l9",
+  "say": "First, a quick warm-up: name some 3-D shapes."
+ }
 }

@@ -14,21 +14,47 @@
     "Bonds to 20 come straight from bonds to 10: 3 + 7 = 10, so 13 + 7 = 20.",
     "Near doubles: 6 + 7 is double 6 and 1 more. Ask 'which double helps?'"
   ],
+  "warmup": {
+    "gen": "addsub.bondsTo",
+    "level": 1,
+    "items": 3,
+    "params": {
+      "target": 10
+    },
+    "mission": "l4",
+    "say": "First, a quick warm-up: bonds to 10."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
         "Two tens frames.",
-        "13 red counters and 7 yellow."
+        "12 red counters."
       ],
-      "question": "Are both frames full?",
+      "question": "How many more to fill both frames?",
       "widget": "tensframe",
       "props": {
         "colours": [
-          13,
-          7
+          12,
+          0
         ],
         "frames": 2
+      },
+      "options": [
+        "2",
+        "8",
+        "12"
+      ],
+      "answer": 1,
+      "reveal": [
+        "8 yellow counters fill them.",
+        "20 is made of 12 and 8."
+      ],
+      "revealProps": {
+        "colours": [
+          12,
+          8
+        ]
       }
     },
     {
@@ -62,6 +88,9 @@
           ],
           "then": [
             "3 and {b} make 10."
+          ],
+          "explain": [
+            "7 yellow counters fill the frame."
           ]
         },
         {
@@ -86,6 +115,9 @@
           ],
           "then": [
             "13 and {b} make 20."
+          ],
+          "explain": [
+            "7 yellow counters fill the gaps."
           ]
         },
         {
@@ -99,21 +131,33 @@
           "then": [
             "13 + 7 = 20.",
             "3 + 7 = 10 helped us."
+          ],
+          "hint": [
+            "13 is 10 and 3.",
+            "Count all the counters in both frames."
           ]
         },
         {
           "say": [
+            "16 red counters.",
             "What goes with 16 to make 20?"
           ],
           "caption": "16 + ? = 20",
           "input": "numpad",
           "answer": 4,
           "hint": [
+            "Count the empty spaces.",
             "6 + 4 = 10."
           ],
           "then": [
             "6 + 4 = 10, so 16 + 4 = 20."
-          ]
+          ],
+          "set": {
+            "colours": [
+              16,
+              0
+            ]
+          }
         }
       ]
     },
@@ -128,9 +172,22 @@
       "answer": 1,
       "reveal": [
         "Double 6 is 12. 5 + 8 is 13.",
+        "The 5 + 8 side goes down.",
         "5 + 8 is bigger, just!"
       ],
-      "art": "planet"
+      "lines": [
+        "Double 6 means 6 + 6.",
+        "The supports hold the scales still."
+      ],
+      "widget": "balance",
+      "props": {
+        "left": "6 + 6",
+        "right": "5 + 8",
+        "hold": true
+      },
+      "revealProps": {
+        "hold": false
+      }
     },
     {
       "type": "try",
@@ -156,6 +213,9 @@
           ],
           "then": [
             "Double 4 is {count}."
+          ],
+          "explain": [
+            "4 red, then 4 yellow."
           ]
         },
         {
@@ -179,6 +239,9 @@
           ],
           "then": [
             "Double 6 is {count}."
+          ],
+          "explain": [
+            "6 yellow go after the 6 red."
           ]
         },
         {
@@ -192,22 +255,36 @@
           "then": [
             "Double 6 is equal to 12.",
             "So 6 plus 7 is equal to {count}."
+          ],
+          "hint": [
+            "Use the yellow brush.",
+            "Tap one empty space."
+          ],
+          "explain": [
+            "1 more yellow counter."
           ]
         },
         {
           "say": [
-            "What is 7 + 8?",
-            "Use double 7 to help."
+            "Here is double 7.",
+            "What is 7 + 8?"
           ],
           "caption": "7 + 8 = ?",
           "input": "numpad",
           "answer": 15,
           "hint": [
-            "Double 7 is 14."
+            "Double 7 is 14.",
+            "7 + 8 is 1 more."
           ],
           "then": [
             "Double 7 is 14. 1 more is 15."
-          ]
+          ],
+          "set": {
+            "colours": [
+              7,
+              7
+            ]
+          }
         }
       ]
     },

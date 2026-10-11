@@ -5,6 +5,7 @@
 // Debug: dev/gen.html?gen=muldiv&all=1   or   dev/gen.html?gen=muldiv.times5&level=3&n=20
 import { factKey } from '../core/facts.js';
 const rowsOf = n => (n === 1 ? '1 row' : `${n} rows`);
+const pairsOf = n => (n === 1 ? '1 pair' : `${n} pairs`);
 
 // ---------- helpers ----------
 const TABLES = [2, 5, 10];
@@ -52,14 +53,31 @@ const objGroups = (g, s, icon = 'dot') => ({ widget: 'objects', props: { n: g * 
 const blasterPic = (rows, size, extra = {}) => ({ widget: 'blaster', props: { size, rows, readonly: true, bar: false, highlightRows: true, ...extra } });
 // The groups widget holds at most 50 things. Bigger totals get a still picture instead, so the hint never shows wrong numbers.
 const GROUPS_MAX = 50;
-const shareHint = (b, e) => (b * e <= GROUPS_MAX
-  ? { widget: 'groups', props: { total: b * e, mode: 'share', bowls: b, icon: 'dot', interactive: true } }
-  : objGroups(b, e, 'dot'));
-const groupHint = (k, gs) => (k * gs <= GROUPS_MAX
-  ? { widget: 'groups', props: { total: k * gs, mode: 'group', groupSize: gs, icon: 'dot', interactive: true } }
+// icon: draw the things the words name (crystals, biscuits); plain dots when the words just say numbers.
+const shareHint = (b, e, icon = 'dot') => (b * e <= GROUPS_MAX
+  ? { widget: 'groups', props: { total: b * e, mode: 'share', bowls: b, icon, interactive: true } }
+  : objGroups(b, e, icon));
+const groupHint = (k, gs, icon = 'dot') => (k * gs <= GROUPS_MAX
+  ? { widget: 'groups', props: { total: k * gs, mode: 'group', groupSize: gs, icon, interactive: true } }
   : blasterPic(k, gs));
 const skip = (s, g) => Array.from({ length: g }, (_, i) => (i + 1) * s).join(', ');
 const repeated = (s, g) => Array(g).fill(s).join(' + ');
+// Running totals with the last one left as "?", for a hint that starts the count but leaves the answer to Finn.
+const partial = (s, g) => Array.from({ length: g }, (_, i) => (i === g - 1 ? '?' : String((i + 1) * s)));
+// The same groups, each in its own colour (red, yellow, blue, green), so each group reads as one lot.
+const colourGroups = (g, s) => Array(g).fill(s);
+// Empty labels reserve the room under each group, so the picture does not jump when a hint fills them in.
+const blankLabels = g => Array(g).fill('');
+const objGroupsLabelled = (g, s, icon = 'dot', labels = partial(s, g)) => ({ widget: 'objects', props: { n: g * s, arrange: 'groups', groups: Array(g).fill(s), icon, groupLabels: labels } });
+// The DfE sentence stems for equal groups (2MD-1).
+// A 100 square with the shown numbers lit up (yellow), so the pattern of the count is easy to see.
+const squareHint = shown => {
+  const lo = Math.min(...shown), hi = Math.max(...shown);
+  const start = lo === 0 ? 0 : 1;
+  const rows = Math.min(10, start === 0 ? Math.floor(hi / 10) + 2 : Math.ceil(hi / 10) + 1);
+  return { widget: 'hundred', props: { start, rows, highlight: shown, readonly: true } };
+};
+const stems = (g, s) => [`There are ${g} equal groups. There are ${s} in each group.`, `${g} groups of ${s} is ${g * s}.`];
 
 // ---------- multiplication ----------
 export const equalGroups = {
@@ -74,10 +92,11 @@ export const equalGroups = {
       const t = g * s;
       return {
         lines: [`${g} ${c.g}. ${s} ${c.item} ${c.where}.`, 'How many altogether?'],
-        ...objGroups(g, s, c.icon),
+        ...objGroupsLabelled(g, s, c.icon, blankLabels(g)),
         input: 'choice', answer: t, options: opts(R, t, [g + s, t - s, t + s, t + 1]),
-        hint: [`Count in ${s}s. Touch each ${c.g1}.`],
-        explain: [`${skip(s, g)}.`, `${g} groups of ${s} is ${t}.`],
+        hint: [`Count in ${s}s. Touch each ${c.g1}.`, 'The numbers start the count for you.'],
+        hintProps: { groupLabels: partial(s, g) },
+        explain: [...stems(g, s), `Count in ${s}s: ${skip(s, g)}.`],
         reteach: small(R, 2, 2, c),
       };
     }
@@ -87,11 +106,13 @@ export const equalGroups = {
       const t = g * s;
       return {
         lines: [`There are ${g} equal groups.`, `There are ${s} in each group.`, 'How many altogether?'],
-        caption: `${repeated(s, g)} = ?`,
-        ...objGroups(g, s, 'dot'),
+        // A long sum would wrap beside the number pad; then the caption says it in words.
+        caption: `${repeated(s, g)} = ?`.length <= 18 ? `${repeated(s, g)} = ?` : `${g} groups of ${s} = ?`,
+        ...objGroupsLabelled(g, s, 'dot', blankLabels(g)),
         input: 'numpad', answer: t,
-        hint: [`Count in ${s}s, one group at a time.`],
-        explain: [`${repeated(s, g)} = ${t}.`, `${g} groups of ${s} is ${t}.`],
+        hint: [`Count in ${s}s, one group at a time.`, 'What goes where the ? is?'],
+        hintProps: { groupLabels: partial(s, g) },
+        explain: [...stems(g, s), `${repeated(s, g)} = ${t}.`],
         fact: factKey('x', g, s),
         reteach: small(R, 2, s, c),
       };
@@ -103,9 +124,9 @@ export const equalGroups = {
       lines: [`${g} ${c.g}. ${s} ${c.item} ${c.where}.`, 'Write the total.'],
       caption: `${g} × ${s} = ?`,
       input: 'numpad', answer: t,
-      hint: [`The ${g} is the number of groups.`, `Count in ${s}s ${g} times.`],
-      hintWidget: objGroups(g, s, 'dot'),
-      explain: [`${g} × ${s} = ${t}.`, `The ${t} is the total number of ${c.item}.`],
+      hint: [`The ${g} is the number of groups.`, `Count in ${s}s, one group at a time.`],
+      hintWidget: objGroupsLabelled(g, s, c.icon),
+      explain: [...stems(g, s), `${g} × ${s} = ${t}. There are ${t} ${c.item}.`],
       fact: factKey('x', g, s),
       reteach: small(R, 3, s, c),
     };
@@ -117,9 +138,10 @@ function small(R, g, s, c = R.pick(GROUPS)) {
   const t = g * s;
   return {
     lines: [`${g} groups of ${s}.`, 'Count them all.'],
-    ...objGroups(g, s, 'dot'),
+    ...objGroupsLabelled(g, s, 'dot', blankLabels(g)),
     input: 'choice', answer: t, options: opts(R, t, [t + 1, t - 1, g + s]),
-    hint: [`Count in ${s}s.`], explain: [`${skip(s, g)}.`],
+    hint: [`Count in ${s}s.`], hintProps: { groupLabels: partial(s, g) },
+    explain: [`Count in ${s}s: ${skip(s, g)}.`, `${g} groups of ${s} is ${t}.`],
   };
 }
 
@@ -136,9 +158,10 @@ export const arrays = {
         lines: [`${rowsOf(r)} of ${s}.`, 'How many dots?'],
         ...blasterPic(r, s),
         input: 'choice', answer: t, options: opts(R, t, [r + s, t + s, t - s]),
-        hint: [`Count in ${s}s, one row at a time.`],
-        explain: [`${skip(s, r)}.`, `${rowsOf(r)} of ${s} is ${t}.`],
-        reteach: { lines: [`2 rows of ${s}.`, 'How many dots?'], ...blasterPic(2, s), input: 'choice', answer: 2 * s, options: opts(R, 2 * s, [s, 2 * s + 1, s + 2]), hint: [`Count every dot.`], explain: [`${s} and ${s} make ${2 * s}.`] },
+        hint: [`Count in ${s}s, one row at a time.`, 'The numbers start the count for you.'],
+        hintProps: { rowLabels: partial(s, r) },
+        explain: [`There are ${rowsOf(r)}. There are ${s} in each row.`, `Count in ${s}s: ${skip(s, r)}.`, `${rowsOf(r)} of ${s} is ${t}.`],
+        reteach: { lines: [`2 rows of ${s}.`, 'How many dots?'], ...blasterPic(2, s), input: 'choice', answer: 2 * s, options: opts(R, 2 * s, [s, 2 * s + 1, s + 2]), hint: ['Count the first row.', 'The second row is the same.'], hintProps: { rowLabels: [String(s), '?'] }, explain: [`${s} and ${s} make ${2 * s}.`] },
       };
     }
     if (level === 2) {
@@ -149,8 +172,9 @@ export const arrays = {
         lines: [`Each row has ${s} dots.`, `How many dots in ${r} rows?`],
         ...blasterPic(r, s),
         input: 'numpad', answer: t,
-        hint: [`Count in ${s}s down the rows.`],
-        explain: [`${skip(s, r)}.`, `${r} × ${s} = ${t}.`],
+        hint: [`Count in ${s}s down the rows.`, 'What goes where the ? is?'],
+        hintProps: { rowLabels: partial(s, r) },
+        explain: [`There are ${rowsOf(r)} of ${s}.`, `Count in ${s}s: ${skip(s, r)}.`, `${r} × ${s} = ${t}.`],
         fact: factKey('x', r, s),
         reteach: arrays.make(1, R, params),
       };
@@ -164,8 +188,8 @@ export const arrays = {
       ...blasterPic(r, s),
       input: 'choice', answer: right,
       options: R.shuffle([right, `${r} + ${s} = ${r + s}`, `${r} × ${s} = ${t + s}`]),
-      hint: ['Count the rows. Count the dots in one row.'],
-      explain: [`${rowsOf(r)} of ${s}.`, `${right}.`],
+      hint: ['Count the rows.', 'Then count the dots in one row.'],
+      explain: [`There are ${rowsOf(r)}. There are ${s} in each row.`, `${rowsOf(r)} of ${s} is ${t}, so ${right}.`],
       fact: factKey('x', r, s),
       reteach: arrays.make(2, R, params),
     };
@@ -185,7 +209,8 @@ export const repeatedAddition = {
         caption: repeated(s, g),
         ...objGroups(g, s, 'dot'),
         input: 'choice', answer: g, options: opts(R, g, [g + 1, g - 1, s]),
-        hint: [`Count the groups of ${s}.`],
+        hint: [`Each colour is one group of ${s}.`, 'Count the colours.'],
+        hintProps: { colours: colourGroups(g, s) },
         explain: [`There are ${g} groups of ${s}.`, `${repeated(s, g)} is ${g} lots of ${s}.`],
       };
     }
@@ -195,7 +220,8 @@ export const repeatedAddition = {
         lines: [`Adding ${s} again and again is multiplying.`, `How many ${s}s?`],
         caption: `${repeated(s, g)} = ? × ${s}`,
         input: 'numpad', answer: g,
-        hint: [`Count how many ${s}s you can see.`],
+        hint: [`Count how many ${s}s are added.`, `Each colour is one ${s}.`],
+        hintWidget: { widget: 'objects', props: { ...objGroups(g, s, 'dot').props, colours: colourGroups(g, s) } },
         explain: [`There are ${g} ${WORD[s] || s + 's'}.`, `${repeated(s, g)} = ${g} × ${s}.`],
         reteach: repeatedAddition.make(1, R, params),
       };
@@ -206,8 +232,9 @@ export const repeatedAddition = {
       lines: [`Which addition is the same as ${g} × ${s}?`],
       input: 'choice', answer: right,
       options: R.shuffle([right, `${g} + ${s}`, repeated(s, g - 1)]),
-      hint: [`${g} × ${s} means ${g} groups of ${s}.`],
-      explain: [`${g} × ${s} is ${g} lots of ${s}.`, `${right} = ${g * s}.`],
+      hint: [`${g} × ${s} means ${g} groups of ${s}.`, `Look for ${g} lots of ${s}.`],
+      hintWidget: { widget: 'objects', props: { ...objGroups(g, s, 'dot').props, colours: colourGroups(g, s) } },
+      explain: [`${g} × ${s} is ${g} groups of ${s}.`, `${right} = ${g * s}.`],
       fact: factKey('x', g, s),
       reteach: repeatedAddition.make(2, R, params),
     };
@@ -221,15 +248,16 @@ function tableGen(t) {
     levels: 3,
     make(level, R, params = {}) {
       if (level <= 1) {
-        const g = pickNot(R, 1, 5, t);
+        const g = pickNot(R, 2, 5, t);
         const p = g * t;
         return {
           lines: [`${rowsOf(g)} of ${t}.`, 'How many dots?'],
           caption: `${g} × ${t} = ?`,
           ...blasterPic(g, t),
           input: 'choice', answer: p, options: opts(R, p, [p + t, p - t, g + t]),
-          hint: [`Count in ${t}s: ${t}, ${2 * t}, ${3 * t}…`],
-          explain: [`${skip(t, g)}.`, `${g} × ${t} = ${p}.`],
+          hint: [`Count in ${t}s, one row at a time.`, 'The numbers start the count for you.'],
+          hintProps: { rowLabels: partial(t, g) },
+          explain: [`There ${g === 1 ? 'is 1 row' : `are ${g} rows`} of ${t}.`, `Count in ${t}s: ${skip(t, g)}.`, `${g} × ${t} = ${p}.`],
           fact: factKey('x', g, t),
         };
       }
@@ -241,9 +269,9 @@ function tableGen(t) {
           lines: [R.pick(['Quick fire!', 'Use your times table.', 'You know this one.'])],
           caption: swap ? `${t} × ${g} = ?` : `${g} × ${t} = ?`,
           input: 'numpad', answer: p,
-          hint: [`Count in ${t}s, ${g} times.`],
-          hintWidget: blasterPic(g, t),
-          explain: [`${skip(t, g)}.`, `${g} × ${t} = ${p}.`],
+          hint: [`Count in ${t}s, ${g} times.`, 'One row for each jump.'],
+          hintWidget: blasterPic(g, t, { rowLabels: partial(t, g) }),
+          explain: [`${g} groups of ${t}.`, `Count in ${t}s: ${skip(t, g)}.`, `${g} × ${t} = ${p}.`],
           fact: factKey('x', g, t),
           reteach: tableGen(t).make(1, R, params),
         };
@@ -254,11 +282,11 @@ function tableGen(t) {
         lines: ['Find the missing number.'],
         caption: R.chance(0.5) ? `? × ${t} = ${p}` : `${t} × ? = ${p}`,
         input: 'numpad', answer: g,
-        hint: [`Count in ${t}s until you reach ${p}.`, 'Count how many jumps.'],
-        hintWidget: blasterPic(g, t),
-        explain: [`${g} × ${t} = ${p}.`, `The missing number is ${g}.`],
+        hint: [`Count in ${t}s until you reach ${p}.`, 'Count the rows.'],
+        hintWidget: blasterPic(g, t, { rowLabels: true }),
+        explain: [`Count in ${t}s: ${skip(t, g)}. That is ${g} jumps.`, `${g} × ${t} = ${p}, so the missing number is ${g}.`],
         fact: factKey('x', g, t),
-        reteach: { lines: ['Count the rows.'], caption: `? × ${t} = ${Math.min(g, 3) * t}`, ...blasterPic(Math.min(g, 3), t), input: 'choice', answer: Math.min(g, 3), options: opts(R, Math.min(g, 3), [t, Math.min(g, 3) + 1, Math.min(g, 3) - 1].filter(v => v !== t)), hint: [`Count in ${t}s.`], explain: [`${skip(t, Math.min(g, 3))}.`] },
+        reteach: { lines: ['Count the rows.'], caption: `? × ${t} = ${Math.min(g, 3) * t}`, ...blasterPic(Math.min(g, 3), t), input: 'choice', answer: Math.min(g, 3), options: opts(R, Math.min(g, 3), [t, Math.min(g, 3) + 1, Math.min(g, 3) - 1].filter(v => v !== t)), hint: [`Count in ${t}s.`, 'Count the rows.'], hintProps: { rowLabels: true }, explain: [`Count in ${t}s: ${skip(t, Math.min(g, 3))}.`, `That is ${Math.min(g, 3)} rows.`] },
       };
     },
   };
@@ -280,8 +308,8 @@ export const mixedTables = {
       return {
         lines: ['Pick the answer.'], caption: `${g} × ${t} = ?`,
         input: 'choice', answer: p, options: opts(R, p, [p + t, p - t, g + t]),
-        hint: [`Count in ${t}s.`], hintWidget: blasterPic(g, t),
-        explain: [`${skip(t, g)}.`, `${g} × ${t} = ${p}.`], fact: factKey('x', g, t),
+        hint: [`Count in ${t}s, ${g} times.`], hintWidget: blasterPic(g, t, { rowLabels: partial(t, g) }),
+        explain: [`${g} groups of ${t}.`, `Count in ${t}s: ${skip(t, g)}.`, `${g} × ${t} = ${p}.`], fact: factKey('x', g, t),
       };
     }
     const t = R.pick(tabs);
@@ -290,24 +318,24 @@ export const mixedTables = {
     if (level === 2) {
       return {
         lines: [R.pick(['Quick fire!', 'What is the answer?'])], caption: R.chance(0.5) ? `${g} × ${t} = ?` : `${t} × ${g} = ?`,
-        input: 'numpad', answer: p, hint: [`Count in ${t}s.`], hintWidget: blasterPic(g, t),
-        explain: [`${g} × ${t} = ${p}.`], fact: factKey('x', g, t), reteach: mixedTables.make(1, R, params),
+        input: 'numpad', answer: p, hint: [`Count in ${t}s, ${g} times.`], hintWidget: blasterPic(g, t, { rowLabels: partial(t, g) }),
+        explain: [`${g} groups of ${t}.`, `Count in ${t}s: ${skip(t, g)}.`, `${g} × ${t} = ${p}.`], fact: factKey('x', g, t), reteach: mixedTables.make(1, R, params),
       };
     }
     const kind = R.pick(['div', 'div', 'miss']);
     if (kind === 'div' && g !== t) {
       return {
         lines: ['Use a times table fact.'], caption: `${p} ÷ ${t} = ?`,
-        input: 'numpad', answer: g, hint: [`How many ${t}s make ${p}?`], hintWidget: blasterPic(g, t),
-        explain: [`${g} × ${t} = ${p}.`, `So ${p} ÷ ${t} = ${g}.`], fact: factKey('÷', p, t),
+        input: 'numpad', answer: g, hint: [`How many ${t}s make ${p}?`, 'Count the rows.'], hintWidget: blasterPic(g, t, { rowLabels: true }),
+        explain: [`${p} divided into groups of ${t} is equal to ${g}.`, `${g} × ${t} = ${p}, so ${p} ÷ ${t} = ${g}.`], fact: factKey('÷', p, t),
         reteach: mixedTables.make(2, R, params),
       };
     }
     const gg = g === t ? (g === 10 ? 9 : g + 1) : g;
     return {
       lines: ['Find the missing number.'], caption: `? × ${t} = ${gg * t}`,
-      input: 'numpad', answer: gg, hint: [`Count in ${t}s to ${gg * t}.`], hintWidget: blasterPic(gg, t),
-      explain: [`${gg} × ${t} = ${gg * t}.`], fact: factKey('x', gg, t), reteach: mixedTables.make(2, R, params),
+      input: 'numpad', answer: gg, hint: [`Count in ${t}s to ${gg * t}.`, 'Count the rows.'], hintWidget: blasterPic(gg, t, { rowLabels: true }),
+      explain: [`Count in ${t}s: ${skip(t, gg)}. That is ${gg} jumps.`, `${gg} × ${t} = ${gg * t}.`], fact: factKey('x', gg, t), reteach: mixedTables.make(2, R, params),
     };
   },
 };
@@ -325,16 +353,20 @@ export const commutative = {
           lines: [`Is ${r} × ${s} the same as ${s} × ${r}?`],
           ...blasterPic(r, s, { flipButton: true }),
           input: 'choice', answer: 'Yes', options: ['Yes', 'No'],
-          hint: ['Turn the array round in your head.', 'Are there more dots?'],
-          explain: [`${rowsOf(r)} of ${s} is ${rowsOf(s)} of ${r}.`, `Both make ${r * s}.`],
+          hint: ['Tap Flip to turn the array round.', 'Are there more dots now?'],
+          hintProps: { interactive: true, readonly: false, flipButton: true, bar: true, lockSize: true },
+          explain: [`${rowsOf(r)} of ${s} turns into ${rowsOf(s)} of ${r}.`, `No dots come or go. Both make ${r * s}.`],
         };
       }
       const big = r * s;
       return {
-        lines: [`Is ${big} ÷ ${s} the same as ${s} ÷ ${big}?`],
+        lines: [`${big} biscuits shared by ${s} robots.`, `Is ${big} ÷ ${s} the same as ${s} ÷ ${big}?`],
+        caption: `${big} ÷ ${s}   or   ${s} ÷ ${big}`,
+        ...(big <= GROUPS_MAX ? { widget: 'groups', props: { total: big, mode: 'share', bowls: s, icon: 'cookie', readonly: true } } : {}),
         input: 'choice', answer: 'No', options: ['Yes', 'No'],
-        hint: [`Sharing ${big} biscuits is not like sharing ${s}.`],
-        explain: [`${big} shared by ${s} gives ${r} each.`, `${s} shared by ${big} gives less than 1 each.`],
+        hint: [big <= GROUPS_MAX ? 'Tap Deal one each to share them out.' : `Picture ${big} biscuits shared by ${s} robots.`, `Could ${s} biscuits go round ${big} robots?`],
+        ...(big <= GROUPS_MAX ? { hintProps: { interactive: true, readonly: false } } : { hintWidget: blasterPic(r, s) }),
+        explain: [`${big} shared between ${s} is ${r} each.`, `${s} shared between ${big} is not even 1 each.`],
       };
     }
     if (level === 2) {
@@ -350,8 +382,8 @@ export const commutative = {
           { label: `${rowsOf(ss)} of ${rr + 1}`, value: 'more', ...pic(ss, rr + 1) },
           { label: `${rowsOf(rr)} of ${ss - 1}`, value: 'less', ...pic(rr, ss - 1) },
         ]),
-        hint: ['Turn the array a quarter turn in your head.'],
-        explain: [`${rowsOf(rr)} of ${ss} is ${rowsOf(ss)} of ${rr}.`, `${rr} × ${ss} = ${ss} × ${rr} = ${rr * ss}.`],
+        hint: ['Turn the array a quarter turn in your head.', 'The rows become the columns.'],
+        explain: [`${rowsOf(rr)} of ${ss} turns into ${rowsOf(ss)} of ${rr}.`, `${rr} × ${ss} = ${ss} × ${rr} = ${rr * ss}.`],
         reteach: commutative.make(1, R, params),
       };
     }
@@ -360,8 +392,9 @@ export const commutative = {
       return {
         lines: [`Which one is the same as ${r} × ${s}?`],
         input: 'choice', answer: right, options: R.shuffle([right, `${r} + ${s}`, `${r * s} ÷ ${s}`]),
-        hint: ['Multiplying can be done in any order.'],
-        explain: [`${r} × ${s} = ${s} × ${r} = ${r * s}.`],
+        hint: ['Multiplying can be done in any order.', 'Tap Flip to see it.'],
+        hintWidget: blasterPic(r, s, { flipButton: true, interactive: true, readonly: false, bar: true, lockSize: true }),
+        explain: [`${rowsOf(r)} of ${s} flips to ${rowsOf(s)} of ${r}.`, `${r} × ${s} = ${s} × ${r} = ${r * s}.`],
         fact: factKey('x', r, s),
       };
     }
@@ -370,7 +403,7 @@ export const commutative = {
       lines: ['Which one is true?'],
       input: 'choice', answer: right,
       options: R.shuffle([right, `${r * s} ÷ ${s} = ${s} ÷ ${r * s}`, `${r + s} − ${s} = ${s} − ${r + s}`]),
-      hint: ['Only one kind of sum works in any order here.'],
+      hint: ['Only one kind of sum works in any order here.', 'Try each one with small numbers.'],
       explain: ['Multiplying works in any order.', 'Dividing and taking away do not.'],
       reteach: commutative.make(2, R, params),
     };
@@ -385,12 +418,14 @@ export const oddEven = {
       const n = R.int(3, 12);
       const pairs = Math.floor(n / 2);
       const ans = n % 2 ? 'Odd' : 'Even';
+      // The dots start in a line (or scattered); the hint pairs them up.
       return {
-        lines: ['Pair up the dots.', `Is ${n} odd or even?`],
-        widget: 'objects', props: { n, arrange: 'groups', groups: [...Array(pairs).fill(2), ...(n % 2 ? [1] : [])], icon: 'dot' },
+        lines: ['Can every dot have a partner?', `Is ${n} odd or even?`],
+        widget: 'objects', props: { n, arrange: n <= 10 ? 'row' : 'scatter', icon: 'dot' },
         input: 'choice', answer: ans, options: ['Odd', 'Even'],
-        hint: ['Is there a dot with no partner?'],
-        explain: n % 2 ? [`${n} has one dot left over.`, `${n} is odd.`] : [`Every dot has a partner.`, `${n} is even.`],
+        hint: ['Look: the dots are in pairs now.', 'Is there a dot with no partner?'],
+        hintProps: { arrange: 'groups', groups: [...Array(pairs).fill(2), ...(n % 2 ? [1] : [])] },
+        explain: n % 2 ? [`${n} makes ${pairsOf(pairs)} and 1 left over.`, `${n} is odd.`] : [`${n} makes ${pairsOf(pairs)}. Every dot has a partner.`, `${n} is even.`],
       };
     }
     if (level === 2) {
@@ -399,8 +434,9 @@ export const oddEven = {
       return {
         lines: ['Is this number odd or even?'], caption: String(n),
         input: 'choice', answer: ans, options: ['Odd', 'Even'],
-        hint: ['Look at the ones digit.', 'Even numbers end in 0, 2, 4, 6 or 8.'],
-        explain: [`${n} ends in ${n % 10}.`, `${n} is ${ans.toLowerCase()}.`],
+        hint: n % 10 ? ['Only the ones digit matters.', `Can ${n % 10} dots all have partners?`] : ['Look at the ones digit.', 'Can 10 dots all have partners?'],
+        hintWidget: { widget: 'objects', props: { n: n % 10 || 10, arrange: 'groups', groups: [...Array(Math.floor((n % 10 || 10) / 2)).fill(2), ...((n % 10) % 2 ? [1] : [])], icon: 'dot' } },
+        explain: [`${n} ends in ${n % 10}.`, `Numbers ending in ${n % 2 ? '1, 3, 5, 7 or 9' : '0, 2, 4, 6 or 8'} are ${ans.toLowerCase()}.`],
         reteach: oddEven.make(1, R),
       };
     }
@@ -412,7 +448,7 @@ export const oddEven = {
     return {
       lines: [`Which number is ${wantEven ? 'even' : 'odd'}?`],
       input: 'choice', answer: ans, options: R.shuffle([ans, ...others]),
-      hint: ['Look at the last digit of each number.'],
+      hint: ['Look at the last digit of each number.', wantEven ? 'Even numbers end in 0, 2, 4, 6 or 8.' : 'Odd numbers end in 1, 3, 5, 7 or 9.'],
       explain: [`${ans} ends in ${ans % 10}.`, `So ${ans} is ${wantEven ? 'even' : 'odd'}.`],
       reteach: oddEven.make(2, R),
     };
@@ -434,8 +470,8 @@ export const sharing = {
         lines: [`Share ${total} ${c.item} between ${b} ${who}.`, 'How many does each one get?'],
         widget: 'groups', props: { total, mode: 'share', bowls: b, icon: c.icon, interactive: true },
         input: 'choice', answer: e, options: opts(R, e, [e + 1, e - 1, b]),
-        hint: ['Tap Deal one each until they are all gone.'],
-        explain: [`Each one gets ${e}.`, `${total} shared between ${b} is ${e}.`],
+        hint: ['Tap Deal one each until they are all gone.', 'Then count one group.'],
+        explain: [`${total} shared equally between ${b} is ${e} each.`, `Each one gets ${e}.`],
       };
     }
     if (level === 2) {
@@ -446,10 +482,10 @@ export const sharing = {
       return {
         lines: [`Share ${total} ${c.item} equally.`, `There are ${b} ${who}.`, 'How many each?'],
         caption: `${total} ÷ ${b} = ?`,
-        widget: 'groups', props: { total, mode: 'share', bowls: b, icon: 'dot', interactive: true },
+        widget: 'groups', props: { total, mode: 'share', bowls: b, icon: c.icon, interactive: true },
         input: 'numpad', answer: e,
-        hint: ['Deal them out, one each at a time.'],
-        explain: [`${total} ÷ ${b} = ${e}.`, `Each one gets ${e}.`],
+        hint: ['Tap Deal one each until they are all gone.', 'Then count one group.'],
+        explain: [`${total} shared equally between ${b} is ${e} each.`, `${total} ÷ ${b} = ${e}.`],
         ...(tabled ? { fact: factKey('÷', total, b) } : {}),
         reteach: sharing.make(1, R, params),
       };
@@ -461,9 +497,9 @@ export const sharing = {
       lines: [`${total} ${c.item} are shared by ${b} ${who}.`, 'Each gets the same. How many each?'],
       caption: `${total} ÷ ${b} = ?`,
       input: 'numpad', answer: e,
-      hint: [`Think: ? × ${b} = ${total}.`],
-      hintWidget: shareHint(b, e),
-      explain: [`${e} × ${b} = ${total}.`, `So ${total} ÷ ${b} = ${e}.`],
+      hint: [`Think: ? × ${b} = ${total}.`, 'Or deal them out and count one group.'],
+      hintWidget: shareHint(b, e, c.icon),
+      explain: [`${total} shared equally between ${b} is ${e} each.`, `${e} × ${b} = ${total}, so ${total} ÷ ${b} = ${e}.`],
       fact: factKey('÷', total, b),
       reteach: sharing.make(2, R, { bowls: [2, 5] }),
     };
@@ -483,8 +519,8 @@ export const grouping = {
         lines: [`${total} ${c.item}. Put them in groups of ${gs}.`, 'How many groups?'],
         widget: 'groups', props: { total, mode: 'group', groupSize: gs, icon: c.icon, interactive: true },
         input: 'choice', answer: k, options: opts(R, k, [k + 1, k - 1, gs]),
-        hint: [`Make groups of ${gs} until none are left.`],
-        explain: [`There are ${k} groups of ${gs}.`, `${total} in groups of ${gs} makes ${k} groups.`],
+        hint: [`Tap Make a group of ${gs} until none are left.`, 'Then count the groups.'],
+        explain: [`${total} divided into groups of ${gs} is equal to ${k}.`, `There are ${k} groups of ${gs}.`],
       };
     }
     if (level === 2) {
@@ -494,10 +530,10 @@ export const grouping = {
       return {
         lines: [`${total} ${c.item}. ${gs} ${c.where}.`, `How many ${c.g}?`],
         caption: `? × ${gs} = ${total}`,
-        widget: 'groups', props: { total, mode: 'group', groupSize: gs, icon: 'dot', interactive: true },
+        widget: 'groups', props: { total, mode: 'group', groupSize: gs, icon: c.icon, interactive: true },
         input: 'numpad', answer: k,
-        hint: [`Count in ${gs}s to ${total}.`, 'Count the jumps.'],
-        explain: [`${k} × ${gs} = ${total}.`, `So you need ${k} ${c.g}.`],
+        hint: [`Tap Make a group of ${gs}.`, 'Count the groups you make.'],
+        explain: [`${total} divided into groups of ${gs} is equal to ${k}.`, `${k} × ${gs} = ${total}, so you need ${k} ${c.g}.`],
         fact: factKey('÷', total, gs),
         reteach: grouping.make(1, R, params),
       };
@@ -509,9 +545,9 @@ export const grouping = {
       lines: [`How many groups of ${gs} are in ${total}?`],
       caption: `${total} ÷ ${gs} = ?`,
       input: 'numpad', answer: k,
-      hint: [`Count in ${gs}s until you reach ${total}.`],
-      hintWidget: blasterPic(k, gs),
-      explain: [`${total} divided into groups of ${gs} is equal to ${k}.`],
+      hint: [`Count in ${gs}s until you reach ${total}.`, 'Count the rows.'],
+      hintWidget: blasterPic(k, gs, { rowLabels: true }),
+      explain: [`${total} divided into groups of ${gs} is equal to ${k}.`, `${k} × ${gs} = ${total}.`],
       fact: factKey('÷', total, gs),
       reteach: grouping.make(2, R, params),
     };
@@ -528,24 +564,26 @@ export const divisionFacts = {
       const q = pickNot(R, 2, 5, d);
       const p = q * d;
       return {
-        lines: [`${p} dots in groups of ${d}.`, 'How many groups?'],
+        lines: [`${p} dots. Put them in groups of ${d}.`, 'How many groups?'],
         caption: `${p} ÷ ${d} = ?`,
-        ...objGroups(q, d, 'dot'),
+        // Scattered first: the hint sorts them into groups.
+        widget: 'objects', props: { n: p, arrange: 'scatter', icon: 'dot' },
         input: 'choice', answer: q, options: opts(R, q, [q + 1, q - 1, d]),
-        hint: ['Count the rings.'],
-        explain: [`There are ${q} groups of ${d}.`, `${p} ÷ ${d} = ${q}.`],
+        hint: [`Look: the dots are in groups of ${d} now.`, 'Count the rings.'],
+        hintProps: { arrange: 'groups', groups: Array(q).fill(d) },
+        explain: [`${p} divided into groups of ${d} is equal to ${q}.`, `${p} ÷ ${d} = ${q}.`],
         fact: factKey('÷', p, d),
       };
     }
     const d = R.pick(tabs);
-    const q = pickNot(R, 1, 10, d);
+    const q = pickNot(R, 2, 10, d);
     const p = q * d;
     if (level === 2) {
       return {
         lines: ['Use your times tables.'], caption: `${p} ÷ ${d} = ?`,
         input: 'numpad', answer: q,
-        hint: [`How many ${d}s make ${p}?`], hintWidget: blasterPic(q, d),
-        explain: [`${q} × ${d} = ${p}.`, `So ${p} ÷ ${d} = ${q}.`],
+        hint: [`How many ${d}s make ${p}?`, 'Count the rows.'], hintWidget: blasterPic(q, d, { rowLabels: true }),
+        explain: [`${p} divided into groups of ${d} is equal to ${q}.`, `${q} × ${d} = ${p}, so ${p} ÷ ${d} = ${q}.`],
         fact: factKey('÷', p, d), reteach: divisionFacts.make(1, R, params),
       };
     }
@@ -555,8 +593,9 @@ export const divisionFacts = {
       return {
         lines: ['Find the missing number.'], caption: `? ÷ ${d} = ${q2}`,
         input: 'numpad', answer: p2,
-        hint: [`${q2} groups of ${d}. How many altogether?`],
-        explain: [`${q2} × ${d} = ${p2}.`, `So ${p2} ÷ ${d} = ${q2}.`],
+        hint: [`${q2} groups of ${d}. How many altogether?`, `Count in ${d}s.`],
+        hintWidget: blasterPic(q2, d, { rowLabels: partial(d, q2) }),
+        explain: [`${q2} groups of ${d} is ${p2}.`, `So ${p2} ÷ ${d} = ${q2}.`],
         fact: factKey('÷', p2, d), reteach: divisionFacts.make(2, R, params),
       };
     }
@@ -564,8 +603,9 @@ export const divisionFacts = {
     return {
       lines: ['Find the missing number.'], caption: `${q3 * d} ÷ ? = ${q3}`,
       input: 'numpad', answer: d,
-      hint: [`${q3} groups. How many in each group?`],
-      explain: [`${q3} × ${d} = ${q3 * d}.`, `So ${q3 * d} ÷ ${d} = ${q3}.`],
+      hint: [`Share ${q3 * d} into ${q3} equal groups.`, 'How many in each group?'],
+      hintWidget: shareHint(q3, d),
+      explain: [`${q3 * d} shared equally between ${q3} is ${d} each.`, `${q3} × ${d} = ${q3 * d}, so ${q3 * d} ÷ ${d} = ${q3}.`],
       fact: factKey('÷', q3 * d, d), reteach: divisionFacts.make(2, R, params),
     };
   },
@@ -578,24 +618,28 @@ export const mulDivProblem = {
     const tabs = tablesFrom(params);
     const kind = level <= 1 ? 'mul' : R.pick(['mul', 'share', 'group']);
     if (kind === 'mul') {
-      const ctx = R.pick([
-        { a: 'rockets', b: 'boosters', each: 'on each rocket', icon: 'fuel' },
-        { a: 'aliens', b: 'eyes', each: 'on each alien', icon: 'dot' },
-        { a: 'robots', b: 'wheels', each: 'on each robot', icon: 'dot' },
-        { a: 'bags', b: 'moon rocks', each: 'in each bag', icon: 'asteroid' },
-        { a: 'pods', b: 'astronauts', each: 'in each pod', icon: 'astronaut' },
-      ]);
       const s = level <= 1 ? R.pick([2, 5]) : R.pick(tabs);
+      // max: the biggest group that still makes sense (no robot has 10 wheels).
+      const ctx = R.pick([
+        { a: 'rockets', b: 'fuel tanks', each: 'on each rocket', icon: 'fuel', max: 5, pic: 'rocket' },
+        { a: 'aliens', b: 'eyes', each: 'on each alien', icon: 'dot', max: 10, pic: 'alien' },
+        { a: 'robots', b: 'wheels', each: 'on each robot', icon: 'dot', max: 5, pic: 'robot' },
+        { a: 'bags', b: 'moon rocks', each: 'in each bag', icon: 'asteroid', max: 10 },
+        { a: 'pods', b: 'astronauts', each: 'in each pod', icon: 'astronaut', max: 10 },
+        { a: 'trays', b: 'crystals', each: 'on each tray', icon: 'crystal', max: 10 },
+      ].filter(c => s <= c.max));
       const g = pickNot(R, 2, level <= 1 ? 4 : level === 2 ? 6 : 10, s);
       const t = g * s;
       const item = {
         lines: [`${g} ${ctx.a}. ${s} ${ctx.b} ${ctx.each}.`, `How many ${ctx.b} altogether?`],
-        hint: [`Count in ${s}s, ${g} times.`],
-        explain: [`${g} × ${s} = ${t}.`, `There are ${t} ${ctx.b}.`],
+        hint: [`Count in ${s}s, ${g} times.`, 'The numbers start the count for you.'],
+        explain: [`There are ${g} groups of ${s}.`, `${g} × ${s} = ${t}. There are ${t} ${ctx.b}.`],
         fact: factKey('x', g, s),
       };
-      if (level <= 1) return { ...item, ...objGroups(g, s, ctx.icon), input: 'choice', answer: t, options: opts(R, t, [g + s, t + s, t - s]) };
-      return { ...item, input: 'numpad', answer: t, hintWidget: objGroups(g, s, 'dot'), reteach: mulDivProblem.make(1, R, params) };
+      if (level <= 1) return { ...item, ...objGroupsLabelled(g, s, ctx.icon, blankLabels(g)), hintProps: { groupLabels: partial(s, g) }, input: 'choice', answer: t, options: opts(R, t, [g + s, t + s, t - s]) };
+      // The story picture shows the rockets, aliens or robots; the hint turns it into the equal groups.
+      const story = ctx.pic ? { widget: 'objects', props: { n: g, icon: ctx.pic, arrange: g <= 6 ? 'row' : 'rows', perRow: 5 }, hintProps: objGroupsLabelled(g, s, ctx.icon).props } : { hintWidget: objGroupsLabelled(g, s, ctx.icon) };
+      return { ...item, ...story, input: 'numpad', answer: t, reteach: mulDivProblem.make(1, R, params) };
     }
     if (kind === 'share') {
       const c = R.pick(SHARE_ITEMS);
@@ -606,9 +650,12 @@ export const mulDivProblem = {
       return {
         lines: [`${b} ${who} share ${total} ${c.item} equally.`, 'How many does each one get?'],
         input: 'numpad', answer: e,
-        hint: [`Think: ${b} × ? = ${total}.`],
-        hintWidget: shareHint(b, e),
-        explain: [`${total} ÷ ${b} = ${e}.`, `Each one gets ${e}.`],
+        hint: [`Think: ${b} × ? = ${total}.`, 'Or deal them out and count one group.'],
+        // The story picture is the pile and the plates; the hint makes it hands-on so Finn can deal.
+        ...(total <= GROUPS_MAX
+          ? { widget: 'groups', props: { total, mode: 'share', bowls: b, icon: c.icon, readonly: true }, hintProps: { interactive: true, readonly: false } }
+          : { hintWidget: shareHint(b, e, c.icon) }),
+        explain: [`${total} shared equally between ${b} is ${e} each.`, `${total} ÷ ${b} = ${e}.`],
         fact: factKey('÷', total, b),
         reteach: sharing.make(1, R),
       };
@@ -620,9 +667,11 @@ export const mulDivProblem = {
     return {
       lines: [`There are ${total} ${c.item}.`, `${gs} fit ${c.where}. How many ${c.g}?`],
       input: 'numpad', answer: k,
-      hint: [`Count in ${gs}s until you reach ${total}.`],
-      hintWidget: groupHint(k, gs),
-      explain: [`? × ${gs} = ${total}.`, `${k} × ${gs} = ${total}, so ${k} ${c.g}.`],
+      hint: [`Make groups of ${gs} until none are left.`, 'Count the groups.'],
+      ...(total <= GROUPS_MAX
+        ? { widget: 'groups', props: { total, mode: 'group', groupSize: gs, icon: c.icon, readonly: true }, hintProps: { interactive: true, readonly: false } }
+        : { hintWidget: groupHint(k, gs, c.icon) }),
+      explain: [`${total} divided into groups of ${gs} is equal to ${k}.`, `${k} × ${gs} = ${total}, so ${k} ${c.g}.`],
       fact: factKey('÷', total, gs),
       reteach: grouping.make(1, R),
     };
@@ -643,24 +692,28 @@ export const countInMultiples = {
         lines: [`Count in ${s}s.`, 'What comes next?'],
         caption: `${seq.slice(0, len - 1).join(', ')}, ?`,
         input: 'choice', answer: ans, options: opts(R, ans, [ans + 1, ans - 1, ans + s, ans - s + 1]),
-        hint: [`Add ${s} more.`],
-        explain: [`${seq.join(', ')}.`],
+        hint: ['Look at the yellow squares.', `Each one is ${s} more. Count on ${s} from ${seq[len - 2]}.`],
+        hintWidget: squareHint(seq.slice(0, len - 1)),
+        explain: [`Each number is ${s} more than the one before.`, `${seq.join(', ')}.`],
       };
     }
     const maxStart = s === 2 ? 10 : s === 5 ? 7 : 6;
     const start = R.int(0, maxStart) * s;
     const back = level === 3 && R.chance(0.6);
-    let seq = Array.from({ length: len }, (_, i) => start + i * s);
+    // Five numbers, or four when five 2-digit numbers would wrap the big caption beside the number pad.
+    const n = Array.from({ length: len }, (_, i) => start + i * s).join(', ').length > 15 ? 4 : len;
+    let seq = Array.from({ length: n }, (_, i) => start + i * s);
     if (back) seq = seq.reverse();
-    const miss = level === 2 ? R.int(1, len - 1) : R.int(1, len - 2);
+    const miss = level === 2 ? R.int(1, n - 1) : R.int(1, n - 2);
     const ans = seq[miss];
     const shown = seq.map((v, i) => (i === miss ? '?' : String(v))).join(', ');
     return {
       lines: [back ? `Count back in ${s}s.` : `Count in ${s}s.`, 'Find the missing number.'],
       caption: shown,
       input: 'numpad', answer: ans,
-      hint: [back ? `Each number is ${s} less.` : `Each number is ${s} more.`],
-      explain: [`${seq.join(', ')}.`],
+      hint: [back ? `Each number is ${s} less.` : `Each number is ${s} more.`, 'Look at the yellow squares. Which one is missing?'],
+      hintWidget: squareHint(seq.filter((_, i) => i !== miss)),
+      explain: [back ? `Each number is ${s} less than the one before.` : `Each number is ${s} more than the one before.`, `${seq.join(', ')}.`],
       reteach: countInMultiples.make(1, R, params),
     };
   },

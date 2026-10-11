@@ -8,6 +8,8 @@
 //   showExpanded           "40 + 7" in column colours ("40 + 7 = 47" with showValue too).
 //   max                    largest value the + buttons can reach (default 99, or 999 with showHundreds).
 //   look                   'blocks' (default: green rods and blue cubes) or 'counters' (circles marked 10 and 1).
+//   swapUp                 default true. false hides the "Swap 10 ones for 1 ten" button and the dashed ring, for
+//                          tasks that break tens into ones (partitioning), so the button doesn't invite undoing it.
 //   readonly
 // Style v2 (white surface): each column is a white card with a 3 px border and heading in its place-value colour
 // (hundreds orange, tens green, ones blue); chunky white +/− buttons; the swap button is primary blue.
@@ -16,6 +18,8 @@
 // Tap a rod to be offered "Swap 1 ten for 10 ones". With hundreds, the same for 10 tens and 1 hundred.
 // State: { hundreds, tens, ones, value }
 // showAnswer(n) (or { tens, ones, hundreds }) animates to the standard partition of n.
+// Sizing: the viewBox narrows (down to 760 wide) when the box is taller than the picture, so the blocks grow to use
+// the height; it redraws when the box changes size.
 // Debug: dev/harness.html?widget=placevalue&props={"tens":3,"ones":14,"showDigits":true,"showExpanded":true,"showValue":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
 import { COL, PAL, FONT } from '../core/theme.js';
@@ -27,7 +31,7 @@ export const meta = {
   state: ['hundreds', 'tens', 'ones', 'value'],
 };
 
-const W = 1000;
+const WMAX = 1000, WMIN = 760;
 const LIM = { hundreds: 9, tens: 19, ones: 99 };
 const PLACE = { hundreds: 100, tens: 10, ones: 1 };
 const NAME = { hundreds: 'Hundreds', tens: 'Tens', ones: 'Ones' };
@@ -58,10 +62,12 @@ export function mount(el, props = {}, ctx = {}) {
   let offerTimer = 0;
   let pop = null;            // { key, index } block to pop on next draw
   const timers = new Set();
+  let W = WMAX;              // viewBox width for this draw (see Sizing above)
   const root = svgRoot(W, 640, 'w-placevalue');
   el.appendChild(root);
   const unbinds = [];
   let geo = null;            // last layout, for animations
+  let drawnWH = '';
 
   const later = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); return t; };
   const ro = () => !!(p.readonly || ctx.readonly || p.interactive === false);
@@ -220,10 +226,20 @@ export function mount(el, props = {}, ctx = {}) {
   }
 
   // ---------- draw ----------
+  function fitWidth() {
+    // The picture's height does not depend on W, so measure it once at full width, then narrow W to the box's shape.
+    W = WMAX;
+    const bw = el.clientWidth, bh = el.clientHeight;
+    drawnWH = `${Math.round(bw)}x${Math.round(bh)}`;
+    if (!(bw > 0 && bh > 0) || cols().length > 2) return;
+    W = clamp(Math.round((layout().VH * bw) / bh), WMIN, WMAX);
+  }
+
   function draw() {
     unbinds.splice(0).forEach(u => u());
     root.replaceChildren();
     root.classList.toggle('ro', ro());
+    fitWidth();
     const L = layout();
     geo = L;
     root.setAttribute('viewBox', `0 0 ${W} ${L.VH}`);
@@ -238,7 +254,7 @@ export function mount(el, props = {}, ctx = {}) {
 
       // A dashed outline round the first full column of ten ones (or ten tens) shows what can be swapped,
       // in the colour of the place it will become.
-      const canFuse = !ro() && ((k === 'ones' && c.ones >= 10 && c.tens < LIM.tens) || (k === 'tens' && p.showHundreds && c.tens >= 10 && c.hundreds < LIM.hundreds));
+      const canFuse = !ro() && ((k === 'ones' && p.swapUp !== false && c.ones >= 10 && c.tens < LIM.tens) || (k === 'tens' && p.showHundreds && c.tens >= 10 && c.hundreds < LIM.hundreds));
       if (canFuse && !counters()) {
         const first10 = L.items[k].slice(0, 10);
         const ringCol = k === 'ones' ? COL.tens : COL.hundreds;
@@ -263,7 +279,7 @@ export function mount(el, props = {}, ctx = {}) {
           g.insertBefore(S('rect', { x: it.x - 8, y: it.y - 4, width: it.w + 16, height: it.h + 8, fill: 'transparent' }), g.firstChild);
           unbinds.push(onTap(g, () => offerBreak(k)));
         }
-        if (!ro() && k === 'ones' && i < 10 && c.ones >= 10 && c.tens < LIM.tens) {
+        if (!ro() && k === 'ones' && p.swapUp !== false && i < 10 && c.ones >= 10 && c.tens < LIM.tens) {
           g.classList.add('pv-tap');
           unbinds.push(onTap(g, () => swapUp('ones')));
         }
@@ -308,7 +324,7 @@ export function mount(el, props = {}, ctx = {}) {
       let btn = null;
       if (offer === 'breakTen' && c.tens > 0 && c.ones + 10 <= LIM.ones) btn = swapBtn(W / 2, sy, 470, 'Swap 1 ten for 10 ones', () => swapDown('tens'));
       else if (offer === 'breakHundred' && c.hundreds > 0 && c.tens + 10 <= LIM.tens) btn = swapBtn(W / 2, sy, 540, 'Swap 1 hundred for 10 tens', () => swapDown('hundreds'));
-      else if (c.ones >= 10 && c.tens < LIM.tens) btn = swapBtn(W / 2, sy, 470, 'Swap 10 ones for 1 ten', () => swapUp('ones'));
+      else if (p.swapUp !== false && c.ones >= 10 && c.tens < LIM.tens) btn = swapBtn(W / 2, sy, 470, 'Swap 10 ones for 1 ten', () => swapUp('ones'));
       else if (p.showHundreds && c.tens >= 10 && c.hundreds < LIM.hundreds) btn = swapBtn(W / 2, sy, 540, 'Swap 10 tens for 1 hundred', () => swapUp('tens'));
       if (btn) root.appendChild(btn);
     }
@@ -432,6 +448,16 @@ export function mount(el, props = {}, ctx = {}) {
     } catch (e) { targets.forEach(t => { t.style.opacity = ''; }); }
   }
 
+  // Redraw when the box changes shape (the viewBox follows it), but not in the middle of a swap animation.
+  let rq = 0, ro_ = null;
+  const recheck = () => {
+    if (`${Math.round(el.clientWidth)}x${Math.round(el.clientHeight)}` === drawnWH) return;
+    clearTimeout(rq);
+    rq = setTimeout(() => { if (!timers.size) draw(); else recheck(); }, 60);
+  };
+  if (typeof ResizeObserver !== 'undefined') { ro_ = new ResizeObserver(recheck); ro_.observe(el); }
+  const t1 = setTimeout(recheck, 80), t2 = setTimeout(recheck, 500);
+
   const api = {
     getState() { return { hundreds: c.hundreds, tens: c.tens, ones: c.ones, value: value() }; },
     update(np = {}) {
@@ -448,8 +474,13 @@ export function mount(el, props = {}, ctx = {}) {
       let goal = null;
       if (answer && typeof answer === 'object') {
         goal = answer;
-        if (isNum(answer.tens) && isNum(answer.ones)) target = { hundreds: clamp(int(answer.hundreds), 0, LIM.hundreds), tens: clamp(int(answer.tens), 0, LIM.tens), ones: clamp(int(answer.ones), 0, LIM.ones) };
-        else answer = mid(answer.value);
+        const H = isNum(answer.hundreds) ? answer.hundreds : c.hundreds, v = mid(answer.value);
+        const mk = (t, o) => ({ hundreds: clamp(int(H), 0, LIM.hundreds), tens: clamp(int(t), 0, LIM.tens), ones: clamp(int(o), 0, LIM.ones) });
+        if (isNum(answer.tens) && isNum(answer.ones)) target = mk(answer.tens, answer.ones);
+        else if (isNum(answer.tens) && isNum(v)) target = mk(answer.tens, v - H * 100 - answer.tens * 10);   // { tens: 3, value: 47 }
+        else if (isNum(answer.tens)) target = mk(answer.tens, c.ones);                                    // { tens: 3 }: just the tens
+        else if (isNum(answer.ones) && !isNum(v)) target = mk(c.tens, answer.ones);                       // { ones: 10 }: just the ones
+        else answer = v;
       }
       if (!target) {
         const n = clamp(int(answer, value()), 0, 999);
@@ -474,10 +505,10 @@ export function mount(el, props = {}, ctx = {}) {
       for (const k of ['hundreds', 'tens', 'ones']) {
         while (sim[k] !== target[k] && steps.length < 120) { const d = sim[k] < target[k] ? 1 : -1; sim[k] += d; steps.push({ k, d }); }
       }
-      if (reducedMotion()) { c = { ...target }; draw(); return; }
+      if (reducedMotion()) { c = { ...target }; draw(); changed(); return; }
       let i = 0;
       const next = () => {
-        if (i >= steps.length) return;
+        if (i >= steps.length) { changed(); return; }  // report the shown answer once it is built
         const s = steps[i++];
         if (s.brk) {
           const old = { ...geo.items.tens[geo.items.tens.length - 1] };
@@ -500,7 +531,8 @@ export function mount(el, props = {}, ctx = {}) {
     },
     destroy() {
       timers.forEach(t => clearTimeout(t)); timers.clear();
-      clearTimeout(offerTimer);
+      clearTimeout(offerTimer); clearTimeout(rq); clearTimeout(t1); clearTimeout(t2);
+      if (ro_) ro_.disconnect();
       unbinds.splice(0).forEach(u => u());
       el.replaceChildren();
     },

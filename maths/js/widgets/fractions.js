@@ -1,8 +1,13 @@
 // fractions: Smash and Glue. A shape (square, rect, circle, bar) or a set of dots, split into equal parts.
 // Props: shape ('square' | 'rect' | 'circle' | 'bar' | 'set'), parts (1, 2, 3, 4, 6, 8; default 1), setSize (set only),
+//        icon (set only: an art.js name such as 'crystal', 'apple', 'cookie', 'star', 'asteroid' drawn as the outlined sticker;
+//        without one the set is solid yellow counters, and the counters in a shaded group take the shading colour),
 //        shaded (count of shaded parts, filled in reading order) or shadedIdx (array of part indices),
 //        tools (array from '2', '3', '4', 'glue', 'fill'), labels (write 1/n in each part), unequal (draw UNEQUAL parts),
-//        colour (shading colour: a palette word such as 'red' or a hex), interactive (default true), readonly.
+//        colour (shading colour: a palette word such as 'red' or a hex), scale (0.3 to 1: draw the whole smaller, e.g. a
+//        small pizza beside a giant one), interactive (default true), readonly.
+// update() that changes parts or unequal (without a new shape) plays the hammer's shake and pop, so a look step can
+// act out a cut: update({ parts: 2 }).
 // Hammer n splits the whole into n equal parts, or splits each part into n when the result is at most 8 parts (2 -> 4).
 // Glue joins pairs of equal parts (4 quarters -> 2 halves), keeping the shading where it can (2/4 becomes 1/2).
 // Tap a part to shade or unshade it. The paint button changes the shading colour (purple, red, blue, orange).
@@ -11,8 +16,10 @@
 // Debug: dev/harness.html?widget=fractions&props={"shape":"square","parts":4,"shaded":3,"labels":true}
 //        dev/harness.html?widget=fractions&props={"shape":"circle","tools":["2","3","4","glue","fill"]}
 //        dev/harness.html?widget=fractions&props={"shape":"set","setSize":8,"parts":4,"shaded":1}
+//        dev/harness.html?widget=fractions&props={"shape":"set","setSize":6,"parts":2,"shaded":1,"icon":"crystal","labels":true}
 import { S, svgRoot, onTap, injectCSS, clamp, reducedMotion } from '../core/dom.js';
 import { COL, PAL, FRAC, FONT } from '../core/theme.js';
+import { artInner, artNames } from '../core/art.js';
 import { sfx } from '../core/sfx.js';
 
 export const meta = {
@@ -87,7 +94,16 @@ export function mount(el, props = {}, ctx = {}) {
 
   const ro = () => !!(p.readonly || ctx.readonly || p.interactive === false);
   const parts = () => (shape === 'circle' || shape === 'set' ? n : cols * rows);
-  const shadeCol = () => (p.colour && PAL[p.colour]) || p.colour || FRAC[colourIdx % FRAC.length];
+  // Default shading colours cycle purple, red, blue, orange. A set of things that are already that colour (purple
+  // crystals, red apples) swaps it for blue, so the shaded group still stands out.
+  const CLASH = { crystal: 0, apple: 1, fuel: 1 };
+  const shadeCol = () => {
+    if (p.colour) return PAL[p.colour] || p.colour;
+    let i = colourIdx % FRAC.length;
+    const cl = shape === 'set' ? CLASH[p.icon] : undefined;
+    if (cl !== undefined) i = i === cl ? 2 : i === 2 ? cl : i;
+    return FRAC[i];
+  };
   const state = () => {
     const pt = parts(), sh = paint.filter(Boolean).length;
     return { parts: pt, shaded: sh, equal: !unequal && (shape !== 'set' || setSize % n === 0), fraction: `${sh}/${pt}` };
@@ -124,8 +140,9 @@ export function mount(el, props = {}, ctx = {}) {
     else { const s = clamp(Math.round(p.shaded ?? 0) || 0, 0, paint.length); for (let i = 0; i < s; i++) paint[i] = shadeCol(); }
   }
 
-  function hammer(k) {
-    if (ro()) return;
+  // quiet: called by showAnswer (works when readonly too, and does not report a change).
+  function hammer(k, quiet = false) {
+    if (ro() && !quiet) return;
     const pt = parts();
     const old = paint.slice();
     if (shape === 'set') {
@@ -168,11 +185,11 @@ export function mount(el, props = {}, ctx = {}) {
     shakeNext = true;
     animNext = true;
     draw();
-    changed();
+    if (!quiet) changed();
   }
 
-  function glue() {
-    if (ro()) return;
+  function glue(quiet = false) {
+    if (ro() && !quiet) return;
     const pt = parts();
     if (pt <= 1) { wobble(); return; }
     const old = paint.slice();
@@ -218,7 +235,7 @@ export function mount(el, props = {}, ctx = {}) {
     sfx('pop');
     animNext = true;
     draw();
-    changed();
+    if (!quiet) changed();
   }
 
   function wobble() {
@@ -341,7 +358,13 @@ export function mount(el, props = {}, ctx = {}) {
         }
       }
     }
-    root.appendChild(body);
+    // scale (0.3 to 1) draws the whole smaller in the middle, e.g. a small pizza beside a giant one.
+    const sc = clamp(Number(p.scale) || 1, 0.3, 1);
+    if (sc < 1) {
+      const outer = S('g', { transform: `translate(${VW / 2} ${VH / 2}) scale(${sc}) translate(${-VW / 2} ${-VH / 2})` });
+      outer.appendChild(body);
+      root.appendChild(outer);
+    } else root.appendChild(body);
     animNext = false;
     syncTools();
   }
@@ -354,19 +377,22 @@ export function mount(el, props = {}, ctx = {}) {
     return base;
   }
 
-  // A set: outlined counters in rings. A shaded ring takes the colour; its counters are filled in.
+  // A set: real things in rings. With an icon each item is the outlined sticker (a crystal, an apple); without one
+  // each item is a solid yellow counter. A shaded ring takes the colour: a coloured outline and a tinted fill, and its
+  // counters turn that colour (icons sit on a coloured disc), so a shaded group reads at a glance.
   function drawSet(body, showLabels) {
     const sizes = setSizes();
     const AW = VW - 30, AH = VH - 30;
     const maxG = Math.max(...sizes, 1);
     const lab = showLabels && n > 1 ? 1.5 : 0;
-    // Pick groups-per-row and dots-per-row that give the biggest dots.
+    const icon = typeof p.icon === 'string' && p.icon !== 'dot' && artNames.includes(p.icon) ? p.icon : null;
+    // Pick groups-per-row and items-per-row that give the biggest items.
     let best = null;
     for (let pr = 1; pr <= n; pr++) {
       const g2 = Math.ceil(n / pr);
       for (let gc = 1; gc <= maxG; gc++) {
         const rr = Math.ceil(maxG / gc);
-        const spk = Math.min((AW / pr) * 0.88 / (gc + 0.7), (AH / g2) * 0.88 / (rr + 0.7 + lab), 80) * (maxG % gc === 0 ? 1 : 0.95);
+        const spk = Math.min((AW / pr) * 0.88 / (gc + 0.7), (AH / g2) * 0.88 / (rr + 0.7 + lab), icon ? 116 : 80) * (maxG % gc === 0 ? 1 : 0.95);
         if (!best || spk > best.sp + 0.01) best = { sp: spk, per: pr, gcols: gc };
       }
     }
@@ -380,18 +406,35 @@ export function mount(el, props = {}, ctx = {}) {
       const rw = (gcols + 0.7) * sp, rh = (grows + 0.7) * sp;
       const ring = S('rect', { x: cx - rw / 2, y: cy - rh / 2, width: rw, height: rh, rx: Math.min(rw, rh) * 0.42 });
       piece(ring, gi);
-      ring.setAttribute('fill', c ? hexA(c, 0.16) : COL.surface);
+      ring.setAttribute('fill', c ? hexA(c, icon ? 0.2 : 0.14) : COL.surface);
       ring.setAttribute('stroke', c || COL.ink);
-      ring.setAttribute('stroke-width', c ? 5 : 3.5);
+      ring.setAttribute('stroke-width', c ? 6 : 3.5);
       body.appendChild(ring);
       for (let k = 0; k < sz; k++) {
         const r = Math.floor(k / gcols), inR = Math.min(gcols, sz - r * gcols);
         const rowsHere = Math.ceil(sz / gcols);
         const x = cx + ((k % gcols) - (inR - 1) / 2) * sp, y = cy + (r - (rowsHere - 1) / 2) * sp;
-        body.appendChild(S('circle', { cx: x, cy: y, r: sp * 0.34, fill: c || COL.surface, stroke: COL.ink, 'stroke-width': 3, 'pointer-events': 'none', class: animNext ? 'split' : '' }));
+        // The pop-in animation sits on an outer group, so it never fights the icon's own transform.
+        const it = S('g', { 'pointer-events': 'none', class: animNext ? 'split' : '' });
+        if (icon) {
+          if (c) it.appendChild(S('circle', { cx: x, cy: y, r: sp * 0.46, fill: hexA(c, 0.42) }));
+          const s = (sp * 0.84) / 104;
+          const a = S('g', { transform: `translate(${x - sp * 0.42} ${y - sp * 0.42}) scale(${s}) translate(2 2)` });
+          a.innerHTML = artInner(icon);
+          it.appendChild(a);
+        } else {
+          it.appendChild(S('circle', { cx: x, cy: y, r: sp * 0.36, fill: c || COL.b, stroke: c ? darkOf(c) : COL.bDark, 'stroke-width': 3 }));
+        }
+        body.appendChild(it);
       }
       if (lab) { const fs = clamp(sp * 0.62, 24, 40); body.appendChild(label(cx, cy + rh / 2 + fs * 1.0, fs, n, COL.ink)); }
     });
+  }
+
+  // The darker outline shade of a palette colour (PAL.purple -> PAL.purpleDark); ink for anything else.
+  function darkOf(c) {
+    const k = Object.keys(PAL).find(key => !key.endsWith('Dark') && PAL[key].toLowerCase() === String(c).toLowerCase());
+    return (k && PAL[k + 'Dark']) || COL.ink;
   }
 
   function hexA(hex, a) {
@@ -437,9 +480,11 @@ export function mount(el, props = {}, ctx = {}) {
   const api = {
     getState: state,
     update(np = {}) {
+      const was = { parts: parts(), unequal };
       p = { ...p, ...np };
       const geo = ['shape', 'parts', 'setSize', 'shaded', 'shadedIdx', 'unequal'].some(k => k in np);
       if (geo) setup();
+      if (geo && !('shape' in np) && (parts() !== was.parts || unequal !== was.unequal)) { shakeNext = true; animNext = true; }
       draw();
     },
     showAnswer(answer) {
@@ -450,7 +495,15 @@ export function mount(el, props = {}, ctx = {}) {
         k = answer.parts ?? null; sh = answer.shaded ?? null;
         if (typeof answer.fraction === 'string' && /^\d+\/\d+$/.test(answer.fraction)) [sh, k] = answer.fraction.split('/').map(Number);
       }
-      if (k && ALLOWED.includes(k) && k !== parts()) { p = { ...p, parts: k, shaded: 0, shadedIdx: undefined, unequal: false }; setup(); }
+      const pt = parts();
+      if (k && ALLOWED.includes(k) && k !== pt) {
+        if (!unequal && k > pt && k % pt === 0 && (shape !== 'set' || setSize % k === 0)) { hammer(k / pt, true); if (sh === null) return; }
+        else if (!unequal && k < pt && pt % k === 0 && (k === 1 || (pt / k) % 2 === 0)) {
+          let guard = 0;
+          while (parts() > k && guard++ < 4) glue(true);
+          if (sh === null) return;
+        } else { p = { ...p, parts: k, shaded: 0, shadedIdx: undefined, unequal: false }; setup(); }
+      }
       if (sh !== null) { paint = paint.map((_, i) => (i < sh ? shadeCol() : null)); }
       shakeNext = true;
       animNext = k !== null || sh !== null;

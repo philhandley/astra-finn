@@ -16,6 +16,18 @@
   "Two quarters is the same as one half. Glue makes that visible.",
   "3/4 is the first fraction Finn meets that is more than 'one of' something."
  ],
+ "warmup": {
+  "gen": "fractions.shadeFraction",
+  "level": 1,
+  "items": 3,
+  "params": {
+   "parts": [
+    2
+   ]
+  },
+  "mission": "f1",
+  "say": "First, a quick warm-up: colour a half."
+ },
  "steps": [
   {
    "type": "look",
@@ -28,7 +40,9 @@
     "readonly": true,
     "shape": "circle",
     "parts": 4,
-    "labels": true
+    "labels": true,
+    "colour": "orange",
+    "shaded": 4
    }
   },
   {
@@ -37,7 +51,7 @@
   },
   {
    "type": "guess",
-   "prompt": "3 slices are eaten. How much of the pizza is that?",
+   "prompt": "3 slices have pepperoni. What fraction of the pizza is that?",
    "options": [
     "1/4",
     "2/4",
@@ -46,14 +60,15 @@
    "answer": 2,
    "reveal": [
     "3/4.",
-    "3 of the 4 equal slices."
+    "3 of the 4 equal slices have pepperoni."
    ],
    "widget": "fractions",
    "props": {
     "readonly": true,
     "shape": "circle",
     "parts": 4,
-    "shaded": 3
+    "shaded": 3,
+    "colour": "red"
    }
   },
   {
@@ -74,6 +89,13 @@
      },
      "then": [
       "1 of 4 equal parts."
+     ],
+     "hint": [
+      "Tap one of the 4 white parts."
+     ],
+     "explain": [
+      "Tap one part.",
+      "1 of 4 equal parts is 1/4."
      ]
     },
     {
@@ -85,6 +107,13 @@
      },
      "then": [
       "2 of 4 equal parts is 2/4."
+     ],
+     "hint": [
+      "Tap one more white part."
+     ],
+     "explain": [
+      "Colour 2 of the 4 parts.",
+      "That is 2/4."
      ]
     },
     {
@@ -100,6 +129,13 @@
      "answer": "Yes",
      "then": [
       "2 quarters fill half the square."
+     ],
+     "hint": [
+      "Do the 2 coloured parts fill half the square?"
+     ],
+     "explain": [
+      "2 quarters fill half the square.",
+      "2/4 is the same as 1/2."
      ]
     },
     {
@@ -112,6 +148,13 @@
      "then": [
       "3/4 is coloured.",
       "Only 1/4 is left."
+     ],
+     "hint": [
+      "Tap one more white part."
+     ],
+     "explain": [
+      "Colour 3 of the 4 parts.",
+      "That is 3/4."
      ]
     }
    ]
@@ -144,6 +187,13 @@
      "then": [
       "Now it is {fraction}.",
       "2/4 is the same as 1/2!"
+     ],
+     "hint": [
+      "Tap the Glue button."
+     ],
+     "explain": [
+      "Glue joins the quarters in pairs.",
+      "2 coloured quarters make 1 coloured half."
      ]
     },
     {
@@ -156,6 +206,13 @@
      "then": [
       "Back to {fraction}.",
       "Same amount, more pieces."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 on it."
+     ],
+     "explain": [
+      "Each half splits into 2 quarters.",
+      "1/2 becomes 2/4."
      ]
     }
    ]
@@ -167,18 +224,26 @@
     "shape": "set",
     "setSize": 8,
     "parts": 4,
-    "labels": true
+    "labels": true,
+    "icon": "cookie"
    },
    "script": [
     {
      "say": [
-      "8 dots in 4 equal groups.",
+      "8 space biscuits in 4 equal groups.",
       "Colour 1/4 of them."
      ],
      "goal": {
       "shaded": 1
      },
      "then": [
+      "1/4 of 8 is 2."
+     ],
+     "hint": [
+      "Tap one ring of biscuits."
+     ],
+     "explain": [
+      "Colour one of the 4 rings.",
       "1/4 of 8 is 2."
      ]
     },
@@ -191,6 +256,14 @@
      },
      "then": [
       "3/4 of 8 is 6."
+     ],
+     "hint": [
+      "3/4 is 3 of the 4 rings.",
+      "Tap 2 more rings."
+     ],
+     "explain": [
+      "Colour 3 of the 4 rings.",
+      "3 groups of 2 is 6, so 3/4 of 8 is 6."
      ]
     }
    ]

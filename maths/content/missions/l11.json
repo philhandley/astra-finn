@@ -21,9 +21,9 @@
       "type": "look",
       "lines": [
         "A rocket and an astronaut.",
-        "One is much taller."
+        "Both stand on the same line."
       ],
-      "question": "Which is taller? How do you know?",
+      "question": "Which is taller?",
       "widget": "measure",
       "props": {
         "tool": "compare",
@@ -34,6 +34,19 @@
           "rocket",
           "astronaut"
         ]
+      },
+      "options": [
+        "Rocket",
+        "Astronaut",
+        "Same"
+      ],
+      "answer": 0,
+      "reveal": [
+        "The rocket's top is higher up.",
+        "Count the cubes: rocket 6, astronaut 3."
+      ],
+      "revealProps": {
+        "cubes": true
       }
     },
     {
@@ -100,6 +113,10 @@
           "then": [
             "The worm is longer.",
             "The pencil is shorter."
+          ],
+          "hint": [
+            "Both start at the dashed line.",
+            "Which one reaches further along?"
           ]
         },
         {
@@ -111,6 +128,10 @@
           "unit": "cubes",
           "then": [
             "4 cubes. The worm is 7 cubes."
+          ],
+          "hint": [
+            "Count the yellow cubes under the pencil.",
+            "Touch each one as you count."
           ]
         },
         {
@@ -121,6 +142,7 @@
           "answer": 3,
           "unit": "cubes",
           "hint": [
+            "The pencil has 4 cubes. The worm has 7.",
             "Count on from 4 to 7."
           ],
           "then": [
@@ -163,6 +185,10 @@
           "then": [
             "The rock side is down.",
             "The rock is heavier than 1 cube."
+          ],
+          "hint": [
+            "The heavier side goes down.",
+            "Which pan is lower?"
           ]
         },
         {
@@ -179,6 +205,10 @@
           ],
           "then": [
             "Level! The rock weighs the same as {b} cubes."
+          ],
+          "explain": [
+            "The rock weighs the same as 5 cubes.",
+            "Now the balance is level."
           ]
         },
         {
@@ -191,6 +221,14 @@
           "then": [
             "Now the cubes are heavier.",
             "The rock is lighter."
+          ],
+          "hint": [
+            "Tap the + button 1 more time.",
+            "Watch which side goes down."
+          ],
+          "explain": [
+            "6 cubes are heavier than the rock.",
+            "So the cubes side goes down."
           ]
         }
       ]
@@ -209,6 +247,16 @@
         "a": 10,
         "b": 5,
         "max": 10
+      },
+      "show": {
+        "label": "Empty tank B",
+        "props": {
+          "b": 0
+        },
+        "lines": [
+          "Empty means no water at all.",
+          "Full, half full, empty."
+        ]
       }
     },
     {
@@ -275,13 +323,35 @@
       "options": [
         {
           "label": "Tall and thin",
-          "art": "rocket",
-          "detail": "It looks higher"
+          "detail": "It looks higher",
+          "widget": "measure",
+          "props": {
+            "tool": "compare",
+            "kind": "capacity",
+            "a": 8,
+            "max": 10,
+            "shapes": [
+              "tall"
+            ],
+            "liquid": "juice",
+            "readonly": true
+          }
         },
         {
           "label": "Short and wide",
-          "art": "ufo",
-          "detail": "It looks fatter"
+          "detail": "It looks wider",
+          "widget": "measure",
+          "props": {
+            "tool": "compare",
+            "kind": "capacity",
+            "a": 7.3,
+            "max": 10,
+            "shapes": [
+              "wide"
+            ],
+            "liquid": "juice",
+            "readonly": true
+          }
         }
       ],
       "reveal": [

@@ -6,6 +6,8 @@
 //            Each counts once only; a blue number shows the order they were tapped.
 //        autoRotate (slow spin until touched), colour (palette name or #hex; default teal; avoid yellow and blue),
 //        highlight ('top' | 'base' | 'side' | 'end' | 'curved'): paint that face yellow and turn the shape so it shows,
+//        print (true, with a flat highlight: the shape moves left and the face's 2-D outline appears on a sheet of paper
+//            on the right, as if the yellow face were painted and pressed down; for reveals),
 //        svg (true: draw the simple SVG picture instead of WebGL, for small option tiles), readonly.
 // Drag to rotate. Renders only when something changes or while spinning; stops when hidden or destroyed.
 // Without WebGL (or before Three.js loads) it shows an SVG drawing of the shape.
@@ -65,13 +67,14 @@ function fromHSL([h, s, l]) {
 }
 // Faces towards the light mix towards white; faces turned away lose lightness but keep their saturation,
 // so a yellow face in shade turns golden, not olive.
-function shadeRGB(rgb, n) {
+// floor: the darkest a face may get; yellow (tapped or highlighted) faces stay bright so they still read as yellow.
+function shadeRGB(rgb, n, floor = 0.66) {
   const l = Math.hypot(...LIGHT);
   const d = (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]) / l;
   const s = 0.8 + 0.34 * d; // about 0.46 (facing away) to 1.14 (facing the light)
   if (s >= 1) { const k = Math.min(0.5, (s - 1) * 1.9); return rgb.map(c => c + (1 - c) * k); }
   const [h, sat, lig] = toHSL(rgb);
-  return fromHSL([h, sat, lig * Math.max(0.66, s)]);
+  return fromHSL([h, sat, lig * Math.max(floor, s)]);
 }
 const cssRGB = c => `rgb(${c.map(v => Math.round(v * 255)).join(',')})`;
 
@@ -231,16 +234,33 @@ let threeP = null;
 const loadThree = () => (threeP = threeP || import('three'));
 
 const VIEW = [0.28, 0.42, 0.86];
+const BASE_VIEW = [0.18, -0.8, 0.58]; // seen from below, about 55 degrees
+const PRINT_SPLIT = 0.56; // with print on, the solid takes the left 56% and the paper the rest
+
+// The flat outline of a face, in its own plane, with its first edge along the bottom: { pts } or { circle: true }; null if curved.
+function faceOutline(f) {
+  if (!f || f.curved) return null;
+  if (!f.poly) return { circle: true };
+  const u = norm(sub(f.poly[1], f.poly[0])), v = cross(f.normal, u);
+  let pts = f.poly.map(P => { const d = sub(P, f.centre); return [dot(d, u), dot(d, v)]; });
+  const my = pts.reduce((a, q) => a + q[1], 0) / pts.length;
+  if (my > pts[0][1]) pts = pts.map(([x, y]) => [x, -y]);
+  return { pts };
+}
 const edgePt = e => (e.closed ? e.pts[Math.floor(e.pts.length * 0.25)] : mul(add(e.pts[0], e.pts[1]), 0.5));
-function initialQ(m, highlight) {
+function initialQ(m, highlight, name) {
   let q = qMul(qAxis([1, 0, 0], 0.42), qAxis([0, 1, 0], -0.62));
   const f = highlight ? m.faces.find(x => x.tag === highlight) : null;
   if (f) {
     // Turn most of the way towards the viewer, so the face shows but the shape still looks solid.
-    const t = qFromTo(qRot(q, f.normal), norm(VIEW));
+    // A base is shown from below and in front (BASE_VIEW), so the rest of the shape rises behind it:
+    // turned straight at the viewer, a cone or pyramid would look like a flat circle or square.
+    const base = f.tag === 'base';
+    const t = qFromTo(qRot(q, f.normal), norm(base ? BASE_VIEW : VIEW));
     const ang = 2 * Math.acos(Math.min(1, Math.max(-1, t[3])));
     const sn = Math.sin(ang / 2);
-    if (sn > 1e-6) q = qNorm(qMul(qAxis([t[0] / sn, t[1] / sn, t[2] / sn], ang * 0.72), q));
+    const frac = base ? 1 : name === 'tri-pyramid' ? 0.45 : 0.72; // a flat triangle-based pyramid turned too far hides the rest
+    if (sn > 1e-6) q = qNorm(qMul(qAxis([t[0] / sn, t[1] / sn, t[2] / sn], ang * frac), q));
   }
   return q;
 }
@@ -252,6 +272,11 @@ export function mount(el, props = {}, ctx = {}) {
     .w-shapes3d.ro canvas, .w-shapes3d.ro svg { cursor: default; }
     .w-shapes3d svg { position: absolute; inset: 0; }
     .w-shapes3d .b3 { position: absolute; inset: 0; pointer-events: none; }
+    .w-shapes3d svg.pr { left: ${PRINT_SPLIT * 100}%; width: ${100 - PRINT_SPLIT * 100}%; pointer-events: none; }
+    .w-shapes3d.printing canvas, .w-shapes3d.printing > svg:not(.pr) { right: auto; width: ${PRINT_SPLIT * 100}%; }
+    .w-shapes3d .pr .sheet { animation: w-shapes3d-press .35s ease-out; transform-box: fill-box; transform-origin: center; }
+    @keyframes w-shapes3d-press { from { opacity: 0; transform: scale(.85); } }
+    @media (prefers-reduced-motion: reduce) { .w-shapes3d .pr .sheet { animation: none; } }
     .w-shapes3d .b3 div { position: absolute; left: 0; top: 0; width: 42px; height: 42px; margin: -21px 0 0 -21px; border-radius: 50%; box-sizing: border-box;
       background: ${LIT_LINE}; color: #fff; border: 3px solid #fff; font: 700 23px/36px ${FONT.display}; text-align: center;
       box-shadow: 0 2px 6px rgba(27,30,46,.28); transition: opacity .15s; }
@@ -260,7 +285,7 @@ export function mount(el, props = {}, ctx = {}) {
   let alive = true;
   let name = validShape(p.shape);
   let m = model(name);
-  let q = initialQ(m, p.highlight);
+  let q = initialQ(m, p.highlight, name);
   let litF = [], litE = [], litV = [];
   let anchors = []; // { kind, i, pt } in tap order (model coordinates)
   let touched = false;
@@ -272,6 +297,7 @@ export function mount(el, props = {}, ctx = {}) {
   wrap.appendChild(svg);
   const badges = h('<div class="b3"></div>');
   wrap.appendChild(badges);
+  let prSvg = null; // the sheet of paper for `print`
   let G = null; // the Three.js bits once loaded
 
   // readonly: false arriving through update() (a hint) switches interaction on even if mounted readonly.
@@ -279,6 +305,29 @@ export function mount(el, props = {}, ctx = {}) {
   const tapMode = () => (['faces', 'edges', 'vertices'].includes(p.tap) ? p.tap : null);
   const hlFace = () => (p.highlight ? m.faces.findIndex(f => f.tag === p.highlight) : -1);
   const spinOn = () => !!p.autoRotate && !touched && !document.hidden && alive;
+  const printing = () => !!p.print && !!faceOutline(m.faces[hlFace()]);
+
+  // print: a sheet of paper on the right with the highlighted face's outline, flat yellow with an ink edge.
+  function drawPrint() {
+    const on = printing();
+    wrap.classList.toggle('printing', on);
+    if (!on) { if (prSvg) { prSvg.remove(); prSvg = null; } return; }
+    if (!prSvg) { prSvg = svgRoot(360, 500, 'pr'); wrap.insertBefore(prSvg, badges); }
+    prSvg.replaceChildren();
+    const o = faceOutline(m.faces[hlFace()]);
+    const cx = 180, cy = 250, box = 210;
+    const sheet = S('g', { class: 'sheet' }, [S('rect', { x: 34, y: 112, width: 292, height: 276, rx: 14, fill: COL.surface, stroke: COL.lineStrong, 'stroke-width': 3, transform: 'rotate(-3 180 250)' })]);
+    const ink = { fill: LIT_FACE, stroke: COL.ink, 'stroke-width': 4.5, 'stroke-linejoin': 'round' };
+    if (o.circle) sheet.appendChild(S('circle', { cx, cy, r: box / 2 - 10, ...ink }));
+    else {
+      const xs = o.pts.map(q => q[0]), ys = o.pts.map(q => q[1]);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      const k = Math.min(box / (x1 - x0 || 1), (box * 0.86) / (y1 - y0 || 1));
+      const d = o.pts.map((q, i) => `${i ? 'L' : 'M'}${(cx + (q[0] - (x0 + x1) / 2) * k).toFixed(1)} ${(cy + (q[1] - (y0 + y1) / 2) * k).toFixed(1)}`).join('') + 'Z';
+      sheet.appendChild(S('path', { d, ...ink }));
+    }
+    prSvg.appendChild(sheet);
+  }
   wrap.classList.toggle('ro', ro());
 
   // ---------- SVG picture (fallback and first paint) ----------
@@ -296,7 +345,7 @@ export function mount(el, props = {}, ctx = {}) {
       const n = qRot(q, f.normal);
       if (n[2] <= 0.0001) return;
       const pts = f.poly.map(P);
-      items.push({ z: pts.reduce((s2, a) => s2 + a[2], 0) / pts.length, d: `M${pts2(pts)}Z`, fill: cssRGB(shadeRGB(fcol(fi), n)) });
+      items.push({ z: pts.reduce((s2, a) => s2 + a[2], 0) / pts.length, d: `M${pts2(pts)}Z`, fill: cssRGB(shadeRGB(fcol(fi), n, litF.includes(fi) || fi === hl ? 0.88 : 0.66)) });
     });
     const tris = m.triFace.length;
     for (let t = 0; t < tris; t++) {
@@ -308,7 +357,7 @@ export function mount(el, props = {}, ctx = {}) {
       const gn = qRot(q, norm(cross(sub(vs[1], vs[0]), sub(vs[2], vs[0]))));
       if (gn[2] <= 0.0001) continue;
       const pts = vs.map(P);
-      const c = cssRGB(shadeRGB(fcol(fi), n));
+      const c = cssRGB(shadeRGB(fcol(fi), n, litF.includes(fi) || fi === hl ? 0.88 : 0.66));
       items.push({ z: (pts[0][2] + pts[1][2] + pts[2][2]) / 3, d: `M${pts2(pts)}Z`, fill: c, stroke: c });
     }
     items.sort((a, b) => a.z - b.z);
@@ -420,12 +469,12 @@ export function mount(el, props = {}, ctx = {}) {
     const a = attr.array, nor = m.nor;
     const c = new T.Color();
     const flatN = m.faces.map(f => (f.poly ? qRot(q, f.normal) : null));
-    const flatC = m.faces.map((f, fi) => (f.poly ? shadeRGB(litF.includes(fi) || fi === hl ? lit : base, flatN[fi]) : null));
+    const flatC = m.faces.map((f, fi) => (f.poly ? (litF.includes(fi) || fi === hl ? shadeRGB(lit, flatN[fi], 0.88) : shadeRGB(base, flatN[fi])) : null));
     m.triFace.forEach((fi, t) => {
       const on = litF.includes(fi) || fi === hl;
       for (let j = 0; j < 3; j++) {
         const o = t * 9 + j * 3;
-        const rgb = flatC[fi] || shadeRGB(on ? lit : base, qRot(q, [nor[o], nor[o + 1], nor[o + 2]]));
+        const rgb = flatC[fi] || shadeRGB(on ? lit : base, qRot(q, [nor[o], nor[o + 1], nor[o + 2]]), on ? 0.88 : 0.66);
         c.setRGB(rgb[0], rgb[1], rgb[2], T.SRGBColorSpace);
         a[o] = c.r; a[o + 1] = c.g; a[o + 2] = c.b;
       }
@@ -477,7 +526,7 @@ export function mount(el, props = {}, ctx = {}) {
 
   function resize() {
     if (!G) return;
-    const w = wrap.clientWidth, hgt = wrap.clientHeight;
+    const w = Math.round(wrap.clientWidth * (printing() ? PRINT_SPLIT : 1)), hgt = wrap.clientHeight;
     if (w < 2 || hgt < 2) return;
     G.w = w; G.h = hgt;
     G.renderer.setSize(w, hgt, false);
@@ -639,7 +688,7 @@ export function mount(el, props = {}, ctx = {}) {
     name = validShape(p.shape);
     m = model(name);
     litF = []; litE = []; litV = []; anchors = [];
-    if (resetView) q = initialQ(m, p.highlight);
+    if (resetView) q = initialQ(m, p.highlight, name);
     buildMesh();
     buildDecor();
   }
@@ -655,8 +704,10 @@ export function mount(el, props = {}, ctx = {}) {
       const tapCh = (before.tap || null) !== (p.tap || null);
       const hlCh = (before.highlight || null) !== (p.highlight || null);
       if (shapeCh || tapCh) rebuild(shapeCh || hlCh);
-      else if (hlCh) q = initialQ(m, p.highlight);
+      else if (hlCh) q = initialQ(m, p.highlight, name);
       if ('autoRotate' in np) touched = false;
+      drawPrint();
+      resize();
       paintFaces();
       buildDecor();
       if (np.svg === false && !G) initThree();
@@ -707,6 +758,7 @@ export function mount(el, props = {}, ctx = {}) {
     },
   };
 
+  drawPrint();
   drawSVG();
   initThree();
   return api;

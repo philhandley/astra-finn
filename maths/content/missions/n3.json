@@ -4,20 +4,50 @@
   "title": "Number Line Landing",
   "tagline": "Land the rocket where the number belongs",
   "covers": ["Y2-NPV-3", "2NPV–2", "1NPV–2"],
-  "patch": { "name": "Number Line Landing", "icon": "numberline" },
+  "patch": {"name": "Number Line Landing", "icon": "numberline"},
   "dadNotes": [
     "DfE sentences: 'a is 36 because it is one more than the midpoint, 35.' 'b is 79 because it is one less than 80.'",
     "On a line with no marks, estimate, don't count: '60 is about here because it's just over half way.'",
     "Ask: 'Which two tens is 47 between? Which is it nearer?'"
   ],
+  "warmup": {
+    "gen": "number.numberLinePlace",
+    "level": 1,
+    "items": 3,
+    "mission": "l2",
+    "say": "First, a quick warm-up: landing rockets on a 0 to 20 line."
+  },
   "steps": [
     {
       "type": "look",
-      "lines": ["A number line from 0 to 100.", "a is 36. It is 1 more than 35.", "b is 79. It is 1 less than 80."],
+      "lines": ["A number line from 0 to 100.", "The small marks are halfway between the tens."],
+      "question": "What number is the purple dot?",
+      "options": ["57", "75", "80"],
+      "answer": 1,
+      "reveal": ["Zoom in! It is 75.", "75 is halfway between 70 and 80."],
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "step": 10, "minor": 5, "labels": "tens", "marks": [{ "at": 36, "label": "a", "colour": "orange" }, { "at": 79, "label": "b", "colour": "purple" }] }
+      "props": {
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "minor": 5,
+        "labels": "tens",
+        "marks": [{"at": 75, "label": "?", "colour": "purple"}]
+      },
+      "revealProps": {
+        "min": 70,
+        "max": 80,
+        "step": 1,
+        "minor": 0,
+        "labels": "all",
+        "marks": [{"at": 75, "colour": "purple"}],
+        "hops": [
+          {"from": 70, "to": 75, "label": "5", "colour": "purple"},
+          {"from": 80, "to": 75, "label": "5", "colour": "purple"}
+        ]
+      }
     },
-    { "type": "ask", "text": "Have you put numbers on a number line at school?" },
+    {"type": "ask", "text": "Have you put numbers on a number line at school?"},
     {
       "type": "guess",
       "prompt": "Which dot is about 60?",
@@ -25,28 +55,97 @@
       "answer": 1,
       "reveal": ["B is about 60.", "60 is just over half way."],
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "step": 100, "minor": 0, "labels": [0, 100], "marks": [{ "at": 30, "label": "A", "colour": "orange" }, { "at": 60, "label": "B", "colour": "orange" }, { "at": 88, "label": "C", "colour": "orange" }] },
-      "revealProps": { "labels": [0, 50, 100], "step": 50 }
+      "props": {
+        "min": 0,
+        "max": 100,
+        "step": 100,
+        "minor": 0,
+        "labels": [0, 100],
+        "marks": [
+          {"at": 30, "label": "A", "colour": "orange"},
+          {"at": 60, "label": "B", "colour": "orange"},
+          {"at": 88, "label": "C", "colour": "orange"}
+        ]
+      },
+      "revealProps": {"labels": [0, 50, 100], "step": 50}
     },
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "mode": "place", "step": 10, "minor": 5, "labels": "tens", "snap": 10 },
+      "props": {"min": 0, "max": 100, "mode": "place", "step": 10, "minor": 5, "labels": "tens", "snap": 10},
       "script": [
-        { "say": ["Land the rocket on 40.", "Drag it, or tap the line."], "goal": { "value": 40 }, "then": ["40 is 4 tens."] },
-        { "set": { "min": 30, "max": 40, "labels": [30, 35, 40], "step": 5, "minor": 1, "snap": 1, "value": null }, "say": ["Zoom in! 30 to 40.", "Land on 36."], "goal": { "value": 36 }, "then": ["36 is 1 more than the midpoint, 35."], "hint": ["Find 35 in the middle.", "Then 1 more."] },
-        { "set": { "value": null }, "say": ["Now land on 39."], "goal": { "value": 39 }, "then": ["39 is 1 less than 40."] },
-        { "set": { "min": 0, "max": 100, "labels": [0, 100], "step": 100, "minor": 0, "snap": 1, "value": null }, "say": ["No marks now!", "Land roughly on 60."], "goal": { "value": { "gte": 54, "lte": 66 } }, "then": ["You landed on {value}.", "60 is just over half way."], "hint": ["Find the middle first.", "60 is a bit more than half way."] }
+        {
+          "say": ["Land the rocket on 40.", "Drag it, or tap the line."],
+          "goal": {"value": 40},
+          "then": ["40 is 4 tens."],
+          "hint": ["Find 40 under the line.", "Tap the line just above it."]
+        },
+        {
+          "set": {"min": 30, "max": 40, "labels": [30, 35, 40], "step": 5, "minor": 1, "snap": 1, "value": null},
+          "say": ["Zoom in! 30 to 40.", "Land on 36."],
+          "goal": {"value": 36},
+          "then": ["36 is 1 more than the midpoint, 35."],
+          "hint": ["Find 35 in the middle.", "Then 1 more."]
+        },
+        {
+          "set": {"value": null},
+          "say": ["Now land on 39."],
+          "goal": {"value": 39},
+          "then": ["39 is 1 less than 40."],
+          "hint": ["40 is at the end.", "39 is 1 mark before it."]
+        },
+        {
+          "set": {"min": 0, "max": 100, "labels": [0, 100], "step": 100, "minor": 0, "snap": 1, "value": null},
+          "say": ["No marks now!", "Land roughly on 60."],
+          "goal": {"value": {"gte": 54, "lte": 66}},
+          "then": ["You landed on {value}.", "60 is just over half way."],
+          "hint": ["Here is the middle: 50.", "60 is a bit more than half way."],
+          "hintProps": {"labels": [0, 50, 100]}
+        }
       ]
     },
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 40, "max": 50, "labels": "ends", "minor": 1, "marks": [{ "at": 47, "label": "47", "colour": "orange" }] },
+      "props": {
+        "min": 40,
+        "max": 50,
+        "labels": "ends",
+        "minor": 1,
+        "hide": [50],
+        "marks": [{"at": 47, "label": "47", "colour": "orange"}]
+      },
       "script": [
-        { "say": ["47 is between two tens.", "What is the next ten?"], "input": "numpad", "answer": 50, "then": ["47 is between 40 and 50."] },
-        { "say": ["Is 47 nearer to 40 or 50?"], "input": "choice", "options": [40, 50], "answer": 50, "then": ["47 is 3 less than 50.", "So it is nearer to 50."] },
-        { "set": { "min": 70, "max": 80, "marks": [{ "at": 72, "label": "72", "colour": "orange" }] }, "say": ["What ten comes just before 72?"], "input": "numpad", "answer": 70, "then": ["72 is between 70 and 80.", "It is nearer to 70."] }
+        {
+          "say": ["47 is between two tens.", "What is the next ten after 47?"],
+          "input": "numpad",
+          "answer": 50,
+          "then": ["47 is between 40 and 50."],
+          "hint": ["Count on from 47: 48, 49...", "Stop when you reach a ten."]
+        },
+        {
+          "say": ["Is 47 nearer to 40 or 50?"],
+          "input": "choice",
+          "options": [40, 50],
+          "answer": 50,
+          "then": ["47 is 3 less than 50.", "So it is nearer to 50."],
+          "set": {"hide": [], "labels": [40, 45, 50]},
+          "hint": ["Halfway is 45.", "Is 47 before or after 45?"]
+        },
+        {
+          "set": {
+            "min": 70,
+            "max": 80,
+            "labels": "ends",
+            "hide": [70],
+            "marks": [{"at": 72, "label": "72", "colour": "orange"}]
+          },
+          "say": ["What ten comes just before 72?"],
+          "input": "numpad",
+          "answer": 70,
+          "then": ["72 is between 70 and 80.", "It is nearer to 70."],
+          "hint": ["Count back from 72: 71...", "Stop when you reach a ten."]
+        }
       ]
     },
     {
@@ -67,7 +166,12 @@
     {
       "type": "error",
       "intro": ["{engineer} explained where 36 goes.", "Can you spot the slip?"],
-      "lines": ["Where does 36 go?", "36 is between 30 and 40.", "The midpoint of 30 and 40 is 35.", "So 36 is 1 less than 35."],
+      "lines": [
+        "Where does 36 go?",
+        "36 is between 30 and 40.",
+        "The midpoint of 30 and 40 is 35.",
+        "So 36 is 1 less than 35."
+      ],
       "wrong": 3,
       "fix": ["36 is 1 more than 35, not less.", "What would you tell {engineer}?"]
     },
@@ -75,12 +179,13 @@
       "type": "athome",
       "title": "Washing line",
       "need": ["String or a long scarf", "Paper and a pen"],
-      "steps": ["Lay the string on the floor.", "Put 0 at one end and 100 at the other.", "Put 50 in the middle. Where do 25, 90 and 61 go?"],
+      "steps": [
+        "Lay the string on the floor.",
+        "Put 0 at one end and 100 at the other.",
+        "Put 50 in the middle. Where do 25, 90 and 61 go?"
+      ],
       "why": "Placing numbers by thinking about halfway builds a sense of size."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "How did you find 60 with no marks?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "How did you find 60 with no marks?"]}
   ]
 }

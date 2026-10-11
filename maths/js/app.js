@@ -26,7 +26,8 @@ async function loadAll() {
   DATA.curriculum = cur;
   for (const s of DATA.sectors) for (const m of s.missions) DATA.meta[m.id] = { ...m, sector: s.id };
   const ids = Object.keys(DATA.meta);
-  await Promise.all(ids.map(id => fetch(`content/missions/${id}.json`).then(r => (r.ok ? r.json() : null)).then(m => { if (m && m.steps) DATA.missions[id] = m; }).catch(() => {})));
+  const getMission = id => fetch(`content/missions/${id}.json`).then(r => (r.ok ? r.json() : null));
+  await Promise.all(ids.map(id => getMission(id).catch(() => new Promise(r => setTimeout(r, 600)).then(() => getMission(id))).then(m => { if (m && m.steps) DATA.missions[id] = m; }).catch(() => {})));
   // Dev only: ?devmission=<name> loads dev/<name>.json as an extra mission.
   const dm = new URLSearchParams(location.search).get('devmission');
   if (dm && /^[\w-]+$/.test(dm)) {
@@ -262,7 +263,7 @@ function renderSector(sid) {
 /* ---------------- Crew Log ---------------- */
 function openLog() {
   const body = h(`<div class="loglist"></div>`);
-  const add = h(`<div class="whybox"><input class="textin" type="text" maxlength="200" placeholder="Add a note to the Crew Log..."><button class="btn small" type="button">${icon('plus')} Add</button></div>`);
+  const add = h(`<div class="logadd"><input class="textin" type="text" maxlength="200" placeholder="Add a note to the Crew Log..."><button class="btn small" type="button">${icon('plus')} Add</button></div>`);
   const list = h(`<div></div>`);
   const title = id => DATA.missions[id]?.title;
   const draw = () => {
@@ -419,6 +420,11 @@ async function boot() {
   }
   window.addEventListener('hashchange', route);
   route();
+  // Dev only: ?devopen=notes | log | tier:<missionId> opens a panel for screenshots.
+  const dv = new URLSearchParams(location.search).get('devopen');
+  if (dv === 'notes') setTimeout(openNotes, 300);
+  else if (dv === 'log') setTimeout(openLog, 300);
+  else if (dv && dv.startsWith('tier:')) setTimeout(() => launch(dv.slice(5)), 300);
   const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   if ('serviceWorker' in navigator && (!local || location.search.includes('sw'))) {
     navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW failed', err));

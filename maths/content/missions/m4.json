@@ -17,6 +17,13 @@
     "£ means pounds and p means pence. 100p is the same as £1.",
     "There is nearly always another way to make an amount. Ask: can you do it with fewer coins?"
   ],
+  "warmup": {
+    "gen": "money.coinValue",
+    "level": 1,
+    "items": 3,
+    "mission": "l10",
+    "say": "First, a quick warm-up: which coin is which?"
+  },
   "steps": [
     {
       "type": "look",
@@ -35,6 +42,22 @@
           "20p",
           "50p",
           "£1",
+          "£2"
+        ]
+      },
+      "options": [
+        "2p",
+        "50p",
+        "£2"
+      ],
+      "answer": 2,
+      "reveal": [
+        "£2 is 2 pounds. That is 200p!",
+        "So £2 is worth more than 50p."
+      ],
+      "revealProps": {
+        "sort": true,
+        "highlight": [
           "£2"
         ]
       }
@@ -102,11 +125,21 @@
           ],
           "then": [
             "You made 30p with {count} coins."
+          ],
+          "hintProps": {
+            "point": [
+              "20p",
+              "10p"
+            ]
+          },
+          "explain": [
+            "20p and 10p make 30p."
           ]
         },
         {
           "set": {
-            "purse": []
+            "purse": [],
+            "point": []
           },
           "say": [
             "Now make 30p with exactly 3 coins."
@@ -120,11 +153,21 @@
           ],
           "then": [
             "{items} make 30p too."
+          ],
+          "hintProps": {
+            "point": [
+              "10p"
+            ]
+          },
+          "explain": [
+            "10p, 20p, 30p.",
+            "Three 10p coins make 30p."
           ]
         },
         {
           "set": {
-            "purse": []
+            "purse": [],
+            "point": []
           },
           "say": [
             "Make 30p with just 2 coins."
@@ -135,12 +178,27 @@
           },
           "then": [
             "Same amount, different coins!"
+          ],
+          "hint": [
+            "Start with a 20p coin.",
+            "Which coin adds 10p more?"
+          ],
+          "hintProps": {
+            "point": [
+              "20p",
+              "10p"
+            ]
+          },
+          "explain": [
+            "20p and 10p make 30p.",
+            "That is just 2 coins."
           ]
         },
         {
           "set": {
             "purse": [],
-            "showTotal": false
+            "showTotal": false,
+            "point": []
           },
           "say": [
             "Make 75p.",
@@ -154,6 +212,13 @@
           ],
           "then": [
             "75p! Biggest coins first is quickest."
+          ],
+          "hintProps": {
+            "showTotal": true
+          },
+          "explain": [
+            "50p, 70p, 75p.",
+            "50p + 20p + 5p = 75p."
           ]
         },
         {
@@ -170,6 +235,20 @@
           "then": [
             "£3 is the same as 300p.",
             "You used {count} coins."
+          ],
+          "hint": [
+            "Start with a £2 coin.",
+            "How much more makes £3?"
+          ],
+          "hintProps": {
+            "point": [
+              "£2",
+              "£1"
+            ]
+          },
+          "explain": [
+            "£2 and £1 make £3.",
+            "£3 is the same as 300p."
           ]
         },
         {
@@ -181,7 +260,8 @@
               "£10",
               "£20"
             ],
-            "purse": []
+            "purse": [],
+            "point": []
           },
           "say": [
             "Notes are for bigger amounts.",
@@ -191,6 +271,19 @@
             "total": 1500
           },
           "then": [
+            "£10 and £5 make £15."
+          ],
+          "hint": [
+            "Start with the £10 note.",
+            "Which note adds £5 more?"
+          ],
+          "hintProps": {
+            "point": [
+              "£10",
+              "£5"
+            ]
+          },
+          "explain": [
             "£10 and £5 make £15."
           ]
         }

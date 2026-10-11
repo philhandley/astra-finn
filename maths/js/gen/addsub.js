@@ -5,6 +5,8 @@
 //   addOnesTens (3, params { kinds }), relatedFacts100 (3), addTwoDigit (3), subTwoDigit (3), threeNumbers (3),
 //   missingNumber (3), equalsTrueFalse (3), commutative (3), inverseCheck (3), factFamily (3), difference (3),
 //   wordProblem (3, params { structures }).
+// Items whose picture is a tens frame also carry answerProps: the props that show the answer on that picture
+// (e.g. 7 red and 3 yellow for 7 + ? = 10). tensframe.showAnswer(3) would show 3 red counters instead.
 import { factKey } from '../core/facts.js';
 
 const M = '−'; // minus sign used in captions and lines (sayable() reads it as "minus")
@@ -62,6 +64,24 @@ const sym = op => (op === '+' ? '+' : M);
 const word = op => (op === '+' ? 'plus' : 'minus');
 const tens = n => `${n} ${n === 1 ? 'ten' : 'tens'}`;
 
+// "Start at 6. Count on 3: 7, 8, 9." (only for small counts, so the line stays short)
+function countWords(op, a, b) {
+  if (!(b >= 1 && b <= 5)) return null;
+  const seq = Array.from({ length: b }, (_, k) => (op === '+' ? a + k + 1 : a - k - 1));
+  return `Start at ${a}. Count ${op === '+' ? 'on' : 'back'} ${b}: ${seq.join(', ')}.`;
+}
+
+// A number line from `from` to `to` for "count the hops" hints: one hop per step for short gaps, or a jump to 10
+// and a jump on (labelled +n / −n) when a long gap crosses 10 (the bridging-10 strategy), so there are fewer hops to count.
+function hopLine(from, to, max = 20) {
+  const step = to >= from ? 1 : -1, gap = Math.abs(to - from);
+  const viaTen = gap > 6 && Math.min(from, to) < 10 && Math.max(from, to) > 10;
+  const hops = [];
+  if (viaTen) hops.push({ from, to: 10 }, { from: 10, to });
+  else for (let v = from; v !== to; v += step) hops.push({ from: v, to: v + step });
+  return { widget: 'numberline', props: { min: 0, max, labels: 'all', hops, marks: [from], readonly: true }, jumps: viaTen };
+}
+
 // ---------------------------------------------------------------- bonds
 
 function fillFrame(a) {
@@ -69,8 +89,8 @@ function fillFrame(a) {
     lines: ['Fill the frame to make 10.', 'Tap each empty space.'],
     widget: 'tensframe', props: { count: a, frames: 1, interactive: true },
     input: 'widget', goal: { count: 10 },
-    hint: ['Tap the empty spaces one at a time.'],
-    explain: [`${a} and ${10 - a} make 10.`],
+    hint: ['Tap each empty space once.', 'Count as you tap.'],
+    explain: [`${a} and ${10 - a} more fill the frame.`, `10 is made of ${a} and ${10 - a}.`],
   };
 }
 
@@ -80,36 +100,40 @@ function bondPicture(T, a, b, R) {
     ? { widget: 'partwhole', props: { whole: 5, parts: [a, b], hide: 1, counters: 'both' } }
     : { widget: 'tensframe', props: { count: a, frames: T > 10 ? 2 : 1 } };
   return {
-    lines: [T === 5 ? `5 is the whole. One part is ${a}.` : `There are ${a} counters.`, `How many more to make ${T}?`],
+    lines: [T === 5 ? `5 is the whole. One part is ${a}.` : `There ${isAre(a)} ${a} ${a === 1 ? 'counter' : 'counters'}.`, `How many more to make ${T}?`],
     caption: `${a} + ? = ${T}`,
     ...pic,
     input: 'choice', answer: b, options: choices(R, b, { min: 0, max: T }),
-    hint: T === 5 ? [`Count on from ${a} to 5.`] : ['Count the empty spaces.'],
-    explain: [`${a} and ${b} make ${T}.`, `${T} is made of ${a} and ${b}.`],
+    // Tens frames: the hint makes the frame hands-on, so Finn can fill the empty spaces and count them.
+    hint: T === 5 ? ['The whole has 5 dots.', `Count on from ${a} to 5.`] : [T > 10 ? 'Tap the empty spaces to fill both frames.' : 'Tap the empty spaces to fill the frame.', 'Count how many you add.'],
+    hintProps: T === 5 ? undefined : { interactive: true },
+    answerProps: T === 5 ? undefined : { colours: [a, b] },
+    explain: [`${a} and ${b} more make ${T}.`, `${T} is made of ${a} and ${b}.`],
     fact,
   };
 }
 
 function bond100(level, R) {
   const p = R.int(1, 9), q = 10 - p, a = p * 10, b = q * 10;
-  const explain = [`${p} + ${q} = 10.`, `So ${a} + ${b} = 100.`];
+  const explain = [`${p} + ${q} = 10.`, `So ${tens(p)} + ${tens(q)} = 10 tens.`, `${a} + ${b} = 100.`];
   const reteach = {
     lines: ['What goes with ' + p + ' to make 10?'], caption: `${p} + ? = 10`,
     widget: 'tensframe', props: { count: p, frames: 1 },
-    input: 'numpad', answer: q, hint: ['Count the empty spaces.'], explain: [`${p} and ${q} make 10.`], fact: factKey('+', p, q),
+    input: 'numpad', answer: q, hint: ['Count the empty spaces.'], answerProps: { colours: [p, q] },
+    explain: [`${p} and ${q} make 10.`, `10 is made of ${p} and ${q}.`], fact: factKey('+', p, q),
   };
   const pw = hide => ({ widget: 'partwhole', props: { whole: 100, parts: [a, b], hide } });
   if (level === 1) {
     return {
       lines: [`${a} and what make 100?`], caption: `${a} + ? = 100`, ...pw(1),
       input: 'choice', answer: b, options: choices(R, b, { min: 0, max: 100, step: 10, extra: [q] }),
-      hint: [`${p} + ? = 10.`, `So ${a} + ? = 100.`], explain, fact: factKey('+', a, b), reteach,
+      hint: [`Think in tens: ${a} is ${tens(p)}.`, `${p} + ? = 10.`], explain, fact: factKey('+', a, b), reteach,
     };
   }
   if (level === 2) {
     return {
       lines: ['What is the missing part?'], caption: `${a} + ? = 100`, ...pw(1),
-      input: 'numpad', answer: b, hint: [`Think: ${p} + ? = 10.`], explain, fact: factKey('+', a, b), reteach,
+      input: 'numpad', answer: b, hint: [`Think in tens: ${a} is ${tens(p)}.`, `${p} + ? = 10.`], explain, fact: factKey('+', a, b), reteach,
     };
   }
   const form = R.pick(['?+b', '100-?', '100=a+?']);
@@ -117,9 +141,9 @@ function bond100(level, R) {
   const ans = form === '?+b' ? a : b;
   return {
     lines: ['What is the missing number?'], caption: cap, input: 'numpad', answer: ans,
-    hint: [`Think of ${form === '?+b' ? q : p} tens.`, 'What makes 10 tens?'],
+    hint: [`Think in tens: ${tens(form === '?+b' ? q : p)}.`, 'What goes with it to make 10 tens?'],
     hintWidget: pw(form === '?+b' ? 0 : 1),
-    explain: form === '100-?' ? [`${a} + ${b} = 100.`, `So 100 ${M} ${b} = ${a}.`] : explain,
+    explain: form === '100-?' ? [`${p} + ${q} = 10, so ${a} + ${b} = 100.`, `So 100 ${M} ${b} = ${a}.`] : explain,
     fact: form === '100-?' ? factKey('-', 100, b) : factKey('+', a, b), reteach,
   };
 }
@@ -133,12 +157,15 @@ export const bondsTo = {
     const a = T === 20 ? R.int(1, 19) : R.int(level >= 3 ? 0 : 1, T - 1);
     const b = T - a;
     const fact = factKey('+', a, b);
-    const explain = [`${a} and ${b} make ${T}.`, `${T} is made of ${a} and ${b}.`];
+    const explain = T === 20 && a % 10 !== 0
+      ? [`${a % 10} + ${10 - (a % 10)} = 10, so ${a} + ${b} = 20.`, `${T} is made of ${a} and ${b}.`]
+      : [`${a} and ${b} make ${T}.`, `${T} is made of ${a} and ${b}.`];
+    const dots = T <= 20; // part-whole counters can be drawn
     let reteach;
     if (T === 20 && a !== 10) {
       const s = a % 10;
       reteach = without(bondPicture(10, s, 10 - s, R), 'reteach');
-      reteach.lines = [`${a} is 10 and ${s}.`, `How many more make 10 from ${s}?`];
+      reteach.lines = a > 10 ? [`${a} is 10 and ${s}.`, `How many more make 10 from ${s}?`] : ['Make 10 first.', `How many more make 10 from ${s}?`];
     }
     if (level === 1) {
       const it = bondPicture(T, a, b, R);
@@ -154,7 +181,8 @@ export const bondsTo = {
         caption: hideA ? `? + ${b} = ${T}` : `${a} + ? = ${T}`,
         widget: 'partwhole', props: { whole: T, parts: [a, b], hide: hideA ? 0 : 1, counters: T <= 10 ? 'both' : 'digits' },
         input: 'numpad', answer: hideA ? a : b,
-        hint: [`Count on from ${hideA ? b : a} to ${T}.`],
+        hint: [`The whole is ${T}. One part is ${hideA ? b : a}.`, `Count on from ${hideA ? b : a} to ${T}.`],
+        hintProps: dots && T > 10 ? { counters: 'both' } : undefined,
         explain, fact, reteach: smaller,
       };
     }
@@ -162,11 +190,15 @@ export const bondsTo = {
     const caption = { '?+b': `? + ${b} = ${T}`, 'a+?': `${a} + ? = ${T}`, 'T-?': `${T} ${M} ? = ${a}`, 'T=a+?': `${T} = ${a} + ?` }[form];
     const ans = form === '?+b' ? a : b;
     const known = form === '?+b' ? b : a;
+    // The hint: the known part as counters in a tens frame; the empty spaces are the missing number.
     return {
       lines: ['What is the missing number?'], caption,
       input: 'numpad', answer: ans,
-      hint: [`What goes with ${known} to make ${T}?`],
-      hintWidget: { widget: 'partwhole', props: { whole: T, parts: [a, b], hide: form === '?+b' ? 0 : 1, counters: T <= 10 ? 'both' : 'digits' } },
+      hint: T === 5 ? ['The whole is 5.', `Count on from ${known} to 5.`] : [known === 0 ? `The ${T > 10 ? 'frames are' : 'frame is'} empty.` : `${known} ${known === 1 ? 'counter is' : 'counters are'} in the ${T > 10 ? 'frames' : 'frame'}.`, `How many more make ${T}? Count the empty spaces.`],
+      hintWidget: T === 5
+        ? { widget: 'partwhole', props: { whole: 5, parts: [a, b], hide: form === '?+b' ? 0 : 1, counters: 'both' } }
+        : { widget: 'tensframe', props: { count: known, frames: T > 10 ? 2 : 1 } },
+      answerProps: T === 5 ? undefined : { colours: [known, ans] },
       explain: form === 'T-?' ? [`${a} and ${b} make ${T}.`, `So ${T} ${M} ${b} = ${a}.`] : explain,
       fact: form === 'T-?' ? factKey('-', T, b) : fact,
       reteach: smaller,
@@ -202,39 +234,71 @@ function factHint(op, a, b) {
   return [`Start at ${a}.`, `Count back ${b}.`];
 }
 
-function factExplain(op, a, b, c) {
-  const lines = [`${a} ${word(op)} ${b} is equal to ${c}.`];
-  if (b === 0 || (op === '+' && a === 0)) lines.push(op === '+' ? 'Adding 0 changes nothing.' : 'Subtracting 0 changes nothing.');
-  return lines;
+// Hints that point at the level 1 picture (coloured rings for adding, crossed-out things for subtracting).
+function pictureHint(op, a, b) {
+  if (op === '+') {
+    if (a === 0 || b === 0) return ['Adding 0 changes nothing.', 'Count them all.'];
+    return ['Tap each one to count it.', `Or start at ${a} and count on the ${b} yellow ones.`];
+  }
+  if (b === 0) return ['Nothing is crossed out.', 'Count them all.'];
+  if (b === a) return [`All ${a} are crossed out.`, 'How many are left?'];
+  return ['Do not count the crossed-out ones.', 'Tap the others to count them.'];
 }
 
-function missingForm(op, a, b, c, R) {
+// The method, then the DfE sentence: "Start at 6. Count on 3: 7, 8, 9." "6 plus 3 is equal to 9."
+function factExplain(op, a, b, c) {
+  const say = `${a} ${word(op)} ${b} is equal to ${c}.`;
+  if (op === '+' && (a === 0 || b === 0)) return ['Adding 0 changes nothing.', say];
+  if (op === '-' && b === 0) return ['Subtracting 0 changes nothing.', say];
+  if (op === '-' && b === a) return [`Take away all ${a}. None are left.`, say];
+  const big = op === '+' ? Math.max(a, b) : a, small = op === '+' ? Math.min(a, b) : b;
+  const how = countWords(op, big, small) || (op === '+' ? `Start at ${big}. Count on ${small} more.` : `Think: ${c} + ${b} = ${a}.`);
+  return [how, say];
+}
+
+// Missing-number forms with a number-line hint: count the hops (or add the two jumps), or hop and see where you land.
+function missingForm(op, a, b, c, R, max) {
+  const count = (from, to, back) => {
+    const line = hopLine(from, to, max);
+    if (from === to) return [[back ? `What can you take away from ${from} and still have ${to}?` : `What can you add to ${from} and still have ${to}?`], line];
+    const hint = line.jumps ? [`Start at ${from}. Jump to 10, then to ${to}.`, 'Add the two jumps.'] : [`Start at ${from}.`, `Count the hops ${back ? 'back ' : ''}to ${to}.`];
+    return [hint, line];
+  };
+  const land = (from, n, to, think) => {
+    const line = hopLine(from, to, max);
+    return [[think, line.jumps ? `Start at ${from}. Jump to 10, then on.` : `Start at ${from}. Hop ${to > from ? 'on' : 'back'} ${n}.`], line];
+  };
+  // ? + b = c: hop back b from c (land on the answer), or count up from b when that is fewer hops.
   const forms = op === '+'
-    ? [[`${a} + ? = ${c}`, b, `Count on from ${a} to ${c}.`], [`? + ${b} = ${c}`, a, `What goes with ${b} to make ${c}?`], [`${c} = ${a} + ?`, b, `Count on from ${a} to ${c}.`]]
-    : [[`${a} ${M} ? = ${c}`, b, `Count back from ${a} to ${c}.`], [`? ${M} ${b} = ${c}`, a, `Think: ${c} + ${b} = ?`], [`${c} = ${a} ${M} ?`, b, `Count back from ${a} to ${c}.`]];
+    ? [[`${a} + ? = ${c}`, b, ...count(a, c)], [`? + ${b} = ${c}`, a, ...(b <= a ? land(c, b, a, `What goes with ${b} to make ${c}?`) : count(b, c))], [`${c} = ${a} + ?`, b, ...count(a, c)]]
+    : [[`${a} ${M} ? = ${c}`, b, ...count(a, c, true)], [`? ${M} ${b} = ${c}`, a, ...land(c, b, a, `Think: ${c} + ${b} = ?`)], [`${c} = ${a} ${M} ?`, b, ...count(a, c, true)]];
   return R.pick(forms);
 }
 
-function factItem(level, R, op, a, b, { max = 10, bridging = false } = {}) {
+function factItem(level, R, op, a, b, { max = 10 } = {}) {
   const c = op === '+' ? a + b : a - b;
   const fact = factKey(op, a, b);
   const pic = factPicture(op, a, b, c, R);
-  const l1 = { ...pic, input: 'choice', answer: c, options: choices(R, c, { min: 0, max: Math.max(max, c + 2) }), hint: factHint(op, a, b), explain: factExplain(op, a, b, c), fact };
+  // Level 1: Help makes the picture tappable, so Finn can count it.
+  const l1 = { ...pic, input: 'choice', answer: c, options: choices(R, c, { min: 0, max: Math.max(max, c + 2) }), hint: pictureHint(op, a, b), hintProps: { tappable: true, interactive: true }, explain: factExplain(op, a, b, c), fact };
   if (level === 1) return l1;
   const hintWidget = op === '+'
     ? { widget: 'tensframe', props: { colours: [a, b], frames: c > 10 ? 2 : 1 } }
     : { widget: pic.widget, props: pic.props };
+  const hint = op === '+'
+    ? (a === 0 || b === 0 ? ['Adding 0 changes nothing.'] : [`${a} red and ${b} yellow counters.`, `Start at ${Math.max(a, b)}. Count on ${Math.min(a, b)}.`])
+    : (b === 0 ? ['Subtracting 0 changes nothing.'] : ['Some are crossed out.', 'Count the ones that are left.']);
   if (level === 2) {
     return {
       lines: [`What is ${a} ${sym(op)} ${b}?`], caption: `${a} ${sym(op)} ${b} = ?`,
-      input: 'numpad', answer: c, hint: factHint(op, a, b), hintWidget, explain: factExplain(op, a, b, c), fact,
+      input: 'numpad', answer: c, hint, hintWidget, explain: factExplain(op, a, b, c), fact,
       reteach: without(l1, 'reteach'),
     };
   }
-  const [caption, ans, hint] = missingForm(op, a, b, c, R);
+  const [caption, ans, mHint, line] = missingForm(op, a, b, c, R, max);
   return {
     lines: ['What is the missing number?'], caption, input: 'numpad', answer: ans,
-    hint: [hint], hintWidget, explain: [`${a} ${sym(op)} ${b} = ${c}.`], fact,
+    hint: mHint, hintWidget: { widget: line.widget, props: line.props }, explain: [`${a} ${word(op)} ${b} is equal to ${c}.`, `So the missing number is ${ans}.`], fact,
     reteach: without(l1, 'reteach'),
   };
 }
@@ -264,26 +328,38 @@ export const factsWithin20 = {
       if (bridge) { a = R.int(2, 9); b = R.int(11 - a, 9); } else { a = 10 + R.int(0, 8); b = R.int(1, 9 - (a - 10)); if (R.chance(0.3)) [a, b] = [b, a]; }
     } else if (bridge) { a = R.int(11, 18); b = R.int(a - 9, 9); if (b <= a - 10) b = a - 9; } else { a = R.int(11, 19); b = R.int(1, a - 10); }
     const c = op === '+' ? a + b : a - b;
+    const big = Math.max(a, b), small = Math.min(a, b);
     if (level === 1) {
       const it = factItem(1, R, op, a, b, { max: 20 });
-      if (op === '+') { it.widget = 'tensframe'; it.props = { colours: [a, b], frames: 2 }; it.lines = [`${a} + ${b}.`, 'How many counters altogether?']; }
-      it.hint = op === '+' ? [`${Math.max(a, b)} is 10 and ${Math.max(a, b) - 10}.`, `Add ${Math.min(a, b)} to the ${Math.max(a, b) - 10}.`] : [`${a} is 10 and ${a - 10}.`, `Subtract ${b} from the ${a - 10}.`];
+      if (op === '+') {
+        it.widget = 'tensframe'; it.props = { colours: [a, b], frames: 2 }; it.lines = [`${a} + ${b}.`, 'How many counters altogether?'];
+        it.hint = ['The first frame is full. That is 10.', 'Count on the counters in the second frame.'];
+        delete it.hintProps;
+        it.answerProps = { colours: [a, b] };
+        it.explain = big === 10 ? [`10 and ${small} make ${c}.`, `So ${a} plus ${b} is equal to ${c}.`] : [`${big} is 10 and ${big - 10}. ${big - 10} + ${small} = ${c - 10}.`, `So ${a} plus ${b} is equal to ${c}.`];
+      } else {
+        it.hint = ['The top row is 10.', 'Count the ones that are not crossed out.'];
+        it.explain = [`${a} is 10 and ${a - 10}. ${a - 10} ${M} ${b} = ${c - 10}.`, `So ${a} minus ${b} is equal to ${c}.`];
+      }
       return it;
     }
     const it = factItem(level, R, op, a, b, { max: 20 });
-    if (bridge) {
+    if (bridge && level === 2) {
       if (op === '+') {
-        const big = Math.max(a, b), small = Math.min(a, b), k = 10 - big, r = small - k;
-        it.hint = ['Make 10 first.', `${big} + ${k} = 10.`];
-        it.explain = [`${big} + ${k} = 10.`, `10 + ${r} = ${c}.`];
+        const k = 10 - big, r = small - k;
+        it.hint = ['Make 10 first.', `${big} + ${k} = 10. Then add the rest.`];
+        it.explain = [`${small} is ${k} and ${r}.`, `${big} + ${k} = 10.`, `10 + ${r} = ${c}.`];
         it.hintWidget = { widget: 'tensframe', props: { colours: [big, small], frames: 2 } };
-        it.reteach = { lines: [`What goes with ${big} to make 10?`], caption: `${big} + ? = 10`, widget: 'tensframe', props: { count: big, frames: 1 }, input: 'numpad', answer: k, hint: ['Count the empty spaces.'], explain: [`${big} and ${k} make 10.`], fact: factKey('+', big, k) };
+        it.answerProps = { colours: [big, small] };
+        it.reteach = { lines: [`What goes with ${big} to make 10?`], caption: `${big} + ? = 10`, widget: 'tensframe', props: { count: big, frames: 1 }, input: 'numpad', answer: k, hint: ['Count the empty spaces.'], answerProps: { colours: [big, k] }, explain: [`${big} and ${k} make 10.`, `10 is made of ${big} and ${k}.`], fact: factKey('+', big, k) };
       } else {
         const o = a - 10, rest = b - o;
-        it.hint = [`First subtract ${o} to get to 10.`, `Then subtract ${rest} more.`];
-        it.explain = [`${a} ${M} ${o} = 10.`, `10 ${M} ${rest} = ${c}.`];
-        it.hintWidget = { widget: 'tensframe', props: { count: a, frames: 2 } };
-        it.reteach = { lines: [`What is 10 ${M} ${rest}?`], caption: `10 ${M} ${rest} = ?`, widget: 'tensframe', props: { count: 10, frames: 1 }, input: 'numpad', answer: 10 - rest, hint: [`Count back ${rest} from 10.`], explain: [`10 ${M} ${rest} = ${10 - rest}.`], fact: factKey('-', 10, rest) };
+        // Hands-on hint: tap the counters away, the second frame first.
+        it.hint = [`Tap the ${o} in the second frame to take ${o === 1 ? 'it' : 'them'} away.`, `Then take ${rest} more from the full frame.`];
+        it.explain = [`${b} is ${o} and ${rest}.`, `${a} ${M} ${o} = 10.`, `10 ${M} ${rest} = ${c}.`];
+        it.hintWidget = { widget: 'tensframe', props: { count: a, frames: 2, interactive: true } };
+        it.answerProps = { count: c };
+        it.reteach = { lines: [`What is 10 ${M} ${rest}?`], caption: `10 ${M} ${rest} = ?`, widget: 'tensframe', props: { count: 10, frames: 1 }, input: 'numpad', answer: 10 - rest, hint: [`Count back ${rest} from 10.`], explain: [`Start at 10. Count back ${rest}.`, `10 ${M} ${rest} = ${10 - rest}.`], fact: factKey('-', 10, rest) };
       }
     }
     return it;
@@ -301,13 +377,13 @@ export const countOn = {
     const hops = Array.from({ length: b }, (_, k) => (op === '+' ? { from: a + k, to: a + k + 1 } : { from: a - k, to: a - k - 1 }));
     const fact = factKey(op, a, b);
     const say = [`Start at ${a}.`, `Count ${op === '+' ? 'on' : 'back'} ${b}.`];
-    const explain = [`${a} ${sym(op)} ${b} = ${c}.`];
+    const explain = [countWords(op, a, b), `${a} ${word(op)} ${b} is equal to ${c}.`];
     if (level === 1) {
       return {
         lines: say, caption: `${a} + ${b} = ?`,
         widget: 'numberline', props: { min: 0, max: 20, labels: 'all', hops, readonly: true },
         input: 'choice', answer: c, options: choices(R, c, { min: 0, max: 20 }),
-        hint: ['Follow the hops.', 'Where does the last hop land?'], explain, fact,
+        hint: [`Put your finger on ${a}.`, 'Follow the hops. Where does the last one land?'], explain, fact,
       };
     }
     if (level === 2) {
@@ -315,7 +391,7 @@ export const countOn = {
         lines: say, caption: `${a} ${M} ${b} = ?`,
         widget: 'numberline', props: { min: 0, max: 20, labels: [...new Set([0, 10, 20, a])], hops, readonly: true },
         input: 'numpad', answer: c,
-        hint: [`Count back ${b} hops from ${a}.`], hintProps: { labels: 'all' }, explain, fact,
+        hint: ['Now every number is shown.', `Count back ${b} ${b === 1 ? 'hop' : 'hops'} from ${a}.`], hintProps: { labels: 'all' }, explain, fact,
       };
     }
     return {
@@ -337,10 +413,10 @@ export const doubles = {
       const n = R.int(2, 10), d = 2 * n;
       return {
         lines: [`What is half of ${d}?`], caption: `Half of ${d} = ?`, input: 'numpad', answer: n,
-        hint: [`What number doubled makes ${d}?`],
-        hintWidget: { widget: 'tensframe', props: { count: d, frames: 2 } },
+        hint: [`Here are ${d} dots in 2 equal groups.`, 'Half is one group. Count it.'],
+        hintWidget: { widget: 'objects', props: { n: d, arrange: 'groups', groups: [n, n], colours: [n, n] } },
         explain: [`Double ${n} is ${d}.`, `So half of ${d} is ${n}.`], fact: factKey('-', d, n),
-        reteach: { lines: [`What is double ${n}?`], caption: `${n} + ${n} = ?`, widget: 'tensframe', props: { colours: [n, n], frames: 2 }, input: 'numpad', answer: d, hint: ['Count both colours.'], explain: [`Double ${n} is ${d}.`], fact: factKey('+', n, n) },
+        reteach: { lines: [`What is double ${n}?`], caption: `${n} + ${n} = ?`, widget: 'objects', props: { n: d, arrange: 'rows', perRow: n, colours: [n, n] }, input: 'numpad', answer: d, hint: [`${n} red and ${n} yellow.`, 'Count them all.'], explain: [`${n} + ${n} = ${d}.`, `Double ${n} is ${d}.`], fact: factKey('+', n, n) },
       };
     }
     const n = level === 1 ? R.int(1, 5) : R.int(3, 10);
@@ -351,14 +427,15 @@ export const doubles = {
       return {
         lines: [`Two rows of ${n} ${many(t, n)}.`, 'How many altogether?'], caption: `${n} + ${n} = ?`, ...pic,
         input: 'choice', answer: d, options: choices(R, d, { min: 0, max: 12 }),
-        hint: [`Count the top row. Then count on ${n}.`], explain: [`Double ${n} is ${d}.`, `${n} + ${n} = ${d}.`], fact: factKey('+', n, n),
+        hint: [`The top row has ${n}. The bottom row has ${n} too.`, `Start at ${n}. Count on the bottom row.`], explain: [`${n} + ${n} = ${d}.`, `Double ${n} is ${d}.`], fact: factKey('+', n, n),
       };
     }
     return {
       lines: [`What is double ${n}?`], caption: `${n} + ${n} = ?`, input: 'numpad', answer: d,
-      hint: n > 5 ? [`${n} is 5 and ${n - 5}.`, `Double 5 is 10. Double ${n - 5} is ${2 * (n - 5)}.`] : [`Count on ${n} from ${n}.`],
-      hintWidget: { widget: 'tensframe', props: { colours: [n, n], frames: 2 } },
-      explain: [`Double ${n} is ${d}.`], fact: factKey('+', n, n),
+      hint: n > 5 ? [`${n} is 5 and ${n - 5}.`, `Double 5 is 10. Then double ${n - 5}.`] : [`Two rows of ${n}.`, `Start at ${n}. Count on ${n}.`],
+      hintWidget: { widget: 'objects', props: { n: d, arrange: 'rows', perRow: n, colours: [n, n] } },
+      explain: n > 5 ? [`${n} is 5 and ${n - 5}.`, `Double 5 is 10. Double ${n - 5} is ${2 * (n - 5)}.`, `10 + ${2 * (n - 5)} = ${d}. Double ${n} is ${d}.`] : [`${n} + ${n} = ${d}.`, `Double ${n} is ${d}.`],
+      fact: factKey('+', n, n),
       reteach: n > 5 ? { lines: [`What is double ${n - 5}?`], caption: `${n - 5} + ${n - 5} = ?`, widget: 'objects', props: { n: 2 * (n - 5), arrange: 'rows', perRow: n - 5, colours: [n - 5, n - 5] }, input: 'numpad', answer: 2 * (n - 5), hint: ['Count all the dots.'], explain: [`Double ${n - 5} is ${2 * (n - 5)}.`], fact: factKey('+', n - 5, n - 5) } : undefined,
     };
   },
@@ -374,13 +451,17 @@ export const nearDoubles = {
         const n = R.int(3, 9), a = n - 1, b = n + 1, s = a + b;
         return {
           lines: ['Use a double to help.'], caption: `${a} + ${b} = ?`, input: 'numpad', answer: s,
-          hint: [`Move 1 from ${b} to ${a}.`, `Now it is ${n} + ${n}.`], explain: [`${a} + ${b} is the same as ${n} + ${n}.`, `Double ${n} is ${s}.`], fact: factKey('+', a, b),
+          hint: [`Move 1 from the ${b} to the ${a}.`, `Now it is ${n} + ${n}.`],
+          hintWidget: { widget: 'objects', props: { n: s, arrange: 'groups', groups: [a, b], colours: [a, b] } },
+          explain: [`Move 1 across: ${a} + ${b} = ${n} + ${n}.`, `Double ${n} is ${s}.`], fact: factKey('+', a, b),
         };
       }
       const n = R.int(4, 9), s = 2 * n + 1;
       return {
         lines: [`Double ${n} is ${2 * n}.`, 'Use it to help.'], caption: `${s} ${M} ${n} = ?`, input: 'numpad', answer: n + 1,
-        hint: [`${s} is 1 more than double ${n}.`, `So ${s} is ${n} and 1 more than ${n}.`], explain: [`${n} + ${n + 1} = ${s}.`, `So ${s} ${M} ${n} = ${n + 1}.`], fact: factKey('-', s, n),
+        hint: [`${s} is 1 more than double ${n}.`, `Take away one group of ${n}. Count what is left.`],
+        hintWidget: { widget: 'objects', props: { n: s, arrange: 'groups', groups: [n, n + 1], colours: [n, n + 1] } },
+        explain: [`Double ${n} is ${2 * n}, so ${n} + ${n + 1} = ${s}.`, `So ${s} ${M} ${n} = ${n + 1}.`], fact: factKey('-', s, n),
       };
     }
     const n = level === 1 ? R.int(1, 5) : R.int(5, 9);
@@ -393,7 +474,7 @@ export const nearDoubles = {
       return {
         lines: [`Double ${n} is ${2 * n}.`, `So what is ${a} + ${b}?`], caption: `${a} + ${b} = ?`, ...pic,
         input: 'choice', answer: s, options: choices(R, s, { min: 0, max: 12, extra: [2 * n] }),
-        hint: ['It is 1 more than the double.'], explain, fact: factKey('+', a, b),
+        hint: [`The ${b > a ? 'yellow' : 'red'} group has 1 extra.`, `So it is 1 more than double ${n}.`], explain, fact: factKey('+', a, b),
       };
     }
     return {
@@ -417,32 +498,32 @@ export const makeTen = {
     if (level >= 2 && R.chance(0.3)) [a, b] = [b, a];
     const s = big + small, k = 10 - big, r = small - k;
     const fact = factKey('+', a, b);
-    const explain = [`${big} + ${k} = 10.`, `10 + ${r} = ${s}.`];
+    const explain = [`${small} is ${k} and ${r}.`, `${big} + ${k} = 10.`, `10 + ${r} = ${s}.`];
     const frames = { widget: 'tensframe', props: { colours: [big, small], frames: 2 } };
-    const reteach = { lines: [`What goes with ${big} to make 10?`], caption: `${big} + ? = 10`, widget: 'tensframe', props: { count: big, frames: 1 }, input: 'numpad', answer: k, hint: ['Count the empty spaces.'], explain: [`${big} and ${k} make 10.`], fact: factKey('+', big, k) };
+    const reteach = { lines: [`What goes with ${big} to make 10?`], caption: `${big} + ? = 10`, widget: 'tensframe', props: { count: big, frames: 1 }, input: 'numpad', answer: k, hint: ['Count the empty spaces.'], answerProps: { colours: [big, k] }, explain: [`${big} and ${k} make 10.`, `10 is made of ${big} and ${k}.`], fact: factKey('+', big, k) };
     if (level === 1) {
       return {
         lines: [`${big} red and ${small} yellow.`, 'Fill the first 10. Then add the rest.'], caption: `${big} + ${small} = ?`, ...frames,
         input: 'choice', answer: s, options: choices(R, s, { min: 10, max: 20 }),
-        hint: [`${k} yellow counters fill the first frame.`, `${r} are left over.`], explain, fact, reteach,
+        hint: ['The first frame is full. That is 10.', 'Count on the yellow in the second frame.'], answerProps: { colours: [big, small] }, explain, fact, reteach,
       };
     }
     if (level === 2) {
       return {
         lines: ['Make 10 first.'], caption: `${a} + ${b} = ?`, input: 'numpad', answer: s,
-        hint: [`${big} + ${k} = 10.`, `How many are left from ${small}?`], hintWidget: frames, explain, fact, reteach,
+        hint: [`${big} + ${k} = 10. The first frame is full.`, `How many yellow are in the second frame?`], hintWidget: frames, answerProps: { colours: [big, small] }, explain, fact, reteach,
       };
     }
     if (R.chance(0.5)) {
       return {
         lines: [`Split ${small} to make 10.`], caption: `${big} + ${small} = ${big} + ${k} + ?`, input: 'numpad', answer: r,
-        hint: [`${small} is ${k} and something.`], hintWidget: { widget: 'partwhole', props: { whole: small, parts: [k, r], hide: 1 } },
+        hint: [`${small} is the whole. ${k} is one part.`, 'What is the other part?'], hintWidget: { widget: 'partwhole', props: { whole: small, parts: [k, r], hide: 1, counters: 'both' } },
         explain: [`${small} is ${k} and ${r}.`, `${big} + ${k} = 10. 10 + ${r} = ${s}.`], reteach,
       };
     }
     return {
       lines: ['Make 10 first.', 'What goes with 10?'], caption: `${big} + ${small} = 10 + ?`, input: 'numpad', answer: r,
-      hint: [`${big} + ${k} = 10.`, `${small} ${M} ${k} = ?`], hintWidget: frames,
+      hint: [`${big} + ${k} = 10. The first frame is full.`, 'How many yellow are in the second frame?'], hintWidget: frames, answerProps: { colours: [big, small] },
       explain: [`${big} + ${k} = 10.`, `${r} is left from ${small}.`, `So ${big} + ${small} = 10 + ${r}.`], reteach,
     };
   },
@@ -458,31 +539,36 @@ export const subtractAcross10 = {
     const c = a - b, rest = b - o;
     const fact = factKey('-', a, b);
     const through = R.chance(0.5);
-    const hint = through ? [`First subtract ${o} to get to 10.`, `Then subtract ${rest} more.`] : [`Subtract ${b} from the 10.`, `Then add the ${o} back on.`];
-    const explain = through ? [`${a} ${M} ${o} = 10.`, `10 ${M} ${rest} = ${c}.`] : [`10 ${M} ${b} = ${10 - b}.`, `${10 - b} + ${o} = ${c}.`];
+    // Hands-on hints: the frame becomes tappable, so Finn takes counters away (the second frame first).
+    const tapHint = [`Tap the ${o} in the second frame to take ${o === 1 ? 'it' : 'them'} away.`, `Then take ${rest} more from the full frame.`];
+    const hint = through ? tapHint : [`Take ${b} away from the full frame.`, `Then add the ${o} in the second frame.`];
+    const explain = through ? [`${b} is ${o} and ${rest}.`, `${a} ${M} ${o} = 10.`, `10 ${M} ${rest} = ${c}.`] : [`${a} is 10 and ${o}.`, `10 ${M} ${b} = ${10 - b}.`, `${10 - b} + ${o} = ${c}.`];
     const frame = { widget: 'tensframe', props: { count: a, frames: 2 } };
+    const tapFrame = { widget: 'tensframe', props: { count: a, frames: 2, interactive: true } };
+    const answerProps = { count: c };
     const reteach = through
-      ? { lines: [`What is 10 ${M} ${rest}?`], caption: `10 ${M} ${rest} = ?`, widget: 'tensframe', props: { count: 10, frames: 1 }, input: 'numpad', answer: 10 - rest, hint: [`Count back ${rest} from 10.`], explain: [`10 ${M} ${rest} = ${10 - rest}.`], fact: factKey('-', 10, rest) }
-      : { lines: [`What is 10 ${M} ${b}?`], caption: `10 ${M} ${b} = ?`, widget: 'tensframe', props: { count: 10, frames: 1 }, input: 'numpad', answer: 10 - b, hint: [`Count back ${b} from 10.`], explain: [`10 ${M} ${b} = ${10 - b}.`], fact: factKey('-', 10, b) };
+      ? { lines: [`What is 10 ${M} ${rest}?`], caption: `10 ${M} ${rest} = ?`, widget: 'tensframe', props: { count: 10, frames: 1 }, input: 'numpad', answer: 10 - rest, hint: [`Count back ${rest} from 10.`], explain: [`Start at 10. Count back ${rest}.`, `10 ${M} ${rest} = ${10 - rest}.`], fact: factKey('-', 10, rest) }
+      : { lines: [`What is 10 ${M} ${b}?`], caption: `10 ${M} ${b} = ?`, widget: 'tensframe', props: { count: 10, frames: 1 }, input: 'numpad', answer: 10 - b, hint: [`What goes with ${b} to make 10?`], explain: [`${b} and ${10 - b} make 10.`, `So 10 ${M} ${b} = ${10 - b}.`], fact: factKey('-', 10, b) };
     if (level === 1) {
       return {
         lines: [`${a} counters.`, `Subtract ${b}.`, 'How many are left?'], caption: `${a} ${M} ${b} = ?`, ...frame,
-        input: 'choice', answer: c, options: choices(R, c, { min: 0, max: 10 }), hint, explain, fact, reteach,
+        input: 'choice', answer: c, options: choices(R, c, { min: 0, max: 10 }), hint: tapHint, hintProps: { interactive: true }, answerProps,
+        explain: [`${b} is ${o} and ${rest}.`, `${a} ${M} ${o} = 10.`, `10 ${M} ${rest} = ${c}.`], fact, reteach,
       };
     }
     if (level === 2) {
-      return { lines: [`What is ${a} ${M} ${b}?`], caption: `${a} ${M} ${b} = ?`, input: 'numpad', answer: c, hint, hintWidget: frame, explain, fact, reteach };
+      return { lines: [`What is ${a} ${M} ${b}?`], caption: `${a} ${M} ${b} = ?`, input: 'numpad', answer: c, hint: tapHint, hintWidget: tapFrame, answerProps, explain, fact, reteach };
     }
     if (through) {
       return {
         lines: ['Subtract through 10.'], caption: `${a} ${M} ${b} = 10 ${M} ?`, input: 'numpad', answer: rest,
-        hint: [`${a} ${M} ${o} = 10.`, `How much of ${b} is still to go?`], hintWidget: frame,
+        hint: [`${a} ${M} ${o} = 10.`, `${b} is ${o} and how many more?`], hintWidget: { widget: 'partwhole', props: { whole: b, parts: [o, rest], hide: 1, counters: 'both' } },
         explain: [`${b} is ${o} and ${rest}.`, `${a} ${M} ${o} = 10, then 10 ${M} ${rest} = ${c}.`], reteach,
       };
     }
     return {
       lines: ['Subtract from 10.'], caption: `${a} ${M} ${b} = ${10 - b} + ?`, input: 'numpad', answer: o,
-      hint: [`10 ${M} ${b} = ${10 - b}.`, `What else is in ${a} besides the 10?`], hintWidget: frame,
+      hint: [`${a} is 10 and some more.`, 'How many are in the second frame?'], hintWidget: frame, answerProps: { count: a },
       explain: [`${a} is 10 and ${o}.`, `10 ${M} ${b} = ${10 - b}. Add the ${o}.`], reteach,
     };
   },
@@ -497,78 +583,93 @@ export const addOnesTens = {
     const all = ['onesAdd', 'onesSub', 'tensAdd', 'tensSub', 'tensTens', 'fromTen'];
     const kinds = Array.isArray(params.kinds) && params.kinds.length ? params.kinds.filter(k => all.includes(k)) : all;
     const kind = R.pick(kinds.length ? kinds : all);
-    let a, b, op, small, explain, hintL3;
+    let a, b, op, small, explain, hintL3, blockHint;
     if (kind === 'onesAdd') {
       const t = R.int(1, 9), u = R.int(0, 8), v = R.int(1, 9 - u);
       a = t * 10 + u; b = v; op = '+'; small = [u, '+', v];
-      explain = [`${u} + ${v} = ${u + v}.`, `So ${a} + ${b} = ${a + b}.`]; hintL3 = [`Only the ones change.`, `${u} + ${v} = ?`];
+      explain = [`${a} is ${t * 10} and ${u}.`, `${u} + ${v} = ${u + v}.`, `So ${a} + ${b} = ${a + b}.`];
+      hintL3 = ['Only the ones change.', `${u} + ${v} = ?`];
+      blockHint = ['Tap Put together.', 'The green tens stay the same. Count the blue ones.'];
     } else if (kind === 'onesSub') {
       const t = R.int(1, 9), u = R.int(1, 9), v = R.int(1, u);
       a = t * 10 + u; b = v; op = '-'; small = [u, '-', v];
-      explain = [`${u} ${M} ${v} = ${u - v}.`, `So ${a} ${M} ${b} = ${a - b}.`]; hintL3 = ['Only the ones change.', `${u} ${M} ${v} = ?`];
+      explain = [`${a} is ${t * 10} and ${u}.`, `${u} ${M} ${v} = ${u - v}.`, `So ${a} ${M} ${b} = ${a - b}.`];
+      hintL3 = ['Only the ones change.', `${u} ${M} ${v} = ?`];
+      blockHint = [`Tap ${v} blue ${v === 1 ? 'cube' : 'cubes'} to take ${v === 1 ? 'it' : 'them'} away.`, 'The green tens stay the same.'];
     } else if (kind === 'tensAdd') {
       const t = R.int(1, 8), u = R.int(1, 9), w = R.int(1, 9 - t);
       a = t * 10 + u; b = w * 10; op = '+'; small = [t, '+', w];
-      explain = [`${tens(t)} + ${tens(w)} = ${tens(t + w)}.`, `So ${a} + ${b} = ${a + b}.`]; hintL3 = [`${t} + ${w} = ${t + w}.`, `So ${tens(t)} + ${tens(w)} = ${tens(t + w)}.`];
+      explain = [`${b} is ${tens(w)}.`, `${tens(t)} + ${tens(w)} = ${tens(t + w)}.`, `So ${a} + ${b} = ${a + b}.`];
+      hintL3 = [`${b} is ${tens(w)}. Only the tens change.`, `${t} + ${w} = ?`];
+      blockHint = ['Tap Put together.', 'The blue ones stay the same. Count the green tens.'];
     } else if (kind === 'tensSub') {
       const t = R.int(2, 9), u = R.int(1, 9), w = R.int(1, t - 1);
       a = t * 10 + u; b = w * 10; op = '-'; small = [t, '-', w];
-      explain = [`${tens(t)} ${M} ${tens(w)} = ${tens(t - w)}.`, `So ${a} ${M} ${b} = ${a - b}.`]; hintL3 = [`${t} ${M} ${w} = ${t - w}.`, `So ${tens(t)} ${M} ${tens(w)} = ${tens(t - w)}.`];
+      explain = [`${b} is ${tens(w)}.`, `${tens(t)} ${M} ${tens(w)} = ${tens(t - w)}.`, `So ${a} ${M} ${b} = ${a - b}.`];
+      hintL3 = [`${b} is ${tens(w)}. Only the tens change.`, `${t} ${M} ${w} = ?`];
+      blockHint = [`Tap ${w} green ${w === 1 ? 'rod' : 'rods'} to take ${w === 1 ? 'it' : 'them'} away.`, 'The blue ones stay the same.'];
     } else if (kind === 'tensTens') {
       if (R.chance(0.5)) {
         const p = R.int(1, 8), q = R.int(1, 9 - p);
         a = p * 10; b = q * 10; op = '+'; small = [p, '+', q];
         explain = [`${p} plus ${q} is equal to ${p + q}.`, `So ${tens(p)} plus ${tens(q)} is equal to ${tens(p + q)}.`];
+        blockHint = ['Tap Put together.', 'Count the green tens: 10, 20, 30…'];
       } else {
         const p = R.int(2, 9), q = R.int(1, p - 1);
         a = p * 10; b = q * 10; op = '-'; small = [p, '-', q];
         explain = [`${p} minus ${q} is equal to ${p - q}.`, `So ${tens(p)} minus ${tens(q)} is equal to ${tens(p - q)}.`];
+        blockHint = [`Tap ${q} green ${q === 1 ? 'rod' : 'rods'} to take ${q === 1 ? 'it' : 'them'} away.`, 'Count the tens that are left.'];
       }
-      hintL3 = [explain[0]];
+      hintL3 = [`Think in tens: ${small[0]} ${sym(small[1])} ${small[2]} = ?`];
     } else {
       const t = R.int(2, 9), v = R.int(1, 9);
       a = t * 10; b = v; op = '-'; small = [10, '-', v];
-      explain = [`10 minus ${v} is equal to ${10 - v}.`, `So ${a} minus ${v} is equal to ${a - v}.`]; hintL3 = [`10 ${M} ${v} = ${10 - v}.`, `So ${a} ${M} ${v} = ?`];
+      explain = [`${a} is ${tens(t - 1)} and 10 ones.`, `10 ${M} ${v} = ${10 - v}.`, `So ${a} ${M} ${v} = ${a - v}.`];
+      hintL3 = [`Swap a ten for 10 ones.`, `10 ${M} ${v} = ?`];
+      blockHint = ['There are no ones. Tap Swap 1 ten for 10 ones.', `Then tap ${v} blue ${v === 1 ? 'cube' : 'cubes'}.`];
     }
     const c = op === '+' ? a + b : a - b;
     const [x, sop, y] = small;
     const sc = sop === '+' ? x + y : x - y;
-    const reteach = {
+    // A smaller fact to try after "Show me" (none when it is trivial, like 0 + 9).
+    const reteach = x === 0 || y === 0 ? undefined : {
       lines: [`What is ${x} ${sym(sop)} ${y}?`], caption: `${x} ${sym(sop)} ${y} = ?`, input: 'numpad', answer: sc,
-      hint: factHint(sop, x, y), hintWidget: sop === '+' ? { widget: 'tensframe', props: { colours: [x, y], frames: x + y > 10 ? 2 : 1 } } : { widget: 'tensframe', props: { count: x, frames: x > 10 ? 2 : 1 } },
-      explain: [`${x} ${sym(sop)} ${y} = ${sc}.`], fact: factKey(sop, x, y),
+      hint: factHint(sop, x, y), hintWidget: sop === '+' ? { widget: 'tensframe', props: { colours: [x, y], frames: x + y > 10 ? 2 : 1 } } : { widget: 'tensframe', props: { count: x, frames: x > 10 ? 2 : 1, interactive: true } },
+      explain: factExplain(sop, x, y, sc), fact: factKey(sop, x, y),
     };
     const fact = kind === 'tensTens' ? factKey(op, a, b) : undefined;
     const caption = `${a} ${sym(op)} ${b} = ?`;
     const lines = [`What is ${a} ${sym(op)} ${b}?`];
-    const hint = kind === 'onesAdd' || kind === 'onesSub' ? ['Only the ones change.', 'The tens stay the same.']
-      : kind === 'tensAdd' || kind === 'tensSub' ? ['Only the tens change.', 'The ones stay the same.']
-        : kind === 'fromTen' ? [`Think: 10 ${M} ${b}.`] : hintL3;
+    const blocks = { widget: 'blocks', props: { a, b, op, interactive: true } };
     if (level === 1) {
       return {
-        lines: [...lines, 'Use the blocks to help.'], caption,
-        widget: 'blocks', props: { a, b, op, interactive: true },
+        lines: [...lines, 'Use the blocks to help.'], caption, ...blocks,
         input: 'choice', answer: c, options: choices(R, c, { min: 0, max: 100, extra: [c + 10, c - 10, c + 1, c - 1].filter(v => v !== c) }),
-        hint, explain, fact, reteach,
+        hint: blockHint, explain, fact, reteach,
       };
     }
     if (level === 2) {
-      let pic;
+      let pic, hint = blockHint;
       if (kind === 'onesAdd' || kind === 'onesSub') {
         const t10 = Math.floor(a / 10) * 10;
         const hops = Array.from({ length: b }, (_, k) => (op === '+' ? { from: a + k, to: a + k + 1 } : { from: a - k, to: a - k - 1 }));
         pic = { widget: 'numberline', props: { min: t10, max: t10 + 10, labels: [...new Set([t10, a, t10 + 10])], hops, readonly: true } };
+        hint = [`Start at ${a}. Count the ${b} ${b === 1 ? 'hop' : 'hops'}.`, 'Now every number is shown.'];
+        return { lines, caption, ...pic, input: 'numpad', answer: c, hint, hintProps: { labels: 'all' }, explain, fact, reteach };
       } else if (kind === 'fromTen') {
         const hops = Array.from({ length: b }, (_, k) => ({ from: a - k, to: a - k - 1 }));
         pic = { widget: 'numberline', props: { min: a - 10, max: a, labels: [a - 10, a], hops, readonly: true } };
+        hint = [`Start at ${a}. Count back ${b} ${b === 1 ? 'hop' : 'hops'}.`, 'Now every number is shown.'];
+        return { lines, caption, ...pic, input: 'numpad', answer: c, hint, hintProps: { labels: 'all' }, explain, fact, reteach };
       } else if (kind === 'tensAdd' || kind === 'tensSub') {
-        pic = { widget: 'blocks', props: { a, b, op, interactive: true } };
+        pic = blocks;
       } else {
         pic = { widget: 'partwhole', props: op === '+' ? { whole: c, parts: [a, b], hide: 'whole' } : { whole: a, parts: [b, c], hide: 1 } };
+        hint = hintL3;
       }
       return { lines, caption, ...pic, input: 'numpad', answer: c, hint, explain, fact, reteach };
     }
-    return { lines, caption, input: 'numpad', answer: c, hint: hintL3, explain, fact, reteach };
+    return { lines, caption, input: 'numpad', answer: c, hint: hintL3, hintWidget: blocks, explain, fact, reteach };
   },
 };
 
@@ -595,11 +696,11 @@ export const relatedFacts100 = {
       return {
         lines: [`${small}.`, `So what is ${A} ${sym(op)} ${B}?`], caption: `${A} ${sym(op)} ${B} = ?`, ...pw,
         input: 'choice', answer: C, options: choices(R, C, { min: 0, max: 100, step: 10, extra: [r] }),
-        hint: ['Use the small fact.', 'Think in tens.'], explain, fact, reteach,
+        hint: [`Think in tens: ${tens(p)} ${sym(op)} ${tens(q)}.`, `${p} ${sym(op)} ${q} = ${r}, so how many tens?`], explain, fact, reteach,
       };
     }
     if (level === 2) {
-      return { lines: [`What is ${A} ${sym(op)} ${B}?`], caption: `${A} ${sym(op)} ${B} = ?`, input: 'numpad', answer: C, hint: [`Think: ${p} ${sym(op)} ${q}.`], hintWidget: pw, explain, fact, reteach };
+      return { lines: [`What is ${A} ${sym(op)} ${B}?`], caption: `${A} ${sym(op)} ${B} = ?`, input: 'numpad', answer: C, hint: [`Think in tens: ${tens(p)} ${sym(op)} ${tens(q)}.`, `What is ${p} ${sym(op)} ${q}?`], hintWidget: pw, explain, fact, reteach };
     }
     const form = R.pick(['?x', 'x?']);
     const cap = form === '?x' ? `? ${sym(op)} ${B} = ${C}` : `${A} ${sym(op)} ? = ${C}`;
@@ -622,20 +723,23 @@ export const addTwoDigit = {
     if (level === 3 && !exch && R.chance(0.5)) { t1 = R.int(3, 7); t2 = R.int(1, 9 - t1); }
     const a = t1 * 10 + u1, b = t2 * 10 + u2, s = a + b;
     const T = (t1 + t2) * 10, O = u1 + u2;
-    const explain = [`${t1 * 10} + ${t2 * 10} = ${T}.`, `${u1} + ${u2} = ${O}.`, `${T} + ${O} = ${s}.`];
+    // DfE: "First I partition both numbers. Then I add the tens. Then I add the ones. Then I combine."
+    const part = x => (x % 10 === 0 ? `${x} is ${tens(x / 10)}.` : `${x} is ${x - (x % 10)} and ${x % 10}.`);
+    const explain = [`${part(a)} ${part(b)}`, `${t1 * 10} + ${t2 * 10} = ${T}.${u1 && u2 ? ` ${u1} + ${u2} = ${O}.` : ''}`, O ? `${T} + ${O} = ${s}.` : `So ${a} + ${b} = ${s}.`];
     const hint = ['First add the tens.', 'Then add the ones.'];
-    const reteach = { lines: [`What is ${u1} + ${u2}?`], caption: `${u1} + ${u2} = ?`, input: 'numpad', answer: O, hint: factHint('+', u1, u2), hintWidget: { widget: 'tensframe', props: { colours: [u1, u2], frames: O > 10 ? 2 : 1 } }, explain: [`${u1} + ${u2} = ${O}.`], fact: factKey('+', u1, u2) };
+    const reteach = u1 === 0 || u2 === 0 ? undefined : { lines: [`What is ${u1} + ${u2}?`], caption: `${u1} + ${u2} = ?`, input: 'numpad', answer: O, hint: factHint('+', u1, u2), hintWidget: { widget: 'tensframe', props: { colours: [u1, u2], frames: O > 10 ? 2 : 1 } }, answerProps: { colours: [u1, u2] }, explain: factExplain('+', u1, u2, O), fact: factKey('+', u1, u2) };
     const blocks = { widget: 'blocks', props: { a, b, op: '+', interactive: true } };
     if (level === 1) {
       return {
         lines: [`What is ${a} + ${b}?`, 'Put the blocks together to help.'], caption: `${a} + ${b} = ?`, ...blocks,
-        input: 'choice', answer: s, options: choices(R, s, { min: 0, max: 100, extra: [s + 10, s - 10, s + 1] }), hint, explain, reteach,
+        input: 'choice', answer: s, options: choices(R, s, { min: 0, max: 100, extra: [s + 10, s - 10, s + 1] }),
+        hint: ['Tap Put together.', 'Count the green tens, then the blue ones.'], explain, reteach,
       };
     }
     if (level === 2) {
       return {
         lines: [`What is ${a} + ${b}?`, 'Swap 10 ones for a ten.'], caption: `${a} + ${b} = ?`, ...blocks,
-        input: 'numpad', answer: s, hint: [...hint, `${O} ones is 1 ten and ${O - 10} ones.`], explain, reteach,
+        input: 'numpad', answer: s, hint: ['Tap Put together. Then tap Swap.', `${O} ones is 1 ten and ${O - 10} ones.`, 'Count the tens, then the ones.'], explain, reteach,
       };
     }
     if (R.chance(0.4)) {
@@ -667,23 +771,28 @@ export const subTwoDigit = {
       a = t1 * 10; b = t2 * 10 + u2;
     }
     const c = a - b, T = Math.floor(b / 10) * 10, u = b % 10, mid = a - T;
-    const explain = u ? [`${a} ${M} ${T} = ${mid}.`, `${mid} ${M} ${u} = ${c}.`] : [`${a} ${M} ${T} = ${c}.`];
+    const t2 = T / 10;
+    // DfE: partition only the number you subtract: 52 − 27 = 52 − 20 − 7.
+    const explain = u ? [`I partition ${b} into ${T} and ${u}.`, `${a} ${M} ${T} = ${mid}.`, `${mid} ${M} ${u} = ${c}.`] : [`${b} is ${tens(t2)}.`, `${a} ${M} ${T} = ${c}.`];
     const hint = u ? [`First subtract ${T}.`, `Then subtract ${u}.`] : [`Subtract ${T}.`, 'The ones stay the same.'];
+    const rodWord = `${t2} green ${t2 === 1 ? 'rod' : 'rods'}`, cubeWord = `${u} blue ${u === 1 ? 'cube' : 'cubes'}`;
     const ones = a % 10;
     const reteach = u > ones
-      ? { lines: [`What is ${10 + ones} ${M} ${u}?`], caption: `${10 + ones} ${M} ${u} = ?`, input: 'numpad', answer: 10 + ones - u, hint: [`First subtract ${ones} to get to 10.`], hintWidget: { widget: 'tensframe', props: { count: 10 + ones, frames: 2 } }, explain: [`${10 + ones} ${M} ${u} = ${10 + ones - u}.`], fact: factKey('-', 10 + ones, u) }
-      : { lines: [`What is ${ones} ${M} ${u}?`], caption: `${ones} ${M} ${u} = ?`, input: 'numpad', answer: ones - u, hint: factHint('-', ones, u), explain: [`${ones} ${M} ${u} = ${ones - u}.`], fact: factKey('-', ones, u) };
+      ? { lines: [`What is ${10 + ones} ${M} ${u}?`], caption: `${10 + ones} ${M} ${u} = ?`, input: 'numpad', answer: 10 + ones - u, hint: ones ? [`Tap the ${ones} in the second frame first.`, 'Then take the rest from the full frame.'] : [`Take ${u} from the full frame.`], hintWidget: { widget: 'tensframe', props: { count: 10 + ones, frames: 2, interactive: true } }, answerProps: { count: 10 + ones - u }, explain: ones ? [`${u} is ${ones} and ${u - ones}.`, `${10 + ones} ${M} ${ones} = 10. 10 ${M} ${u - ones} = ${10 + ones - u}.`] : [`10 ${M} ${u} = ${10 - u}.`], fact: factKey('-', 10 + ones, u) }
+      : u === 0 ? undefined
+        : { lines: [`What is ${ones} ${M} ${u}?`], caption: `${ones} ${M} ${u} = ?`, input: 'numpad', answer: ones - u, hint: factHint('-', ones, u), explain: factExplain('-', ones, u, ones - u), fact: factKey('-', ones, u) };
     const blocks = { widget: 'blocks', props: { a, b, op: '-', interactive: true } };
     if (level === 1) {
       return {
         lines: [`What is ${a} ${M} ${b}?`, 'Tap the blocks to subtract.'], caption: `${a} ${M} ${b} = ?`, ...blocks,
-        input: 'choice', answer: c, options: choices(R, c, { min: 0, max: 100, extra: [c + 10, c - 10, c + 1].filter(v => v >= 0) }), hint, explain, reteach,
+        input: 'choice', answer: c, options: choices(R, c, { min: 0, max: 100, extra: [c + 10, c - 10, c + 1].filter(v => v >= 0) }),
+        hint: u ? [`Tap ${rodWord}.`, `Then tap ${cubeWord}. Count what is left.`] : [`Tap ${rodWord}.`, 'Count what is left.'], explain, reteach,
       };
     }
     if (level === 2) {
       return {
         lines: [`What is ${a} ${M} ${b}?`, 'Swap a ten for 10 ones.'], caption: `${a} ${M} ${b} = ?`, ...blocks,
-        input: 'numpad', answer: c, hint, explain, reteach,
+        input: 'numpad', answer: c, hint: [`Tap ${rodWord} first.`, 'Then tap Swap 1 ten for 10 ones.', `Now tap ${cubeWord}.`], explain, reteach,
       };
     }
     return { lines: [`What is ${a} ${M} ${b}?`], caption: `${a} ${M} ${b} = ?`, input: 'numpad', answer: c, hint, hintWidget: blocks, explain, reteach };
@@ -707,8 +816,8 @@ export const threeNumbers = {
     const [p, q, r] = nums, s = p + q + r;
     const caption = `${p} + ${q} + ${r} = ?`;
     const z = bond ? s - 10 : null;
-    const explain = bond ? [`${bond[0]} + ${bond[1]} = 10.`, `10 + ${z} = ${s}.`] : [`${p} + ${q} = ${p + q}.`, `${p + q} + ${r} = ${s}.`];
-    const hint = bond ? ['Find 2 numbers that make 10.'] : ['Add 2 numbers first.', 'Then add the last one.'];
+    const explain = bond ? [`First I find a bond to 10: ${bond[0]} + ${bond[1]} = 10.`, `Then 10 + ${z} = ${s}.`] : [`${p} + ${q} = ${p + q}.`, `${p + q} + ${r} = ${s}.`];
+    const hint = bond ? ['Find 2 groups that make 10.', 'Add those first. Then add the last group.'] : ['Add 2 groups first.', 'Then add the last one.'];
     const pic = { widget: 'objects', props: { n: s, arrange: 'groups', groups: nums, colours: nums } };
     const reteach = bond
       ? { lines: [`What goes with ${bond[0]} to make 10?`], caption: `${bond[0]} + ? = 10`, widget: 'tensframe', props: { count: bond[0], frames: 1 }, input: 'numpad', answer: bond[1], hint: ['Count the empty spaces.'], explain: [`${bond[0]} and ${bond[1]} make 10.`], fact: factKey('+', bond[0], bond[1]) }
@@ -722,7 +831,9 @@ export const threeNumbers = {
       const shown = nums.map((v, i) => (i === hideAt ? '?' : String(v)));
       return {
         lines: ['What is the missing number?'], caption: `${shown.join(' + ')} = ${s}`, input: 'numpad', answer: bond[1],
-        hint: [`The total is ${s}.`, 'Is there a bond to 10 hiding?'], explain, reteach,
+        hint: [`The whole is ${s}.`, 'Is there a bond to 10 hiding?'],
+        hintWidget: { widget: 'partwhole', props: { whole: s, parts: nums, hide: hideAt } },
+        explain: [`${bond[0]} + ${bond[1]} = 10.`, `10 + ${z} = ${s}.`, `So the missing number is ${bond[1]}.`], reteach,
       };
     }
     return { lines: ['Add the 3 numbers.'], caption, input: 'numpad', answer: s, hint, hintWidget: pic, explain, reteach };
@@ -767,7 +878,7 @@ export const missingNumber = {
     }
     const caption = `${L} = ${Rt}`;
     const balance = { widget: 'balance', props: { left: L, right: Rt } };
-    const explain = [`${full}.`, 'Both sides are the same.'];
+    const explain = [`${full}.`, 'Both sides are the same, so the scales balance.'];
     if (level === 1) {
       return {
         lines: ['The scales balance.', 'What number is hiding?'], caption, ...balance,
@@ -844,7 +955,9 @@ export const commutative = {
       const opts = strChoices(R, ans, [`${big} ${M} ${small}`, `${b} + ${b}`, `${a} + ${a}`].filter(x => x !== ans));
       return {
         lines: [`Which is the same as ${a} + ${b}?`], caption: `${a} + ${b}`, input: 'choice', answer: ans, options: opts,
-        hint: ['Adding works in any order.'], explain: [`${a} + ${b} = ${a + b} and ${b} + ${a} = ${a + b}.`, 'Adding works in any order.'],
+        hint: [`The bar shows ${a} and ${b}.`, 'Which one uses the same two numbers, added?'],
+        hintWidget: { widget: 'bar', props: { kind: 'partwhole', whole: a + b, parts: [a, b] } },
+        explain: [`${a} + ${b} = ${a + b} and ${b} + ${a} = ${a + b}.`, 'Adding works in any order.'],
         fact: factKey('+', a, b),
       };
     }
@@ -856,7 +969,8 @@ export const commutative = {
       const big = Math.max(a, b), small = Math.min(a, b);
       return {
         lines: ['Is this true or false?'], caption: `${big} ${M} ${small} = ${small} ${M} ${big}`, input: 'choice', answer: 'false', options: TF,
-        hint: [`Start with ${small}. Can you subtract ${big}?`],
+        hint: [`${big} ${M} ${small} = ${big - small}.`, `Start with ${small}. Can you take away ${big}?`],
+        hintWidget: { widget: 'balance', props: { left: `${big} ${M} ${small}`, right: `${small} ${M} ${big}` } },
         explain: [`${big} ${M} ${small} = ${big - small}.`, `${small} ${M} ${big} is not ${big - small}.`, 'Order matters when we subtract.'],
       };
     }
@@ -864,7 +978,7 @@ export const commutative = {
     const right = truth ? `${b} + ${a}` : `${b} + ${a + 1}`;
     return {
       lines: ['Is this true or false?'], caption: `${a} + ${b} = ${right}`, input: 'choice', answer: truth ? 'true' : 'false', options: TF,
-      hint: ['Look at the numbers on each side.'], hintWidget: { widget: 'balance', props: { left: `${a} + ${b}`, right } },
+      hint: ['Look at the numbers on each side.', 'Are they the same two numbers?'], hintWidget: { widget: 'balance', props: { left: `${a} + ${b}`, right } },
       explain: truth ? [`Both sides use ${a} and ${b}.`, 'Adding works in any order, so it is true.'] : [`${a} + ${b} = ${a + b}.`, `${right} = ${a + b + 1}.`, 'The sides are not the same.'],
       fact: level === 1 ? factKey('+', a, b) : undefined,
     };
@@ -887,7 +1001,7 @@ export const inverseCheck = {
       return {
         lines: [`${a} + ${b} = ${s}.`, 'Which calculation checks it?'], caption: `${a} + ${b} = ${s}`,
         input: 'choice', answer: ans, options: strChoices(R, ans, d.slice(0, 2)),
-        hint: ['Subtraction undoes addition.', `Start at ${s}. Subtract ${b}.`],
+        hint: ['Subtraction undoes addition.', `Start with the whole: ${s}.`],
         explain: [`${s} ${M} ${b} = ${a}.`, `We got back to ${a}, so it checks.`],
         hintWidget: { widget: 'partwhole', props: { whole: s, parts: [a, b] } },
       };
@@ -897,7 +1011,7 @@ export const inverseCheck = {
     return {
       lines: [`${s} ${M} ${b} = ${a}.`, 'Which calculation checks it?'], caption: `${s} ${M} ${b} = ${a}`,
       input: 'choice', answer: ans, options: strChoices(R, ans, d),
-      hint: ['Addition undoes subtraction.', `Start at ${a}. Add ${b}.`],
+      hint: ['Addition undoes subtraction.', `Which one adds back to ${s}?`],
       explain: [`${a} + ${b} = ${s}.`, `We got back to ${s}, so it checks.`],
       hintWidget: { widget: 'partwhole', props: { whole: s, parts: [a, b] } },
     };
@@ -917,7 +1031,7 @@ export const factFamily = {
     const A = a * k, B = b * k, S = A + B;
     const fam = [`${A} + ${B} = ${S}`, `${B} + ${A} = ${S}`, `${S} ${M} ${A} = ${B}`, `${S} ${M} ${B} = ${A}`];
     const pw = { widget: 'partwhole', props: { whole: S, parts: [A, B], counters: S <= 10 ? 'both' : 'digits' } };
-    const explain = [`${S} is the whole. ${A} and ${B} are the parts.`, `${fam[2]} and ${fam[3]}.`];
+    const explain = [`${S} is the whole. ${A} and ${B} are the parts.`, `${fam[0]}, ${fam[1]}.`, `${fam[2]}, ${fam[3]}.`];
     if (level === 1) {
       const ans = R.pick(fam);
       const d = R.shuffle([`${S} + ${A} = ${S + A}`, `${S} + ${B} = ${S + B}`, `${A} + ${A} = ${2 * A}`].filter(x => !fam.includes(x)));
@@ -930,10 +1044,19 @@ export const factFamily = {
     const caps = [`${A} + ${B} = ?`, `${B} + ? = ${S}`, `${S} ${M} ${A} = ?`, `${S} ${M} ? = ${A}`];
     const answers = [S, A, B, B];
     const facts = [factKey('+', A, B), factKey('+', A, B), factKey('-', S, A), factKey('-', S, B)];
+    const formHint = [
+      [`The parts are ${A} and ${B}.`, 'Put the parts together. What is the whole?'],
+      [`The whole is ${S}. One part is ${B}.`, 'What is the other part?'],
+      [`The whole is ${S}. Take away the ${A} part.`, 'Which part is left?'],
+      [`The whole is ${S}. ${A} is left.`, 'Which part was taken away?'],
+    ][form];
+    // The picture hides the number we are looking for, so it shows the family without giving the answer away.
+    const hidden = { widget: 'partwhole', props: { ...pw.props, hide: form === 0 ? 'whole' : form === 1 ? 0 : 1 } };
     return {
-      lines: ['Use the part-whole picture.'], caption: caps[form], ...(level === 2 ? pw : {}),
-      input: 'numpad', answer: answers[form], hint: [`${S} is the whole.`, `${A} and ${B} are the parts.`],
-      hintWidget: level === 3 ? pw : undefined, explain, fact: tens ? facts[form] : facts[form],
+      lines: [level === 2 ? 'Use the part-whole picture.' : 'Use a fact family.'], caption: caps[form], ...(level === 2 ? hidden : {}),
+      input: 'numpad', answer: answers[form], hint: formHint,
+      hintWidget: level === 3 ? hidden : undefined,
+      explain: [`${S} is the whole. ${A} and ${B} are the parts.`, `So ${fam[form]}.`], fact: facts[form],
     };
   },
 };
@@ -953,8 +1076,9 @@ export const difference = {
         const d = price - have;
         return {
           lines: [`The rocket kit costs £${price}.`, `You have £${have}.`, 'How much more do you need?'],
+          widget: 'bar', props: { kind: 'compare', a: price, b: have, labelA: 'Cost', labelB: 'You have', unknown: 'difference' },
           input: 'numpad', answer: d, prefix: '£',
-          hint: [`Count on from £${have} to £${price}.`], hintWidget: { widget: 'bar', props: { kind: 'compare', a: price, b: have, labelA: 'Cost', labelB: 'You have', unknown: 'difference' } },
+          hint: [`Count on from £${have} to £${price}.`, `Or work out £${price} ${M} £${have}.`],
           explain: [`£${price} ${M} £${have} = £${d}.`, `You need £${d} more.`],
         };
       }
@@ -964,8 +1088,9 @@ export const difference = {
       const d = a - b;
       return {
         lines: [`Rocket A is ${a} cm tall.`, `Rocket B is ${b} cm tall.`, 'What is the difference in height?'],
+        widget: 'bar', props: { kind: 'compare', a, b, labelA: 'Rocket A', labelB: 'Rocket B', unknown: 'difference' },
         input: 'numpad', answer: d, unit: 'cm',
-        hint: [`Count on from ${b} to ${a}.`], hintWidget: { widget: 'bar', props: { kind: 'compare', a, b, labelA: 'Rocket A', labelB: 'Rocket B', unknown: 'difference' } },
+        hint: [`Count on from ${b} to ${a}.`, `Or work out ${a} ${M} ${b}.`],
         explain: [`${a} ${M} ${b} = ${d}.`, `The difference is ${d} cm.`],
       };
     }
@@ -978,22 +1103,25 @@ export const difference = {
     const lines = [`Crew A found ${a} ${many(t, a)}.`, `Crew B found ${b}.`,
       q === 'more' ? 'How many more did Crew A find?' : q === 'fewer' ? 'How many fewer did Crew B find?' : 'What is the difference?'];
     const bar = { widget: 'bar', props: { kind: 'compare', a, b, labelA: 'Crew A', labelB: 'Crew B', unknown: 'difference', icons: level === 1 ? t.icon : undefined } };
-    const explain = [`${b} + ${d} = ${a}.`, `So the difference is ${d}.`];
+    const explain = [`${b} + ${d} = ${a}.`, `The difference between ${a} and ${b} is ${d}.`];
     const hint = [`${b} + ? = ${a}`, `Or work out ${a} ${M} ${b}.`];
-    if (level === 1) return { lines, ...bar, input: 'choice', answer: d, options: choices(R, d, { min: 0, max: 10, extra: [a, b].filter(v => v !== d) }), hint, explain, fact: factKey('-', a, b) };
+    if (level === 1) return { lines, ...bar, input: 'choice', answer: d, options: choices(R, d, { min: 0, max: 10, extra: [a, b].filter(v => v !== d) }), hint: ['Line up the two bars.', 'Count the empty boxes.'], explain, fact: factKey('-', a, b) };
     return {
-      lines, ...bar, input: 'numpad', answer: d, hint, explain, fact: factKey('-', a, b),
+      lines, ...bar, input: 'numpad', answer: d,
+      hint: a <= 12 ? ['Line up the two bars.', 'Count the empty boxes.'] : [`Count on from ${b} to ${a}.`, `Or work out ${a} ${M} ${b}.`],
+      hintProps: a <= 12 ? { icons: t.icon } : undefined,
+      explain, fact: factKey('-', a, b),
       reteach: d <= 10 && a <= 10 ? undefined : { lines: ['Crew A found 7.', 'Crew B found 4.', 'How many more did Crew A find?'], widget: 'bar', props: { kind: 'compare', a: 7, b: 4, labelA: 'Crew A', labelB: 'Crew B', unknown: 'difference', icons: 'star' }, input: 'numpad', answer: 3, hint: ['Count the empty boxes.'], explain: ['4 + 3 = 7.', 'The difference is 3.'], fact: factKey('-', 7, 4) },
     };
   },
 };
 
-function story(structure, t, a, b, R) {
+function story(structure, t, a, b, R, level = 1) {
   const s = a + b;
   switch (structure) {
     case 'aggregation': {
-      // Level 1 draws the first group with red rings and the second with yellow, so the words match.
-      const [c1, c2] = R.pick([['red', 'yellow'], ['big', 'small']]);
+      // Level 1 draws the first group with red rings and the second with yellow, so the words must say red and yellow.
+      const [c1, c2] = level === 1 ? ['red', 'yellow'] : R.pick([['red', 'yellow'], ['big', 'small']]);
       return { lines: [`There are ${a} ${c1} ${many(t, a)}.`, `There are ${b} ${c2} ${many(t, b)}.`, `How many ${t.many} altogether?`], op: '+', ans: s, full: [a, '+', b, s], say: `${a} plus ${b} is equal to ${s}` };
     }
     case 'partitioning': {
@@ -1023,26 +1151,38 @@ export const wordProblem = {
     if (level === 1) { a = R.int(1, 6); b = R.int(1, 10 - a); }
     else if (level === 2) { a = R.int(3, 12); b = R.int(2, 20 - a); }
     else if (R.chance(0.5)) { a = R.int(12, 60); b = R.int(2, 9); } else { a = R.int(12, 50); b = R.int(10, 99 - a); }
-    const st = story(structure, t, a, b, R);
+    if (a === b) b = b > 2 ? b - 1 : b + 1; // equal parts would put the answer in the story
+    const st = story(structure, t, a, b, R, level);
     const [x, op, y, z] = st.full;
     const eq = `${x} ${sym(op)} ${y} = ${z}`;
     const explain = [`${eq}.`, `We can write this as ${st.say}.`];
-    const hint = structure === 'aggregation' ? ['Put the two groups together.'] : structure === 'augmentation' ? [`Start at ${a}. Count on ${b}.`]
-      : structure === 'partitioning' ? [`${x} is the whole. ${y} is one part.`] : [`Start at ${x}. Take away ${y}.`];
+    // Counting on or back is a good nudge for small steps; bigger ones go tens first.
+    const onHint = (p, q) => (q <= 5 ? [`Start at ${p}. Count on ${q}.`] : p + q <= 20 ? [`Start at ${Math.max(p, q)}.`, `Count on ${Math.min(p, q)}.`] : ['Add the tens.', 'Then add the ones.']);
+    const backHint = (p, q) => (q <= 5 ? [`Start at ${p}. Count back ${q}.`] : p <= 20 ? [`Take away ${p - 10} to get to 10.`, 'Then take away the rest.'] : ['Take away the tens.', 'Then take away the ones.']);
+    let hint = structure === 'aggregation' ? ['Put the two groups together.', 'How many altogether?'] : structure === 'augmentation' ? onHint(a, b)
+      : structure === 'partitioning' ? [`${x} is the whole. ${y} is one part.`, 'What is the other part?'] : backHint(x, y);
+    if (level === 1) {
+      // Point at the picture: coloured rings, or crossed-out things.
+      hint = structure === 'reduction' ? ['Do not count the crossed-out ones.', 'Tap the others to count them.']
+        : structure === 'partitioning' ? ['The red ones are not the answer.', 'Tap the yellow ones to count them.']
+          : ['Tap each one to count them all.', `Or start at ${a} and count on ${b}.`];
+    }
     const basic = z <= 20 && x <= 20;
     const fact = basic ? factKey(op, x, y) : undefined;
     if (level === 1) {
       const props = structure === 'reduction' ? { n: x, icon: t.icon, crossed: y, arrange: 'row' }
         : structure === 'partitioning' ? { n: x, icon: t.icon, colours: [y, z], arrange: 'row' }
           : { n: z, icon: t.icon, colours: [x, y], arrange: 'row' };
-      return { lines: st.lines, widget: 'objects', props, input: 'choice', answer: st.ans, options: choices(R, st.ans, { min: 0, max: 12 }), hint, explain, fact };
+      return { lines: st.lines, widget: 'objects', props, input: 'choice', answer: st.ans, options: choices(R, st.ans, { min: 0, max: 12 }), hint, hintProps: { tappable: true, interactive: true }, explain, fact };
     }
-    const hintWidget = level === 2
+    // Levels 2 and 3 show the story as a model (part-whole, then a bar model); the hint adds counters where they fit.
+    const model = level === 2
       ? { widget: 'partwhole', props: op === '+' ? { whole: z, parts: [x, y], hide: 'whole' } : { whole: x, parts: [y, z], hide: 1 } }
       : { widget: 'bar', props: op === '+' ? { kind: 'partwhole', whole: z, parts: [x, y], unknown: 'whole' } : { kind: 'partwhole', whole: x, parts: [y, z], unknown: 1 } };
+    const hintProps = level === 2 && Math.max(x, z) <= 20 ? { counters: 'both' } : undefined;
     const reteach = level === 3
       ? { lines: [`What is ${x} ${sym(op)} ${y}?`], caption: `${x} ${sym(op)} ${y} = ?`, input: 'numpad', answer: z, hint: op === '+' ? ['Add the tens. Then add the ones.'] : [`Subtract the tens. Then the ones.`], explain: [`${eq}.`], hintWidget: { widget: 'blocks', props: { a: x, b: y, op, interactive: true } } }
       : { lines: [`What is ${x} ${sym(op)} ${y}?`], caption: `${x} ${sym(op)} ${y} = ?`, input: 'numpad', answer: z, hint: factHint(op, x, y), explain: [`${eq}.`], fact };
-    return { lines: st.lines, input: 'numpad', answer: st.ans, hint, hintWidget, explain, fact, reteach };
+    return { lines: st.lines, ...model, input: 'numpad', answer: st.ans, hint, hintProps, explain, fact, reteach };
   },
 };

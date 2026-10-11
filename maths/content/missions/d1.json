@@ -20,9 +20,19 @@
    "type": "look",
    "lines": [
     "Our scanner spotted lots of asteroids.",
-    "Some have red rings, some yellow, some blue."
+    "Each one has a coloured ring."
    ],
-   "question": "Which colour do you think has the most?",
+   "question": "How many ring colours can you see?",
+   "options": [
+    "2",
+    "3",
+    "4"
+   ],
+   "answer": 1,
+   "reveal": [
+    "3 colours: red, yellow and blue.",
+    "Here is one of each."
+   ],
    "widget": "objects",
    "props": {
     "n": 12,
@@ -33,6 +43,15 @@
      4,
      3
     ]
+   },
+   "revealProps": {
+    "n": 3,
+    "colours": [
+     1,
+     1,
+     1
+    ],
+    "arrange": "row"
    }
   },
   {
@@ -114,6 +133,10 @@
      "then": [
       "4 lines, then the 5th goes across.",
       "That makes a gate of 5."
+     ],
+     "hint": [
+      "Find the + button on the Red row.",
+      "Tap it 5 times. Count as you tap."
      ]
     },
     {
@@ -129,6 +152,10 @@
      },
      "then": [
       "Our tally chart is finished!"
+     ],
+     "hint": [
+      "Use the + on the Yellow row, then the Blue row.",
+      "Count the marks as you go: 4 yellow, 3 blue."
      ]
     },
     {
@@ -139,6 +166,10 @@
      "answer": 12,
      "then": [
       "5 + 4 + 3 = 12."
+     ],
+     "hint": [
+      "Red has a gate of 5.",
+      "Count on the other marks: 6, 7, 8..."
      ]
     },
     {
@@ -180,6 +211,10 @@
      "answer": "Blue",
      "then": [
       "Blue has the fewest: 3."
+     ],
+     "hint": [
+      "Look at the Number column.",
+      "Which number is the smallest?"
      ]
     },
     {
@@ -190,6 +225,10 @@
      "answer": 2,
      "then": [
       "5 take away 3 is 2."
+     ],
+     "hint": [
+      "Red has 5. Blue has 3.",
+      "Count on from 3 to 5."
      ]
     }
    ]
@@ -304,5 +343,17 @@
     "Why is the 5th tally mark drawn across the others?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "number.skipCount",
+  "level": 1,
+  "items": 3,
+  "params": {
+   "steps": [
+    5
+   ]
+  },
+  "mission": "l3",
+  "say": "First, a quick warm-up: counting in 5s."
+ }
 }

@@ -16,19 +16,39 @@
     "Past is the right half of the clock, to is the left half.",
     "Say 'quarter past' and 'quarter to' out loud whenever the time fits."
   ],
+  "warmup": {
+    "gen": "time.readClock",
+    "level": 1,
+    "items": 3,
+    "mission": "l10",
+    "say": "First, a quick warm-up: o'clock and half past."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
         "This is the Clock Tower clock.",
-        "The small numbers count the minutes in 5s."
+        "The small blue numbers show the minutes."
       ],
-      "question": "What do you notice about 5, 10, 15, 20?",
+      "question": "5, 10, 15, 20... what comes next?",
       "widget": "clock",
       "props": {
-        "h": 3,
-        "m": 15,
+        "h": 10,
+        "m": 20,
         "minuteLabels": true
+      },
+      "options": [
+        "21",
+        "25",
+        "30"
+      ],
+      "answer": 1,
+      "reveal": [
+        "25! The minutes go up in 5s.",
+        "The long hand on 5 means 25 minutes."
+      ],
+      "revealProps": {
+        "m": 25
       }
     },
     {
@@ -84,9 +104,25 @@
           "then": [
             "A quarter of the way round.",
             "It is {words}."
+          ],
+          "hint": [
+            "The long blue hand starts on 12.",
+            "Drag it round to 3: a quarter of the way."
+          ],
+          "hintProps": {
+            "ring": [
+              3
+            ]
+          },
+          "explain": [
+            "The long hand goes from 12 to 3.",
+            "A quarter of the way round: quarter past 2."
           ]
         },
         {
+          "set": {
+            "ring": []
+          },
           "say": [
             "Now drag it on to 9.",
             "That is quarter to."
@@ -97,12 +133,26 @@
           "then": [
             "Quarter to means 15 minutes to go.",
             "It is {words}."
+          ],
+          "hint": [
+            "Keep going round: past 4, 5, 6...",
+            "Stop on the 9."
+          ],
+          "hintProps": {
+            "ring": [
+              9
+            ]
+          },
+          "explain": [
+            "The long hand goes on round to 9.",
+            "Quarter to 3: 15 minutes before 3 o'clock."
           ]
         },
         {
           "set": {
             "h": 12,
-            "m": 0
+            "m": 0,
+            "ring": []
           },
           "say": [
             "Make it quarter past 7."
@@ -117,12 +167,26 @@
           ],
           "then": [
             "Short hand just past 7. Long hand on 3."
+          ],
+          "hintProps": {
+            "ring": [
+              3
+            ],
+            "ringHour": [
+              7
+            ]
+          },
+          "explain": [
+            "The long hand on 3 means quarter past.",
+            "Watch the short hand go just past 7."
           ]
         },
         {
           "set": {
             "h": 12,
-            "m": 0
+            "m": 0,
+            "ring": [],
+            "ringHour": []
           },
           "say": [
             "Make it quarter to 5."
@@ -138,6 +202,18 @@
           "then": [
             "Quarter to 5.",
             "The short hand is nearly at 5."
+          ],
+          "hintProps": {
+            "ring": [
+              9
+            ],
+            "ringHour": [
+              5
+            ]
+          },
+          "explain": [
+            "The long hand on 9 means quarter to.",
+            "Watch the short hand go nearly to 5."
           ]
         }
       ]
@@ -163,9 +239,27 @@
           "then": [
             "4 lots of 5 is 20.",
             "It is {words}."
+          ],
+          "hint": [
+            "Look for 20 beside the 4.",
+            "Drag the long blue hand there."
+          ],
+          "hintProps": {
+            "ring": [
+              4
+            ],
+            "sweep": true
+          },
+          "explain": [
+            "4 lots of 5 is 20.",
+            "The long hand on 4 is 20 minutes past."
           ]
         },
         {
+          "set": {
+            "ring": [],
+            "sweep": null
+          },
           "say": [
             "Drag it to the 7."
           ],
@@ -175,13 +269,29 @@
           "then": [
             "7 lots of 5 is 35.",
             "After 6 we say to: {words}."
+          ],
+          "hint": [
+            "Count on in 5s: 20, 25, 30, 35.",
+            "35 is beside the 7."
+          ],
+          "hintProps": {
+            "ring": [
+              7
+            ],
+            "sweep": true
+          },
+          "explain": [
+            "5, 10, 15, 20, 25, 30, 35.",
+            "The long hand on 7 is 35 minutes."
           ]
         },
         {
           "set": {
             "h": 12,
             "m": 0,
-            "minuteLabels": false
+            "minuteLabels": false,
+            "ring": [],
+            "sweep": null
           },
           "say": [
             "No helper numbers now.",
@@ -196,12 +306,26 @@
           ],
           "then": [
             "10 past 8. We can write 8:10."
+          ],
+          "hintProps": {
+            "ring": [
+              2
+            ],
+            "ringHour": [
+              8
+            ]
+          },
+          "explain": [
+            "10 minutes past: the long hand on 2.",
+            "The short hand goes just past 8."
           ]
         },
         {
           "set": {
             "h": 12,
-            "m": 0
+            "m": 0,
+            "ring": [],
+            "ringHour": []
           },
           "say": [
             "Make it 20 to 3."
@@ -217,6 +341,18 @@
           "then": [
             "The long hand is on 8.",
             "20 to 3 is 2:40."
+          ],
+          "hintProps": {
+            "ring": [
+              8
+            ],
+            "ringHour": [
+              3
+            ]
+          },
+          "explain": [
+            "20 minutes to 3: the long hand on 8.",
+            "The short hand is nearly at 3."
           ]
         }
       ]
@@ -233,6 +369,19 @@
         "h": 12,
         "m": 15,
         "minuteLabels": true
+      },
+      "options": [
+        "On 3",
+        "On 6",
+        "On 9"
+      ],
+      "answer": 1,
+      "reveal": [
+        "6 × 5 = 30.",
+        "The long hand on 6 is 30 minutes: half past."
+      ],
+      "revealProps": {
+        "m": 30
       }
     },
     {
@@ -285,9 +434,26 @@
           ],
           "then": [
             "7:35 is 25 to 8."
+          ],
+          "hintProps": {
+            "ring": [
+              7
+            ],
+            "ringHour": [
+              7,
+              8
+            ]
+          },
+          "explain": [
+            "35 minutes: the long hand on 7.",
+            "The short hand is between 7 and 8."
           ]
         },
         {
+          "set": {
+            "ring": [],
+            "ringHour": []
+          },
           "say": [
             "Now show 11:50."
           ],
@@ -298,6 +464,22 @@
           },
           "then": [
             "11:50 is 10 to 12."
+          ],
+          "hint": [
+            "50 minutes: the long blue hand goes on 10.",
+            "The short red hand goes nearly to 12."
+          ],
+          "hintProps": {
+            "ring": [
+              10
+            ],
+            "ringHour": [
+              12
+            ]
+          },
+          "explain": [
+            "50 minutes: the long hand on 10.",
+            "The short hand is nearly at 12. It is 10 to 12."
           ]
         },
         {
@@ -305,7 +487,9 @@
             "h": 4,
             "m": 25,
             "digital": false,
-            "interactive": false
+            "interactive": false,
+            "ring": [],
+            "ringHour": []
           },
           "caption": "",
           "say": [

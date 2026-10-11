@@ -15,6 +15,13 @@
     "Swap the numbers in an addition: same answer. Try it with a subtraction: it breaks.",
     "Check a subtraction by adding: 62 − 28 = 34, so 34 + 28 should be 62."
   ],
+  "warmup": {
+    "gen": "addsub.factFamily",
+    "level": 2,
+    "items": 3,
+    "mission": "b1",
+    "say": "First, a quick warm-up: fact families."
+  },
   "steps": [
     {
       "type": "look",
@@ -30,6 +37,27 @@
         "parts": [
           4,
           9
+        ],
+        "colours": [
+          "red",
+          "yellow"
+        ]
+      },
+      "show": {
+        "label": "Swap them round",
+        "props": {
+          "parts": [
+            9,
+            4
+          ],
+          "colours": [
+            "yellow",
+            "red"
+          ]
+        },
+        "lines": [
+          "Yes! 9 and 4 make 13 too.",
+          "We can add in any order."
         ]
       }
     },
@@ -51,20 +79,30 @@
         "9 − 4 = 5.",
         "4 − 9 does not make 5."
       ],
-      "art": "satellite"
+      "lines": [
+        "Here is 9 − 4.",
+        "9 dots. 4 are crossed out."
+      ],
+      "widget": "objects",
+      "props": {
+        "n": 9,
+        "arrange": "row",
+        "crossed": 4
+      }
     },
     {
       "type": "try",
       "widget": "balance",
       "props": {
         "left": "4 + 9",
-        "right": "9 + 4"
+        "right": "9 + 4",
+        "hold": true
       },
       "script": [
         {
           "say": [
-            "4 + 9 on one side.",
-            "9 + 4 on the other."
+            "4 + 9 on one side. 9 + 4 on the other.",
+            "Will it stay level or tip?"
           ],
           "input": "choice",
           "options": [
@@ -72,18 +110,32 @@
             "It tips"
           ],
           "answer": "Level",
+          "hint": [
+            "Work out 4 + 9.",
+            "Then work out 9 + 4."
+          ],
           "then": [
-            "4 + 9 = 13 and 9 + 4 = 13.",
-            "Adding works in any order."
+            "4 + 9 = 13 and 9 + 4 = 13."
+          ]
+        },
+        {
+          "set": {
+            "hold": false
+          },
+          "say": [
+            "The supports are gone.",
+            "It stays level. Adding works in any order."
           ]
         },
         {
           "set": {
             "left": "9 − 4",
-            "right": "4 − 9"
+            "right": "4 − 9",
+            "hold": true
           },
           "say": [
-            "Now 9 − 4 and 4 − 9."
+            "Now 9 − 4 and 4 − 9.",
+            "Will it stay level or tip?"
           ],
           "input": "choice",
           "options": [
@@ -91,9 +143,21 @@
             "It tips"
           ],
           "answer": "It tips",
+          "hint": [
+            "9 − 4 = 5.",
+            "Can you take 9 away from 4?"
+          ],
           "then": [
             "9 − 4 = 5.",
-            "4 − 9 is not 5.",
+            "4 − 9 is not 5."
+          ]
+        },
+        {
+          "set": {
+            "hold": false
+          },
+          "say": [
+            "The supports are gone. It tips!",
             "Order matters when we subtract."
           ]
         },
@@ -113,6 +177,10 @@
             "7 − 5"
           ],
           "answer": "7 + 5",
+          "hint": [
+            "Adding undoes subtracting.",
+            "Which one adds back to 12?"
+          ],
           "then": [
             "7 + 5 = 12.",
             "Adding undoes subtracting. It checks!"
@@ -128,7 +196,8 @@
         "parts": [
           34,
           28
-        ]
+        ],
+        "hide": 0
       },
       "script": [
         {
@@ -142,6 +211,10 @@
           "then": [
             "62 − 28 = 34.",
             "We got back to 34. It checks!"
+          ],
+          "hint": [
+            "Start at 62.",
+            "Take away 20, then take away 8."
           ]
         },
         {
@@ -163,6 +236,10 @@
           "then": [
             "35 + 15 = 50.",
             "The missing part is 35."
+          ],
+          "hint": [
+            "Start at 50.",
+            "Take away 10, then take away 5."
           ]
         },
         {
@@ -184,6 +261,10 @@
           "then": [
             "40 − 14 = 26.",
             "Adding found the whole."
+          ],
+          "hint": [
+            "26 + 4 = 30.",
+            "Then add 10 more."
           ]
         }
       ]

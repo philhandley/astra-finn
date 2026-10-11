@@ -1,7 +1,7 @@
 // objects: a set of things to count, group or take away. Reference widget for the contract in ENGINE.md.
 // Props: n, icon (art name or 'dot'), arrange ('row' | 'rows' | 'groups' | 'scatter' | 'dice' | 'line'),
 //        perRow, groups (array of group sizes), colours ([gold count, cyan count]), crossed (cross out the last k),
-//        tappable (tap to count: each tapped item gets its count number), readonly.
+//        tappable (tap to count: each tapped item gets its count number), groupLabels (text under each group, e.g. running totals), mirror ('alternate': every second item faces the other way, for pairs of boots), readonly.
 // State: { n, tapped }
 import { S, svgRoot, onTap, injectCSS, clamp } from '../core/dom.js';
 import { artInner } from '../core/art.js';
@@ -28,18 +28,29 @@ function layout(p) {
   const rings = []; // {x, y, w, h}
   if (arrange === 'groups' && Array.isArray(p.groups) && p.groups.length) {
     const gs = p.groups.map(g => clamp(Math.round(g), 0, 30)).slice(0, 12);
-    const cols = gs.length <= 3 ? gs.length : gs.length <= 6 ? 3 : 4;
-    const rowsN = Math.ceil(gs.length / cols);
-    const cw = W / cols, ch = H / rowsN;
     const big = Math.max(...gs, 1);
-    const inner = Math.ceil(Math.sqrt(big));
-    const r = Math.min((cw * 0.92) / (inner * 2.5 + 0.8), (ch * 0.92) / (Math.ceil(big / inner) * 2.5 + 0.8), 48);
+    // Groups of 10 sit as 5 x 2 (like a tens frame); others as near-squares.
+    const inner = big === 10 ? 5 : Math.ceil(Math.sqrt(big));
+    const linesMax = Math.ceil(big / inner);
+    const labelled = Array.isArray(p.groupLabels) && p.groupLabels.length;
+    const SP = 2.3;
+    // Pick the grid of groups that draws the items largest.
+    let best = null;
+    for (let cols = 1; cols <= gs.length; cols++) {
+      const rowsN = Math.ceil(gs.length / cols);
+      const cw = W / cols, ch = H / rowsN;
+      const r = Math.min((cw * 0.9) / (inner * SP + 0.8), ((ch - (labelled ? 46 : 0)) * 0.9) / (linesMax * SP + 0.8), 54);
+      if (!best || r > best.r + 0.01) best = { cols, rowsN, cw, ch, r };
+    }
+    const { cols, cw, ch, r } = best;
     gs.forEach((size, gi) => {
-      const cx = (gi % cols + 0.5) * cw, cy = (Math.floor(gi / cols) + 0.5) * ch;
+      // A short last row of groups sits in the middle, not at the left.
+      const row = Math.floor(gi / cols), inRow = Math.min(cols, gs.length - row * cols);
+      const cx = (gi % cols + 0.5 + (cols - inRow) / 2) * cw, cy = (row + 0.5) * ch - (labelled ? 20 : 0);
       const per = Math.min(inner, Math.max(1, size));
       const lines = Math.ceil(size / per) || 1;
-      const sp = r * 2.5;
-      rings.push({ x: cx - (per * sp) / 2 - r * 0.4, y: cy - (lines * sp) / 2 - r * 0.4, w: per * sp + r * 0.8, h: lines * sp + r * 0.8 });
+      const sp = r * SP;
+      rings.push({ x: cx - (per * sp) / 2 - r * 0.4, y: cy - (lines * sp) / 2 - r * 0.4, w: per * sp + r * 0.8, h: lines * sp + r * 0.8, label: labelled ? p.groupLabels[gi] : null });
       for (let k = 0; k < size; k++) {
         pos.push({ x: cx - ((per - 1) * sp) / 2 + (k % per) * sp, y: cy - ((lines - 1) * sp) / 2 + Math.floor(k / per) * sp, r, g: gi });
       }
@@ -123,8 +134,12 @@ export function mount(el, props = {}, ctx = {}) {
     const crossed = clamp(Math.round(p.crossed || 0), 0, n);
     for (const rg of rings) {
       root.appendChild(S('rect', { x: rg.x, y: rg.y, width: rg.w, height: rg.h, rx: Math.min(rg.w, rg.h) * 0.3, fill: COL.surface2, stroke: COL.lineStrong, 'stroke-width': 3, 'stroke-dasharray': '10 8' }));
+      if (rg.label !== null && rg.label !== undefined && rg.label !== '') {
+        root.appendChild(S('text', { x: rg.x + rg.w / 2, y: rg.y + rg.h + 40, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 36, fill: COL.focus }, [String(rg.label)]));
+      }
     }
     const icon = p.icon || 'dot';
+    const labels = [];
     pos.forEach((q, i) => {
       const g = S('g', { class: 'it', transform: `translate(${q.x} ${q.y})` });
       const k = tapped.indexOf(i);
@@ -135,7 +150,8 @@ export function mount(el, props = {}, ctx = {}) {
       } else {
         if (Array.isArray(p.colours)) g.appendChild(S('circle', { r: q.r * 1.02, fill: 'none', stroke: colourFor(i), 'stroke-width': 5 }));
         const s = (q.r * 1.7) / 100;
-        const a = S('g', { transform: `translate(${-q.r * 0.85} ${-q.r * 0.85}) scale(${s})` });
+        const flip = p.mirror === 'alternate' && i % 2 === 1;
+        const a = S('g', { transform: flip ? `translate(${q.r * 0.85} ${-q.r * 0.85}) scale(${-s} ${s})` : `translate(${-q.r * 0.85} ${-q.r * 0.85}) scale(${s})` });
         a.innerHTML = artInner(icon);
         g.appendChild(a);
       }
@@ -144,7 +160,11 @@ export function mount(el, props = {}, ctx = {}) {
         g.appendChild(S('path', { d: `M${-q.r} ${-q.r}L${q.r} ${q.r}`, stroke: COL.ink, 'stroke-width': 6, 'stroke-linecap': 'round' }));
       }
       if (k >= 0) {
-        g.appendChild(S('text', { y: q.r * 1.15 + 34, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 34, fill: COL.focus }, [String(k + 1)]));
+        // Count labels go on a top layer (so the next row never covers them). With two colours, each colour counts from 1.
+        let num = k + 1;
+        if (Array.isArray(p.colours)) { const c = colourFor(i); num = tapped.slice(0, k + 1).filter(j => colourFor(j) === c).length; }
+        const fs = clamp(q.r * 1.05, 22, 34);
+        labels.push(S('text', { x: q.x, y: q.y + q.r * 1.15 + fs, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': fs, fill: COL.focus, stroke: '#fff', 'stroke-width': 7, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }, [String(num)]));
       }
       if (p.tappable && !ro()) {
         // Large invisible hit area.
@@ -159,12 +179,18 @@ export function mount(el, props = {}, ctx = {}) {
       }
       root.appendChild(g);
     });
+    labels.forEach(l => root.appendChild(l));
   }
 
   const api = {
     getState() { return { n: layout(p).pos.length, tapped: tapped.length }; },
     update(np) { p = { ...p, ...np }; if ('n' in np || 'groups' in np || 'arrange' in np) tapped = []; draw(); },
-    showAnswer() { tapped = layout(p).pos.map((_, i) => i); draw(); },
+    showAnswer() {
+      const all = layout(p).pos.map((_, i) => i);
+      const crossed = clamp(Math.round(p.crossed || 0), 0, all.length);
+      tapped = all.slice(0, all.length - crossed);
+      draw();
+    },
     destroy() { unbinds.splice(0).forEach(u => u()); el.replaceChildren(); },
   };
   draw();

@@ -14,6 +14,16 @@
     "Look for a bond to 10 or a double first. Order doesn't matter when adding.",
     "Ask 'which two would you add first, and why?'"
   ],
+  "warmup": {
+    "gen": "addsub.bondsTo",
+    "level": 2,
+    "items": 3,
+    "params": {
+      "target": 10
+    },
+    "mission": "l4",
+    "say": "First, a quick warm-up: bonds to 10."
+  },
   "steps": [
     {
       "type": "look",
@@ -36,6 +46,27 @@
           7,
           4
         ]
+      },
+      "show": {
+        "label": "Find a 10",
+        "props": {
+          "groups": [
+            10,
+            7
+          ],
+          "colours": [
+            6,
+            0,
+            4,
+            0,
+            0,
+            7
+          ]
+        },
+        "lines": [
+          "6 and 4 make 10. Add those first!",
+          "Then 10 and 7 make 17."
+        ]
       }
     },
     {
@@ -46,28 +77,42 @@
       "type": "guess",
       "prompt": "Which two make 10?",
       "options": [
-        "6 and 7",
-        "6 and 4",
-        "7 and 4"
+        "3 and 8",
+        "3 and 7",
+        "8 and 7"
       ],
       "answer": 1,
       "reveal": [
-        "6 + 4 = 10!",
-        "Then 10 + 7 = 17."
+        "3 + 7 = 10!",
+        "Then 10 + 8 = 18."
       ],
       "widget": "objects",
       "props": {
-        "n": 17,
+        "n": 18,
         "arrange": "groups",
         "groups": [
-          6,
-          7,
-          4
+          3,
+          8,
+          7
         ],
         "colours": [
-          6,
+          3,
+          8,
+          7
+        ]
+      },
+      "revealProps": {
+        "groups": [
+          10,
+          8
+        ],
+        "colours": [
+          3,
+          0,
           7,
-          4
+          0,
+          0,
+          8
         ]
       }
     },
@@ -92,6 +137,10 @@
           },
           "hint": [
             "Tap the frame 6 times."
+          ],
+          "explain": [
+            "5 red on the top row, 1 below.",
+            "That makes 6."
           ]
         },
         {
@@ -107,6 +156,9 @@
           ],
           "then": [
             "6 + 4 = 10."
+          ],
+          "explain": [
+            "4 yellow fill the first frame."
           ]
         },
         {
@@ -120,6 +172,13 @@
           "then": [
             "10 + 7 = 17.",
             "So 6 + 7 + 4 = 17."
+          ],
+          "hint": [
+            "Keep the yellow brush.",
+            "Tap 7 more in the second frame."
+          ],
+          "explain": [
+            "7 more yellow go in the second frame."
           ]
         },
         {
@@ -131,11 +190,18 @@
           "input": "numpad",
           "answer": 18,
           "hint": [
-            "5 + 5 = 10."
+            "5 + 5 = 10.",
+            "Build it in the frames if you like."
           ],
           "then": [
             "5 + 5 = 10. 10 + 8 = 18."
-          ]
+          ],
+          "set": {
+            "colours": [
+              0,
+              0
+            ]
+          }
         },
         {
           "caption": "3 + 9 + 7 = ?",
@@ -145,11 +211,18 @@
           "input": "numpad",
           "answer": 19,
           "hint": [
-            "Which two make 10?"
+            "Look for 2 numbers that make 10.",
+            "Then add the last one."
           ],
           "then": [
             "3 + 7 = 10. 10 + 9 = 19."
-          ]
+          ],
+          "set": {
+            "colours": [
+              0,
+              0
+            ]
+          }
         }
       ]
     },

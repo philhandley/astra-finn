@@ -3,7 +3,19 @@
 //        purse (array of names already in the purse), showTotal (show the purse total, "35p" or "£1.35"),
 //        interactive (default true), price (pence: show a price tag), readonly, maxItems (default 12),
 //        labels (default true: write the value on each coin; false for recognising coins by shape and colour),
-//        sort (true: show the purse biggest first).
+//        sort (true: show the purse biggest first),
+//        highlight (array of coin names: those purse coins get a green ring and the rest fade; for reveals),
+//        counts (true, or a number k: write the running total under the first k purse coins, in the order shown;
+//        with sort, that is counting on from the biggest coin. A hint: "10p, 15p, ..." then Finn carries on).
+//        point (array of coin names: a blue ring round those coins in the tray, or in the purse when there is no
+//        tray; a hint, "Find the 10p"),
+//        topUp (true: showAnswer keeps the coins already in the purse and adds the rest, for "add 20p more" steps),
+//        countAnswer (true: the answer is a number of coins, as in "How many 20p coins make £1?"; showAnswer(n)
+//        then fills the purse with n of the first tray or purse coin and shows the total).
+// showAnswer(pence or a goal): a hands-on purse is filled with the fewest coins (or topped up, see topUp; a goal's
+// count is met, all-the-same coins first; { items } puts exactly those coins in),
+// then onChange fires so a hands-on step can move on. A display-only purse is never changed: it just shows its
+// total and running totals when they match the answer (pence, or pounds for a £ answer).
 // Names: 1p 2p 5p 10p 20p 50p £1 £2 £5 £10 £20 (also "100p" for £1 and "200p" for £2).
 // Tap a tray coin: it flies into the purse. Tap a purse coin: it goes back.
 // State: { total (pence), count, items (array of names in purse order) }
@@ -113,7 +125,7 @@ export function drawMoney(name, labels = true, k = 1) {
 const sizeOf = name => { const c = COINS[name]; return c.note ? { w: c.w, h: c.h } : { w: c.d * K, h: c.d * K }; };
 
 // Flow items into rows inside a box at scale s. Returns positions or null if they do not fit.
-function flow(names, box, s, gap = 18) {
+function flow(names, box, s, gap = 18, extra = 0) {
   const rows = [];
   let row = [], rw = 0;
   for (const n of names) {
@@ -124,7 +136,7 @@ function flow(names, box, s, gap = 18) {
     rw += (row.length > 1 ? gap : 0) + iw;
   }
   if (row.length) rows.push(row);
-  const rowH = rows.map(r => Math.max(...r.map(i => i.ih)));
+  const rowH = rows.map(r => Math.max(...r.map(i => i.ih)) + extra);
   const totalH = rowH.reduce((a, b) => a + b, 0) + gap * Math.max(0, rows.length - 1);
   if (totalH > box.h || rows.some(r => r.reduce((a, i) => a + i.iw, 0) + gap * (r.length - 1) > box.w + 0.5)) return null;
   const out = [];
@@ -132,16 +144,16 @@ function flow(names, box, s, gap = 18) {
   rows.forEach((r, ri) => {
     const w = r.reduce((a, i) => a + i.iw, 0) + gap * (r.length - 1);
     let x = box.x + (box.w - w) / 2;
-    for (const i of r) { out.push({ n: i.n, x: x + i.iw / 2, y: y + rowH[ri] / 2, s }); x += i.iw + gap; }
+    for (const i of r) { out.push({ n: i.n, x: x + i.iw / 2, y: y + (rowH[ri] - extra) / 2, s, ly: y + rowH[ri] - extra * 0.3 }); x += i.iw + gap; }
     y += rowH[ri] + gap;
   });
   return out;
 }
 
-function fit(names, box, maxS) {
+function fit(names, box, maxS, extra = 0) {
   if (!names.length) return [];
-  for (let s = maxS; s > 0.2; s *= 0.94) { const f = flow(names, box, s); if (f) return f; }
-  return flow(names, box, 0.2) || [];
+  for (let s = maxS; s > 0.2; s *= 0.94) { const f = flow(names, box, s, 18, extra); if (f) return f; }
+  return flow(names, box, 0.2, 18, extra) || [];
 }
 
 export function mount(el, props = {}, ctx = {}) {
@@ -177,6 +189,9 @@ export function mount(el, props = {}, ctx = {}) {
     const hasTray = tr.length > 0;
     const hasTop = !!(p.showTotal || Number.isFinite(Number(p.price)) && p.price !== undefined && p.price !== null);
     const purseBox = hasTray ? { x: 8, y: 8, w: W - 16, h: 362 } : { x: 4, y: 4, w: W - 8, h: H - 8 };
+    // One coin on its own (an option tile, "which coin is this?"): crop the view to a square round it so it is big.
+    const solo = !hasTray && !hasTop && purse.length === 1 && !COINS[purse[0]].note;
+    root.setAttribute('viewBox', solo ? `${(W - H) / 2} 0 ${H} ${H}` : `0 0 ${W} ${H}`);
     // The purse.
     if (hasTray || hasTop) {
       root.appendChild(S('rect', { x: purseBox.x + 1.5, y: purseBox.y + 1.5, width: purseBox.w - 3, height: purseBox.h - 3, rx: 26, fill: COL.surface2, stroke: COL.lineStrong, 'stroke-width': 3, 'stroke-dasharray': '14 10' }));
@@ -198,16 +213,44 @@ export function mount(el, props = {}, ctx = {}) {
     const inner = { x: purseBox.x + 14, y: purseBox.y + 10 + top, w: purseBox.w - 28, h: purseBox.h - 20 - top };
     const shown = purse.map((n, i) => ({ n, i }));
     if (p.sort) shown.sort((a, b) => COINS[b.n].v - COINS[a.n].v);
-    const maxS = hasTray ? 1.25 : purse.length <= 1 ? 4 : purse.length <= 3 ? 2.6 : 1.9;
-    const pos = fit(shown.map(o => o.n), inner, maxS);
+    // A bare purse (no tray, no total or price) grows its coins to fill the space, so they read well in small tiles.
+    const maxS = hasTray ? 1.25 : !hasTop ? (solo ? 5 : 4) : purse.length <= 1 ? 4 : purse.length <= 3 ? 2.6 : 1.9;
+    const nCount = p.counts === true ? shown.length : clamp(Math.round(Number(p.counts) || 0), 0, shown.length);
+    const pos = fit(shown.map(o => o.n), inner, maxS, nCount ? 46 : 0);
+    let running = 0;
     const labels = p.labels !== false;
+    const hl = Array.isArray(p.highlight) ? p.highlight.map(normCoin).filter(Boolean) : [];
+    const pointed = Array.isArray(p.point) ? p.point.map(normCoin).filter(Boolean) : [];
+    // A blue hint ring round a coin or note (drawn under it).
+    const pointRing = (q, sz) => {
+      const ring = { fill: COL.focusSoft, stroke: PAL.blue, 'stroke-width': 6, 'pointer-events': 'none' };
+      if (COINS[q.n].note) root.appendChild(S('rect', { x: q.x - (sz.w * q.s) / 2 - 10, y: q.y - (sz.h * q.s) / 2 - 10, width: sz.w * q.s + 20, height: sz.h * q.s + 24, rx: 18, ...ring }));
+      else root.appendChild(S('circle', { cx: q.x, cy: q.y + 2, r: (sz.w * q.s) / 2 + 10, ...ring }));
+    };
     pos.forEach((q, k) => {
       const idx = shown[k].i;
+      if (pointed.includes(q.n) && !hasTray && !hl.length) pointRing(q, sizeOf(q.n));
       const outer = S('g', {});
+      if (hl.length) {
+        if (hl.includes(q.n)) {
+          const sz = sizeOf(q.n), c = COINS[q.n], pad = 14;
+          const ring = { fill: COL.goodSoft, stroke: COL.good, 'stroke-width': 6, 'pointer-events': 'none' };
+          if (c.note) outer.appendChild(S('rect', { x: q.x - (sz.w * q.s) / 2 - pad, y: q.y - (sz.h * q.s) / 2 - pad, width: sz.w * q.s + pad * 2, height: sz.h * q.s + pad * 2 + 4, rx: 20, ...ring }));
+          else outer.appendChild(S('circle', { cx: q.x, cy: q.y + 2, r: (sz.w * q.s) / 2 + pad, ...ring }));
+        } else outer.setAttribute('opacity', '0.4');
+      }
       const g = S('g', { class: 'tap', 'data-purse': idx, transform: `translate(${q.x} ${q.y}) scale(${q.s})` });
       g.appendChild(drawMoney(q.n, labels, 1 / Math.sqrt(q.s)));
       outer.appendChild(g);
       root.appendChild(outer);
+      // Running total under the coin (counting on, biggest first).
+      running += COINS[q.n].v;
+      if (k < nCount) {
+        const t = money(running);
+        const tw = 26 + t.length * 19;
+        root.appendChild(S('rect', { x: q.x - tw / 2, y: q.ly - 21, width: tw, height: 42, rx: 14, fill: COL.focusSoft, stroke: PAL.blue, 'stroke-width': 3, 'pointer-events': 'none' }));
+        root.appendChild(S('text', { x: q.x, y: q.ly + 10, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 30, fill: COL.ink, 'pointer-events': 'none' }, [t]));
+      }
       if (!ro()) {
         const sz = sizeOf(q.n);
         g.insertBefore(S('rect', { x: -Math.max(sz.w, 70) / 2, y: -Math.max(sz.h, 70) / 2, width: Math.max(sz.w, 70), height: Math.max(sz.h, 70), fill: 'transparent' }), g.firstChild);
@@ -226,8 +269,9 @@ export function mount(el, props = {}, ctx = {}) {
       const full = purse.length >= maxItems();
       const tpos = fit(tr, { x: 20, y: 386, w: W - 40, h: 94 }, 1.0);
       tpos.forEach(q => {
-        const g = S('g', { class: 'tap', 'data-tray': q.n, transform: `translate(${q.x} ${q.y}) scale(${q.s})`, opacity: full ? 0.45 : 1 });
         const sz = sizeOf(q.n);
+        if (pointed.includes(q.n)) pointRing(q, sz);
+        const g = S('g', { class: 'tap', 'data-tray': q.n, transform: `translate(${q.x} ${q.y}) scale(${q.s})`, opacity: full ? 0.45 : 1 });
         g.appendChild(S('rect', { x: -Math.max(sz.w, 76) / 2, y: -64, width: Math.max(sz.w, 76), height: 128, fill: 'transparent' }));
         g.appendChild(drawMoney(q.n, labels, 1 / Math.sqrt(q.s)));
         root.appendChild(g);
@@ -242,6 +286,26 @@ export function mount(el, props = {}, ctx = {}) {
     }
   }
 
+  // Drop coins into the purse one at a time (after emptying it if fresh), then report the new state.
+  function dropIn(set, fresh) {
+    timers.forEach(clearTimeout);
+    if (fresh) { purse = []; draw(); }
+    const gap = reducedMotion() ? 0 : 200;
+    timers = set.map((n, i) => setTimeout(() => { purse.push(n); draw(); }, gap * (i + 1)));
+    timers.push(setTimeout(() => { ctx.onChange && ctx.onChange(api.getState()); }, gap * (set.length + 1) + 60));
+  }
+  // Exactly k coins from the tray making an amount: all the same coin if that works, else a search from the biggest.
+  function exactly(amount, k) {
+    const avail = (tray().length ? tray() : coinNames.filter(n => !COINS[n].note)).sort((a, b) => COINS[b].v - COINS[a].v);
+    const same = avail.find(n => COINS[n].v * k === amount);
+    if (same) return Array(k).fill(same);
+    const rec = (left, j, from) => {
+      if (j === 0) return left === 0 ? [] : null;
+      for (let i = from; i < avail.length; i++) { if (COINS[avail[i]].v > left) continue; const r = rec(left - COINS[avail[i]].v, j - 1, i); if (r) return [avail[i], ...r]; }
+      return null;
+    };
+    return k >= 1 && k <= 30 ? rec(amount, k, 0) : null;
+  }
   // Fewest coins for an amount, from the tray if there is one.
   function makeChange(amount) {
     const avail = (tray().length ? tray() : coinNames).filter(n => COINS[n].v <= amount).sort((a, b) => COINS[b].v - COINS[a].v);
@@ -255,18 +319,38 @@ export function mount(el, props = {}, ctx = {}) {
     getState() { return { total: total(), count: purse.length, items: [...purse] }; },
     update(np) { setFromProps(np || {}); draw(); },
     showAnswer(answer) {
-      let amt = null;
+      let amt = null, count = null;
+      const items = Array.isArray(answer) ? answer : answer && typeof answer === 'object' && Array.isArray(answer.items) ? answer.items : null;
+      if (items) {
+        if (ro()) return;
+        dropIn(items.map(normCoin).filter(Boolean), true);
+        return;
+      }
       if (typeof answer === 'number') amt = answer;
-      else if (answer && typeof answer === 'object' && Number.isFinite(Number(answer.total))) amt = Number(answer.total);
-      else if (Array.isArray(answer)) { purse = answer.map(normCoin).filter(Boolean); draw(); return; }
+      else if (answer && typeof answer === 'object' && Number.isFinite(Number(answer.total))) {
+        amt = Number(answer.total);
+        if (Number.isFinite(Number(answer.count))) count = Math.round(Number(answer.count));
+      }
       if (amt === null) return;
-      const set = makeChange(Math.round(amt));
-      if (!set) return;
-      purse = [];
-      draw();
-      // Drop the coins in one at a time.
-      timers.forEach(clearTimeout);
-      timers = set.map((n, i) => setTimeout(() => { purse.push(n); draw(); }, reducedMotion() ? 0 : 200 * (i + 1)));
+      if (p.countAnswer) {
+        const coin = (Array.isArray(p.tray) ? p.tray.map(normCoin).filter(Boolean)[0] : null) || purse[0] || (Array.isArray(p.purse) ? normCoin(p.purse[0]) : null);
+        const n = Math.round(amt);
+        if (coin && n >= 1 && n <= 30) { purse = Array(n).fill(coin); p.showTotal = true; draw(); }
+        return;
+      }
+      if (ro()) {
+        // A purse to count: keep its coins and show the total (and the counting on) if it is the answer.
+        const t = total();
+        if (purse.length && (Math.round(amt) === t || Math.round(amt * 100) === t)) { p.showTotal = true; p.sort = true; p.counts = true; draw(); }
+        return;
+      }
+      amt = Math.round(amt);
+      if (count) { const set = exactly(amt, count); if (set) dropIn(set, true); return; }
+      // topUp: a step that adds to coins already in the purse keeps them and adds the rest.
+      const have = total();
+      if (p.topUp && purse.length && have < amt) { const more = makeChange(amt - have); if (more) { dropIn(more, false); return; } }
+      const set = makeChange(amt);
+      if (set) dropIn(set, true);
     },
     destroy() { timers.forEach(clearTimeout); unbinds.splice(0).forEach(u => u()); el.replaceChildren(); },
   };
@@ -274,5 +358,6 @@ export function mount(el, props = {}, ctx = {}) {
   purse = null;
   setFromProps(props);
   draw();
+  el.__dev = { api, ctx }; // test hook: dev pages can set a state and fire onChange
   return api;
 }

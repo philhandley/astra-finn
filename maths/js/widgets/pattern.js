@@ -174,13 +174,37 @@ export function mount(el, props = {}, ctx = {}) {
       justPlaced = -1;
       draw();
     },
+    // "Show me" accepts a list of items or keys, or a goal: { seq: [...] }, { lastShape, lastColour, lastRotate }
+    // (places a matching palette tile in the next slot) or { count: n } (carries the repeat on for n slots).
     showAnswer(answer) {
-      const arr = Array.isArray(answer) ? answer : answer ? [answer] : [];
-      const list = arr.map(a => (typeof a === 'string' ? [...palette(), ...items()].find(it => patternKey(it) === a) : a)).filter(Boolean);
+      const byKey = k => [...palette(), ...items()].find(it => patternKey(it) === k);
+      let list = [];
+      if (Array.isArray(answer)) list = answer.map(a => (typeof a === 'string' ? byKey(a) : a));
+      else if (typeof answer === 'string') list = [byKey(answer)];
+      else if (answer && typeof answer === 'object' && (answer.shape || answer.art)) list = [answer];
+      else if (answer && typeof answer === 'object') {
+        if (Array.isArray(answer.seq)) list = answer.seq.map(byKey);
+        else if (answer.lastShape || answer.lastColour || answer.lastRotate !== undefined) {
+          const fits = it => (!answer.lastShape || (it.shape || it.art) === answer.lastShape) && (!answer.lastColour || it.colour === answer.lastColour)
+            && (answer.lastRotate === undefined || normRot(it.rotate) === normRot(answer.lastRotate));
+          const it = palette().find(fits) || items().find(fits);
+          if (it) list = filled.length < nSlots() ? [...filled, it] : [...filled.slice(0, -1), it];
+        } else if (answer.count !== undefined) {
+          let n = answer.count;
+          if (n && typeof n === 'object') n = n.eq ?? n.gte ?? n.lte;
+          // With no row to carry on (Finn makes his own), show an AB pattern from the first two palette tiles.
+          const its = items().length ? items() : palette().slice(0, 2);
+          // The repeating unit: the `unit` prop, or the shortest block that repeats through the row.
+          let k = Math.round(+p.unit || 0);
+          if (!(k > 0)) { k = its.length || 1; for (let c = 1; c <= its.length; c++) if (its.every((it, i) => patternKey(it) === patternKey(its[i % c]))) { k = c; break; } }
+          list = Array.from({ length: clamp(Math.round(+n || 0), 0, nSlots()) }, (_, j) => its[(its.length + j) % k]);
+        }
+      }
+      list = list.filter(Boolean);
       if (!list.length) return;
       filled = list.slice(0, nSlots()).map(it => ({ ...it }));
       justPlaced = filled.length - 1;
-      draw();
+      changed();
     },
     destroy() { unbinds.splice(0).forEach(u => u()); el.replaceChildren(); },
   };

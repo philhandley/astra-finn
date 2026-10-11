@@ -16,14 +16,21 @@
     "For subtraction, partition only the number you subtract: 52 − 27 = 52 − 20 − 7.",
     "Written column methods are not needed in Year 2. The column picture is only a preview."
   ],
+  "warmup": {
+    "gen": "addsub.addOnesTens",
+    "level": 2,
+    "items": 3,
+    "mission": "b3",
+    "say": "First, a quick warm-up: adding ones or tens."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
-        "34 + 28.",
-        "Tens and ones, and the same in columns."
+        "34 + 28 in blocks.",
+        "Green rods are tens. Blue cubes are ones."
       ],
-      "question": "How many tens? How many ones?",
+      "question": "How many blue cubes altogether?",
       "widget": "blocks",
       "props": {
         "a": 34,
@@ -31,6 +38,19 @@
         "op": "+",
         "interactive": false,
         "showColumns": true
+      },
+      "options": [
+        "10",
+        "12",
+        "14"
+      ],
+      "answer": 1,
+      "reveal": [
+        "4 ones and 8 ones make 12 ones.",
+        "That is enough to make a new ten!"
+      ],
+      "revealProps": {
+        "combined": true
       }
     },
     {
@@ -48,9 +68,20 @@
       "answer": 1,
       "reveal": [
         "About 60. It is 62.",
-        "30 + 30 = 60, so it is near 60."
+        "34 is near 30. 28 is near 30.",
+        "30 + 30 = 60."
       ],
-      "art": "rocket"
+      "widget": "blocks",
+      "props": {
+        "a": 34,
+        "b": 28,
+        "op": "+",
+        "interactive": false
+      },
+      "revealProps": {
+        "combined": true,
+        "exchanged": true
+      }
     },
     {
       "type": "try",
@@ -79,6 +110,15 @@
           },
           "then": [
             "{tens} tens and {ones} ones."
+          ],
+          "hint": [
+            "Tap the blue Put together button."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "Tens go with tens. Ones go with ones."
           ]
         },
         {
@@ -95,6 +135,12 @@
           "then": [
             "Then I combine all of the tens and all of the ones.",
             "{tens} tens and {ones} ones is {value}."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "10 blue cubes become 1 green rod."
           ]
         },
         {
@@ -106,6 +152,10 @@
           "answer": 62,
           "then": [
             "34 + 28 = 62."
+          ],
+          "hint": [
+            "Count the green tens: 10, 20, 30…",
+            "Then count on the blue ones."
           ]
         }
       ]
@@ -130,10 +180,13 @@
             "takenTens": 2
           },
           "hint": [
-            "Tap the green rods."
+            "Tap 2 green rods."
           ],
           "then": [
             "52 − 20 = {value}."
+          ],
+          "explain": [
+            "Take away 2 green rods."
           ]
         },
         {
@@ -150,6 +203,12 @@
           "then": [
             "{tens} tens and {ones} ones.",
             "Still {value}."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "One rod becomes 10 blue cubes."
           ]
         },
         {
@@ -160,11 +219,14 @@
             "taken": 27
           },
           "hint": [
-            "Tap the blue cubes."
+            "Tap 7 blue cubes."
           ],
           "then": [
             "32 − 7 = {value}.",
             "So 52 − 27 = {value}."
+          ],
+          "explain": [
+            "Take away 7 blue cubes."
           ]
         },
         {
@@ -205,16 +267,28 @@
           ],
           "then": [
             "63 − 17 = {value}."
+          ],
+          "hintProps": {
+            "pulse": true
+          },
+          "explain": [
+            "Take 1 rod. Swap a ten. Take 7 cubes."
           ]
         },
         {
           "say": [
-            "How many tens are left?"
+            "How many are left?",
+            "Count the tens, then the ones."
           ],
           "input": "numpad",
-          "answer": "{tens}",
+          "answer": 46,
+          "hint": [
+            "Count the green rods that are not crossed out.",
+            "Then count on the blue cubes."
+          ],
           "then": [
-            "{tens} tens and {ones} ones."
+            "4 tens and 6 ones is 46.",
+            "63 − 17 = 46."
           ]
         }
       ]

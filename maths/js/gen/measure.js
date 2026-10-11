@@ -5,7 +5,10 @@
 // Check: dev/gen.html?gen=measure&all=1
 const lv = (level, max) => Math.max(1, Math.min(max, Math.round(level) || 1));
 const OBJ = ['pencil', 'crayon', 'worm', 'key', 'spoon', 'rocket'];
-const MASS_ART = ['asteroid', 'apple', 'crystal', 'robot', 'helmet', 'boot', 'fuel', 'cookie'];
+// Things to weigh: light things in grams, heavy things in kilograms (no 6 kg apples).
+const MASS_G = ['boot', 'crystal', 'asteroid', 'helmet'];
+const MASS_KG = ['robot', 'asteroid', 'fuel', 'crystal'];
+const massThing = (R, unit, want) => { const list = unit === 'kg' ? MASS_KG : MASS_G; return list.includes(want) ? want : R.pick(list); };
 const NAME = { pencil: 'pencil', crayon: 'crayon', worm: 'worm', key: 'key', spoon: 'spoon', rocket: 'rocket', asteroid: 'moon rock', apple: 'apple', crystal: 'crystal', robot: 'robot', helmet: 'helmet', boot: 'boot', fuel: 'fuel can', cookie: 'cookie', rover: 'rover' };
 
 function pickOptions(R, correct, pool, n = 3) {
@@ -22,13 +25,36 @@ function onMark(R, min, max, marks, labels, onLabel) {
   }
   return R.pick(vals.length ? vals : [min + marks]);
 }
-function scaleCount(v, labels, marks) {
+// The method for reading a scale: start at the labelled number below, then count on in the small marks.
+// what: 'The needle points to' (scales), 'The water comes up to' (jug), 'The red line comes up to' (thermometer).
+function scaleCount(v, labels, marks, what = 'The needle points to') {
   const below = Math.floor(v / labels) * labels;
-  if (below === v) return [`The needle points to ${v}.`];
+  if (below === v) return [`${what} ${v}.`];
   const steps = [];
-  for (let x = below + marks; x <= v; x += marks) steps.push(x);
-  return [`Start at ${below}.`, `Count on in ${marks}s: ${steps.join(', ')}.`];
+  for (let x = below + marks; x <= v + 1e-9; x += marks) steps.push(Math.round(x));
+  return [`Each small mark is ${marks} more. Start at ${below}.`, `Count on in ${marks}s: ${steps.join(', ')}.`];
 }
+const belowLabel = (v, labels) => Math.floor(v / labels) * labels;
+// A reading hint: point at the labelled number below (blue) and draw the count-on hops (purple) up to the reading.
+function readHint(v, s, thing) {
+  if (s.on) return { hint: [`Look where ${thing}.`, 'Read the number there.'], hintProps: undefined };
+  const b = belowLabel(v, s.labels);
+  return {
+    hint: [`The numbers go up in ${s.labels}s. Each small mark is ${s.marks} more.`, `Start at ${b}, in the blue ring. Count on along the purple jumps.`],
+    hintProps: { target: b, hops: b },
+  };
+}
+// A setting hint: ring the number to find (labelled), or the labelled number to count on from.
+function setHint(v, s, verb) {
+  if (s.on) return { hint: [verb, `Find ${v}, in the blue ring.`], hintProps: { target: v } };
+  const b = belowLabel(v, s.labels);
+  return { hint: [`Start at ${b}, in the blue ring.`, `Each small mark is ${s.marks} more. Count on to ${v}.`], hintProps: { target: b } };
+}
+const PIC = {
+  cm: 'A centimetre is about as wide as your finger.', m: 'A metre is about one big stride.',
+  g: 'A gram is as light as a paper clip.', kg: 'A kilogram is like a bag of sugar.',
+  ml: 'A millilitre is a tiny drop.', l: 'A litre is a big bottle of water.',
+};
 
 /* ---------- Reading scales ---------- */
 export const readRuler = {
@@ -47,7 +73,7 @@ export const readRuler = {
       return {
         lines: [`The ${NAME[obj]} does not start at 0.`, `How long is the ${NAME[obj]}?`],
         widget: 'measure', props, input: 'numpad', answer: value, unit: 'cm',
-        hint: [`It starts at ${start}.`, 'Count the centimetres from there.'],
+        hint: [`It starts at ${start}, not 0.`, 'Count the purple jumps: one for each centimetre.'], hintProps: { hops: start },
         explain: [`It starts at ${start} and ends at ${end}.`, `${end} − ${start} = ${value}.`, `It is ${value} cm long.`],
         reteach: {
           lines: [`How long is the ${NAME[obj]} now?`], widget: 'measure', props: { ...props, start: 0 },
@@ -55,10 +81,14 @@ export const readRuler = {
         },
       };
     }
+    const b = belowLabel(value, labels);
     return {
       lines: [`How long is the ${NAME[obj]}?`], widget: 'measure', props, input: 'numpad', answer: value, unit: 'cm',
-      hint: ['It starts at 0.', 'Look where the end lines up.'],
-      explain: [`The ${NAME[obj]} starts at 0.`, `It ends at ${value}.`, `It is ${value} cm long.`],
+      hint: level === 1 ? ['It starts at 0.', 'Follow the dashed line down from the end. What number is there?']
+        : ['It starts at 0. The end is between 2 numbers.', `Start at ${b}, in the blue ring. Count on the purple jumps.`],
+      hintProps: level === 1 ? undefined : { target: b, hops: b },
+      explain: level === 1 ? [`The ${NAME[obj]} starts at 0.`, `It ends at ${value}.`, `It is ${value} cm long.`]
+        : [`It starts at 0 and ends after ${b}.`, `Count on from ${b}: ${Array.from({ length: value - b }, (_, k) => b + k + 1).join(', ')}.`, `It is ${value} cm long.`],
       reteach: level === 2 ? {
         lines: [`How long is the ${NAME[obj]}?`], widget: 'measure', props: { ...props, max: 15, value: Math.min(value, 15), labels: 1 },
         input: 'numpad', answer: Math.min(value, 15), unit: 'cm', hint: ['Every centimetre has a number here.'], explain: [`It ends at ${Math.min(value, 15)}.`],
@@ -79,12 +109,12 @@ export const readScales = {
     level = lv(level, 3);
     const s = R.pick(SCALE_SETS[level]);
     const value = onMark(R, 0, s.max, s.marks, s.labels, s.on);
-    const obj = params.object || R.pick(MASS_ART);
+    const obj = massThing(R, s.unit, params.object);
     return {
       lines: [`How heavy is the ${NAME[obj]}?`, 'Read the scales.'],
       widget: 'measure', props: { tool: 'scales', unit: s.unit, max: s.max, labels: s.labels, marks: s.marks, value, object: obj, readonly: true },
       input: 'numpad', answer: value, unit: s.unit,
-      hint: s.on ? ['Look where the needle points.'] : [`The numbers go up in ${s.labels}s.`, `Each small mark is ${s.marks} more.`],
+      ...readHint(value, s, 'the red needle points'),
       explain: [...scaleCount(value, s.labels, s.marks), `It weighs ${value} ${s.unit}.`],
       reteach: level > 1 ? readScales.make(level - 1, R, { object: obj }) : undefined,
     };
@@ -108,8 +138,8 @@ export const readJug = {
       lines: ['How much is in the jug?'],
       widget: 'measure', props: { tool: 'jug', unit: s.unit, max: s.max, labels: s.labels, marks: s.marks, value, liquid, readonly: true },
       input: 'numpad', answer: value, unit: s.unit,
-      hint: s.on ? ['Look at the top of the liquid.', 'Read the number next to it.'] : [`The numbers go up in ${s.labels}s.`, `Each small mark is ${s.marks} more.`],
-      explain: [...scaleCount(value, s.labels, s.marks).map(l => l.replace('The needle points', 'The liquid comes up')), `There is ${value} ${s.unit}.`],
+      ...readHint(value, s, 'the top of the liquid is'),
+      explain: [...scaleCount(value, s.labels, s.marks, 'The top of the liquid is level with'), `There is ${value} ${s.unit}.`],
       reteach: level > 1 ? readJug.make(level - 1, R) : undefined,
     };
   },
@@ -128,8 +158,8 @@ export const readThermometer = {
       lines: ['How warm is it?', 'Read the thermometer.'],
       widget: 'measure', props: { tool: 'thermometer', min: 0, max: 40, labels: s.labels, marks: s.marks, value, object, readonly: true },
       input: 'numpad', answer: value, unit: '°C',
-      hint: s.on ? ['Look at the top of the red line.'] : [`The numbers go up in ${s.labels}s.`, `Each small mark is ${s.marks} more.`],
-      explain: [...scaleCount(value, s.labels, s.marks).map(l => l.replace('The needle points', 'The red line comes up')), `It is ${value} °C.`],
+      ...readHint(value, { ...s, labels: s.labels }, 'the top of the red line is'),
+      explain: [...scaleCount(value, s.labels, s.marks, 'The red line comes up to'), `It is ${value} °C.`],
       reteach: level > 1 ? readThermometer.make(level - 1, R) : undefined,
     };
   },
@@ -146,13 +176,19 @@ export const makeLength = {
     const start = level === 3 ? R.int(1, 6) : 0;
     const goal = level === 1 ? R.int(3, 15) : level === 2 ? R.int(7, Math.min(19, max - start)) : R.int(4, 14);
     const from = goal === 2 ? 5 : 2;
+    const labels = max === 15 ? 1 : max === 20 ? 2 : 5;
+    const end = start + goal, b = belowLabel(end, labels);
+    let hint, hintProps;
+    if (level === 3) { hint = [`It starts at ${start}. Drag the end and count the purple jumps.`, `Stop when there are ${goal} jumps.`]; hintProps = { hops: start }; }
+    else if (end % labels === 0) { hint = [`Find ${goal} on the ruler, by the blue arrow.`, 'Drag the orange handle there.']; hintProps = { target: goal }; }
+    else { hint = [`${goal} has no number. Find ${b}, by the blue arrow.`, `Then count on ${end - b} small mark${end - b === 1 ? '' : 's'}.`]; hintProps = { target: b }; }
     return {
       lines: [`Make the ${NAME[obj]} ${goal} cm long.`, level === 3 ? `It starts at ${start}.` : 'Drag the orange handle.'],
       caption: `${goal} cm`,
-      widget: 'measure', props: { tool: 'ruler', unit: 'cm', max, start, value: from, object: obj, marks: 1, labels: max === 15 ? 1 : max === 20 ? 2 : 5, interactive: true },
+      widget: 'measure', props: { tool: 'ruler', unit: 'cm', max, start, value: from, object: obj, marks: 1, labels, interactive: true },
       input: 'widget', goal: { value: goal },
-      hint: level === 3 ? [`Count ${goal} centimetres on from ${start}.`] : [`Stop the end on ${goal}.`],
-      explain: level === 3 ? [`${start} + ${goal} = ${start + goal}.`, `The end goes on ${start + goal}.`] : [`The ${NAME[obj]} starts at 0.`, `So the end goes on ${goal}.`],
+      hint, hintProps,
+      explain: level === 3 ? [`It starts at ${start}. Count on ${goal}: ${start} + ${goal} = ${end}.`, `The end goes on ${end}.`] : [`The ${NAME[obj]} starts at 0.`, `So the end goes on ${goal}.`],
     };
   },
 };
@@ -164,14 +200,14 @@ export const setScale = {
     level = lv(level, 3);
     const s = R.pick(SCALE_SETS[level]);
     const value = onMark(R, 0, s.max, s.marks, s.labels, s.on);
-    const obj = R.pick(MASS_ART);
+    const obj = massThing(R, s.unit);
     return {
       lines: [`The ${NAME[obj]} weighs ${value} ${s.unit}.`, 'Move the needle to show it.'],
       caption: `${value} ${s.unit}`,
       widget: 'measure', props: { tool: 'scales', unit: s.unit, max: s.max, labels: s.labels, marks: s.marks, value: 0, object: obj, interactive: true },
       input: 'widget', goal: { value },
-      hint: ['Drag the needle, or tap the + button.', s.on ? `Find ${value} on the dial.` : `Each small mark is ${s.marks} more.`],
-      explain: scaleCount(value, s.labels, s.marks),
+      ...setHint(value, s, 'Drag the red needle, or tap the + button.'),
+      explain: [...scaleCount(value, s.labels, s.marks), `It weighs ${value} ${s.unit}.`],
     };
   },
 };
@@ -188,8 +224,8 @@ export const fillJug = {
       caption: `${value} ${s.unit}`,
       widget: 'measure', props: { tool: 'jug', unit: s.unit, max: s.max, labels: s.labels, marks: s.marks, value: 0, interactive: true },
       input: 'widget', goal: { value },
-      hint: [s.on ? `Find ${value} on the jug.` : `Each small mark is ${s.marks} more.`],
-      explain: scaleCount(value, s.labels, s.marks),
+      ...setHint(value, s, 'Drag the orange handle up.'),
+      explain: [...scaleCount(value, s.labels, s.marks, 'Fill it so the top of the water is level with'), `That is ${value} ${s.unit}.`],
     };
   },
 };
@@ -206,8 +242,8 @@ export const setThermometer = {
       caption: `${value} °C`,
       widget: 'measure', props: { tool: 'thermometer', min: 0, max: 40, labels: s.labels, marks: s.marks, value: 0, object: value >= 20 ? 'sun' : 'moon', interactive: true },
       input: 'widget', goal: { value },
-      hint: [s.on ? `Find ${value} on the thermometer.` : `Each small mark is ${s.marks} more.`],
-      explain: scaleCount(value, s.labels, s.marks),
+      ...setHint(value, s, 'Drag the orange handle up or down.'),
+      explain: [...scaleCount(value, s.labels, s.marks, 'The red line goes up to'), `That is ${value} °C.`],
     };
   },
 };
@@ -229,19 +265,21 @@ export const chooseUnit = {
     level = lv(level, 3);
     if (level === 3 && R.chance(0.5)) {
       const [q, tool] = R.pick(TOOL_Q);
+      const why = { ruler: 'A ruler measures how long or tall.', scales: 'Scales measure how heavy.', jug: 'A jug measures how much liquid.', thermometer: 'A thermometer measures how hot or cold.' };
       return {
         lines: [`Which tool shows ${q}?`], input: 'choice', answer: tool, options: R.shuffle(['ruler', 'scales', 'jug', 'thermometer']),
         hint: ['A ruler measures length. Scales measure mass.', 'A jug measures liquid. A thermometer measures heat.'],
-        explain: [`Use the ${tool}.`],
+        explain: [why[tool], `So use the ${tool}.`],
       };
     }
     const kind = UNIT_ITEMS[params.kind] ? params.kind : level === 1 ? 'length' : R.pick(level === 2 ? ['mass', 'capacity'] : ['length', 'mass', 'capacity']);
     const [thing, unit] = R.pick(UNIT_ITEMS[kind]);
     const [small, big] = UNIT_PAIR[kind];
     return {
-      lines: [`Would you ${VERB[kind]} ${thing} in ${small} or ${big}?`], input: 'choice', answer: unit, options: [small, big],
-      hint: [`${small} is for small things.`, `${big} is for big things.`],
-      explain: [`${thing[0].toUpperCase() + thing.slice(1)} is ${unit === small ? 'small' : 'big'}.`, `Use ${UNIT_WORD[unit]}.`],
+      lines: [`Would you ${VERB[kind]} ${thing} in ${small} or ${big}?`], input: 'choice', answer: unit,
+      options: [small, big].map(u => ({ label: `${u}: ${UNIT_WORD[u]}`, value: u })),
+      hint: [`Is ${thing} small or big?`, PIC[small], PIC[big]],
+      explain: [`${thing[0].toUpperCase() + thing.slice(1)} is ${unit === small ? 'small' : 'big'}.`, `So use ${UNIT_WORD[unit]}: ${unit}.`],
     };
   },
 };
@@ -254,9 +292,12 @@ export const compareMeasures = {
     level = lv(level, 3);
     let xs, ys, x, y;
     if (level === 1) {
-      x = R.int(2, 50); y = R.chance(0.15) ? x : R.int(2, 50);
+      // In the mission's units (a mass mission compares grams or kilograms, not centimetres).
+      const u = Array.isArray(params.units) && params.units.length ? R.pick(params.units) : 'cm';
+      const hund = u === 'g' || u === 'ml';
+      x = hund ? R.int(1, 9) * 100 : R.int(2, 50); y = R.chance(0.15) ? x : hund ? R.int(1, 9) * 100 : R.int(2, 50);
       if (Math.abs(x - y) < 3 && x !== y) y = x + 5;
-      xs = `${x} cm`; ys = `${y} cm`;
+      xs = `${x} ${u}`; ys = `${y} ${u}`;
     } else if (level === 2) {
       const u = R.pick(Array.isArray(params.units) && params.units.length ? params.units : ['g', 'kg', 'ml', 'l', 'cm', 'm']);
       const big = u === 'g' || u === 'ml';
@@ -270,10 +311,14 @@ export const compareMeasures = {
       [x, xs, y, ys] = R.chance(0.5) ? pr : [pr[2], pr[3], pr[0], pr[1]];
     }
     const answer = x > y ? '>' : x < y ? '<' : '=';
+    // Level 3: write the bigger unit in the smaller one (1 m is 100 cm) so both numbers can be compared.
+    const SMALL = { m: ['cm', '1 m is 100 cm.'], kg: ['g', '1 kg is 1000 g.'], l: ['ml', '1 l is 1000 ml.'] };
+    const conv = [[xs, x], [ys, y]].map(([t, v]) => { const u = t.split(' ').pop(); return SMALL[u] ? { t, v, u: SMALL[u][0], fact: SMALL[u][1] } : null; }).filter(Boolean);
+    const big = Math.max(x, y) >= 100 && (Math.max(x, y) % 50 === 0);
     return {
       lines: ['Which sign goes in the gap?'], caption: `${xs}  ?  ${ys}`, input: 'choice', answer, options: ['<', '>', '='],
-      hint: level === 3 ? ['1 m = 100 cm. 1 kg = 1000 g.', '1 l = 1000 ml.'] : ['The open side faces the bigger amount.'],
-      explain: [`${xs} ${answer === '=' ? 'is the same as' : answer === '>' ? 'is more than' : 'is less than'} ${ys}.`, `So ${xs} ${answer} ${ys}.`],
+      hint: level === 3 && conv.length ? [conv[0].fact, `So compare ${x} and ${y}.`] : [big ? 'Compare the hundreds first.' : 'Compare the tens first, then the ones.', 'The open side of the sign faces the bigger amount.'],
+      explain: [...(level === 3 ? conv.map(c => `${c.t} is ${c.v} ${c.u}.`) : []), `${xs} ${answer === '=' ? 'is the same as' : answer === '>' ? 'is more than' : 'is less than'} ${ys}.`, `So ${xs} ${answer} ${ys}.`],
     };
   },
 };
@@ -294,8 +339,8 @@ export const orderMeasures = {
     if (opts.every((v, i) => v === sorted[i])) opts = [...sorted].reverse();
     return {
       lines: ['Put them in order.', `Start with the ${up ? words[0] : words[1]}.`], input: 'order', options: opts, answer: sorted,
-      hint: ['Find the smallest number first.', 'Compare the tens, then the ones.'],
-      explain: [`${sorted.join(', ')}.`],
+      hint: [`Find the ${up ? 'smallest' : 'biggest'} number first. Tap it.`, (u === 'g' || u === 'ml') ? 'Compare the hundreds, then the tens.' : 'Compare the tens, then the ones.'],
+      explain: [`${sorted[0]} is the ${up ? words[0] : words[1]}.`, `Then ${sorted.slice(1).join(', then ')}.`],
     };
   },
 };
@@ -313,7 +358,7 @@ export const measureProblem = {
         { lines: [`A rocket is ${a + b} cm tall.`, `A toy rocket is ${a} cm tall.`, 'How much taller is the big one?'], ans: b, u: 'cm', ex: [`${a} + ${b} = ${a + b}.`, `It is ${b} cm taller.`] },
         { lines: [`A bag has ${a} kg of moon rock.`, `You add ${b} kg more.`, 'How much now?'], ans: a + b, u: 'kg', ex: [`${a} + ${b} = ${a + b}.`] },
       ]);
-      return { lines: t.lines, input: 'numpad', answer: t.ans, unit: t.u, hint: ['Count on from the bigger number.'], explain: t.ex };
+      return { lines: t.lines, input: 'numpad', answer: t.ans, unit: t.u, hint: ['Start at the bigger number.', 'Count on the smaller one on your fingers.'], explain: t.ex };
     }
     if (level === 2) {
       let a = R.int(2, 7) * 10 + R.int(0, 9), b = R.int(1, 3) * 10 + R.int(0, 5);
@@ -339,10 +384,14 @@ export const measureProblem = {
 export const compareY1 = {
   about: 'Year 1: longer, taller, heavier, fuller; measure with cubes',
   levels: 3,
-  make(level, R) {
+  make(level, R, params = {}) {
     level = lv(level, 3);
+    // params.kind keeps to one kind: 'length' (length and height), 'mass' or 'capacity'.
+    const want = params.kind;
+    if (want === 'capacity') level = 2;
+    if (level === 2 && (want === 'length' || want === 'mass')) level = want === 'length' ? 1 : 3;
     if (level === 1) {
-      const kind = R.pick(['length', 'height', 'mass']);
+      const kind = want === 'length' ? R.pick(['length', 'height']) : want === 'mass' ? 'mass' : R.pick(['length', 'height', 'mass']);
       let a, b;
       do { a = R.int(2, 9); b = R.int(2, 9); } while (Math.abs(a - b) < 2);
       if (kind === 'length') {
@@ -353,8 +402,8 @@ export const compareY1 = {
           lines: [longer ? 'Which is longer?' : 'Which is shorter?'],
           widget: 'measure', props: { tool: 'compare', kind: 'length', a, b, icons: [oa, ob], readonly: true },
           input: 'choice', answer, options: [oa, ob],
-          hint: ['They both start at the same line.', 'Look at the other end.'],
-          explain: [`The ${answer} is ${longer ? 'longer' : 'shorter'}.`],
+          hint: ['They both start at the same line.', 'Now each has cubes under it. Which needs more cubes?'], hintProps: { cubes: true },
+          explain: [`The ${oa} is ${a} cubes long. The ${ob} is ${b} cubes long.`, `So the ${answer} is ${longer ? 'longer' : 'shorter'}.`],
         };
       }
       if (kind === 'height') {
@@ -365,8 +414,8 @@ export const compareY1 = {
           lines: [taller ? 'Which is taller?' : 'Which is shorter?'],
           widget: 'measure', props: { tool: 'compare', kind: 'height', a, b, icons: [ia, ib], readonly: true },
           input: 'choice', answer, options: [{ label: ia, value: ia, art: ia }, { label: ib, value: ib, art: ib }],
-          hint: ['They stand on the same ground.', 'Look at the tops.'],
-          explain: [`The ${answer} is ${taller ? 'taller' : 'shorter'}.`],
+          hint: ['They stand on the same ground.', 'Look at the tops. Count the cubes beside each one.'], hintProps: { cubes: true },
+          explain: [`The ${ia} is ${a} cubes tall. The ${ib} is ${b} cubes tall.`, `So the ${answer} is ${taller ? 'taller' : 'shorter'}.`],
         };
       }
       const [ia, ib] = R.sample(['asteroid', 'apple', 'crystal', 'cookie', 'helmet'], 2);
@@ -376,8 +425,8 @@ export const compareY1 = {
         lines: [heavy ? 'Which is heavier?' : 'Which is lighter?'],
         widget: 'measure', props: { tool: 'compare', kind: 'mass', a, b, icons: [ia, ib], readonly: true },
         input: 'choice', answer, options: [{ label: NAME[ia], value: ia, art: ia }, { label: NAME[ib], value: ib, art: ib }],
-        hint: ['The heavier side goes down.'],
-        explain: [`The ${NAME[answer]} side is ${heavy ? 'down' : 'up'}.`, `The ${NAME[answer]} is ${heavy ? 'heavier' : 'lighter'}.`],
+        hint: ['The heavier side goes down.', 'Which pan is lower?'],
+        explain: [`The ${NAME[answer]} side is ${heavy ? 'down' : 'up'}.`, `So the ${NAME[answer]} is ${heavy ? 'heavier' : 'lighter'}.`],
       };
     }
     if (level === 2) {
@@ -387,8 +436,8 @@ export const compareY1 = {
           lines: ['Look at the tank.', 'Is it full, half full or empty?'],
           widget: 'measure', props: { tool: 'compare', kind: 'capacity', a: lvl, max: 10, readonly: true },
           input: 'choice', answer: word, options: ['full', 'half full', 'empty'],
-          hint: ['Full means right to the top.', 'Half full means up to the middle.'],
-          explain: [`The tank is ${word}.`],
+          hint: ['Full means right to the top.', 'Half full means up to the dashed half line.'], hintProps: { halfLine: true },
+          explain: [word === 'full' ? 'The water comes right to the top.' : word === 'empty' ? 'There is no water at all.' : 'The water comes up to the half line.', `So the tank is ${word}.`],
         };
       }
       let a, b;
@@ -399,11 +448,11 @@ export const compareY1 = {
         lines: [more ? 'Which tank has more water?' : 'Which tank has less water?'],
         widget: 'measure', props: { tool: 'compare', kind: 'capacity', a, b, max: 10, readonly: true },
         input: 'choice', answer, options: ['A', 'B'],
-        hint: ['The tanks are the same size.', 'Look at how high the water is.'],
-        explain: [`Tank ${answer} has ${more ? 'more' : 'less'} water.`],
+        hint: ['The tanks are the same size.', 'Follow the dashed lines. Which water is higher?'], hintProps: { guides: true },
+        explain: [`The water in tank ${a > b ? 'A' : 'B'} is higher.`, `So tank ${answer} has ${more ? 'more' : 'less'} water.`],
       };
     }
-    if (R.chance(0.5)) {
+    if (want === 'length' || (want !== 'mass' && R.chance(0.5))) {
       const obj = R.pick(['worm', 'pencil', 'crayon', 'spoon']);
       const n = R.int(3, 9);
       return {
@@ -429,7 +478,9 @@ export const compareY1 = {
 /* ---------- Estimating ---------- */
 const EST = {
   1: [['a door', 'tall', 2, 'm', 'cm'], ['a pencil', 'long', 15, 'cm', 'm'], ['a car', 'long', 4, 'm', 'cm'], ['a book', 'wide', 20, 'cm', 'm'], ['a classroom', 'long', 8, 'm', 'cm'], ['a crayon', 'long', 10, 'cm', 'm'], ['a bus', 'long', 10, 'm', 'cm'], ['a key', 'long', 5, 'cm', 'm']],
-  2: [['an apple', 'heavy', 200, 'g', 'kg'], ['a bath', 'full', 100, 'l', 'ml'], ['a teaspoon', 'full', 5, 'ml', 'l'], ['a bag of sugar', 'heavy', 1, 'kg', 'g'], ['a cup', 'full', 200, 'ml', 'l'], ['a big dog', 'heavy', 30, 'kg', 'g'], ['a bucket', 'full', 10, 'l', 'ml'], ['a biscuit', 'heavy', 10, 'g', 'kg']],
+  // Level 2 adds mass and capacity, plus harder lengths (used when a mission keeps to length).
+  2: [['a bed', 'long', 2, 'm', 'cm'], ['a school ruler', 'long', 30, 'cm', 'm'], ['a giraffe', 'tall', 5, 'm', 'cm'], ['a shoe', 'long', 20, 'cm', 'm'],
+    ['an apple', 'heavy', 200, 'g', 'kg'], ['a bath', 'full', 100, 'l', 'ml'], ['a teaspoon', 'full', 5, 'ml', 'l'], ['a bag of sugar', 'heavy', 1, 'kg', 'g'], ['a cup', 'full', 200, 'ml', 'l'], ['a big dog', 'heavy', 30, 'kg', 'g'], ['a bucket', 'full', 10, 'l', 'ml'], ['a biscuit', 'heavy', 10, 'g', 'kg']],
 };
 const EST3 = [
   ['How long is a pencil?', 'about 15 cm', ['about 15 m', 'about 2 cm']], ['How tall is a door?', 'about 2 m', ['about 20 m', 'about 20 cm']],
@@ -441,22 +492,28 @@ const Q = { tall: 'How tall is', long: 'How long is', wide: 'How wide is', heavy
 export const estimate = {
   about: 'Estimate: is it about 2 m or 2 cm?',
   levels: 3,
-  make(level, R) {
+  make(level, R, params = {}) {
     level = lv(level, 3);
+    // params.units (e.g. ['cm', 'm']) keeps to those units, so a length mission only estimates lengths.
+    const units = Array.isArray(params.units) && params.units.length ? params.units : null;
+    const keep = list => { const k = units ? list.filter(e => units.includes(e[3])) : list; return k.length ? k : list; };
     if (level === 3) {
-      const [q, a, others] = R.pick(EST3);
+      const pool = units ? EST3.filter(e => units.includes(e[1].split(' ').pop())) : EST3;
+      const [q, a, others] = R.pick(pool.length ? pool : EST3);
+      const u = a.split(' ').pop();
       return {
         lines: [q, 'Pick the best guess.'], input: 'choice', answer: a, options: R.shuffle([a, ...others]),
-        hint: ['Picture it in your hands.', 'Is it small or big?'], explain: [`It is ${a}.`],
+        hint: ['Picture it in your hands. Is it small or big?', PIC[u]], explain: [`It is ${a}.`, PIC[u]],
       };
     }
-    const [thing, adj, n, u, wrongU] = R.pick(EST[level]);
+    const pool = level === 1 ? EST[1] : units ? [...EST[1], ...EST[2]] : EST[2];
+    const [thing, adj, n, u, wrongU] = R.pick(keep(pool));
     const right = `about ${n} ${u}`, wrong = `about ${n} ${wrongU}`;
     const q = adj === 'full' ? `How much does ${thing} hold?` : `${Q[adj]} ${thing}?`;
     return {
       lines: [q], input: 'choice', answer: right, options: R.shuffle([right, wrong]),
-      hint: ['A centimetre is about as wide as your finger.', 'A metre is a big step.'].slice(0, level === 1 ? 2 : 1).concat(level === 2 ? ['A gram is very light. A litre is a big bottle.'] : []),
-      explain: [`${thing[0].toUpperCase() + thing.slice(1)} is ${right}.`],
+      hint: [`Picture ${thing}.`, PIC[u], PIC[wrongU]],
+      explain: [`${thing[0].toUpperCase() + thing.slice(1)} is ${right}.`, PIC[u]],
     };
   },
 };

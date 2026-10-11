@@ -17,6 +17,16 @@
     "When counting on, say the start number, then count the hops: 'six... seven, eight, nine'.",
     "Ask Finn to tell the story first, then write the number sentence."
   ],
+  "warmup": {
+    "gen": "addsub.factsWithin10",
+    "level": 1,
+    "items": 3,
+    "params": {
+      "op": "+"
+    },
+    "mission": "l4",
+    "say": "First, a quick warm-up: adding within 10."
+  },
   "steps": [
     {
       "type": "look",
@@ -27,13 +37,30 @@
       "question": "How many rockets now?",
       "widget": "objects",
       "props": {
-        "n": 7,
+        "n": 5,
         "icon": "rocket",
         "colours": [
           5,
-          2
+          0
         ],
         "arrange": "row"
+      },
+      "options": [
+        "6",
+        "7",
+        "8"
+      ],
+      "answer": 1,
+      "reveal": [
+        "5 rockets and 2 more make 7.",
+        "5 + 2 = 7."
+      ],
+      "revealProps": {
+        "n": 7,
+        "colours": [
+          5,
+          2
+        ]
       }
     },
     {
@@ -67,6 +94,9 @@
           "then": [
             "5 + 2 = {value}.",
             "We counted on from 5."
+          ],
+          "explain": [
+            "Hop, hop: 6, 7."
           ]
         },
         {
@@ -91,6 +121,13 @@
           },
           "then": [
             "8 + 3 = {value}."
+          ],
+          "hint": [
+            "Tap the Hop button 3 times.",
+            "Say the numbers as you hop."
+          ],
+          "explain": [
+            "Hop 3 times: 9, 10, 11."
           ]
         },
         {
@@ -109,6 +146,13 @@
           "then": [
             "9 − 4 = {value}.",
             "We counted back."
+          ],
+          "hint": [
+            "Tap the Hop button 4 times.",
+            "The rocket hops back to smaller numbers."
+          ],
+          "explain": [
+            "Hop back 4 times: 8, 7, 6, 5."
           ]
         }
       ]
@@ -123,37 +167,50 @@
       ],
       "answer": 2,
       "reveal": [
-        "They are both 9!",
+        "They are both 9, so the scales stay level!",
         "Adding or subtracting 0 changes nothing."
       ],
-      "art": "astronaut"
+      "widget": "balance",
+      "props": {
+        "left": "9 − 0",
+        "right": "9 + 0",
+        "hold": true
+      },
+      "revealProps": {
+        "hold": false
+      }
     },
     {
       "type": "try",
       "widget": "objects",
       "props": {
         "n": 6,
-        "icon": "astronaut",
+        "icon": "rocket",
         "arrange": "row"
       },
       "script": [
         {
           "say": [
-            "First there were 6 astronauts in the rover."
+            "First there were 6 rockets on the pad."
           ]
         },
         {
           "set": {
             "crossed": 2
           },
+          "caption": "6 − 2 = ?",
           "say": [
-            "Then 2 astronauts got out.",
-            "How many are in the rover now?"
+            "Then 2 rockets took off.",
+            "How many are on the pad now?"
           ],
           "input": "numpad",
           "answer": 4,
+          "hint": [
+            "The crossed-out rockets have gone.",
+            "Count the ones that are left."
+          ],
           "then": [
-            "Now there are 4 astronauts in the rover.",
+            "Now there are 4 rockets on the pad.",
             "We can write this as 6 minus 2 is equal to 4."
           ]
         },
@@ -161,15 +218,19 @@
           "set": {
             "n": 5,
             "crossed": 0,
-            "icon": "alien"
+            "icon": "asteroid"
           },
           "caption": "5 − 0 = ?",
           "say": [
-            "5 aliens.",
+            "5 moon rocks.",
             "Take away 0. How many now?"
           ],
           "input": "numpad",
           "answer": 5,
+          "hint": [
+            "Nothing is crossed out.",
+            "Count all the moon rocks."
+          ],
           "then": [
             "Subtracting 0 changes nothing.",
             "5 − 0 = 5."
@@ -181,10 +242,15 @@
           },
           "caption": "5 − 5 = ?",
           "say": [
-            "Now take away all 5."
+            "Now take away all 5.",
+            "How many are left?"
           ],
           "input": "numpad",
           "answer": 0,
+          "hint": [
+            "All 5 are crossed out.",
+            "Are any left?"
+          ],
           "then": [
             "5 − 5 = 0.",
             "None are left."

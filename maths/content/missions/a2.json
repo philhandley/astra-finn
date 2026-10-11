@@ -14,20 +14,43 @@
   "Commutative means any order: 3 × 5 = 5 × 3. Division is not like that.",
   "Turn a real egg box round to prove the total stays the same."
  ],
+ "warmup": {
+  "gen": "muldiv.arrays",
+  "level": 1,
+  "items": 3,
+  "mission": "a1",
+  "say": "First, a quick warm-up: count the rows of dots."
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
     "A crate of fuel cans.",
-    "3 rows of 5 cans."
+    "3 rows of 5 cans. That is 15 cans."
    ],
-   "question": "Is it still 15 if you turn the crate?",
-   "widget": "objects",
+   "question": "If we turn the crate, will there be more cans?",
+   "widget": "blaster",
    "props": {
-    "n": 15,
+    "size": 5,
+    "rows": 3,
+    "readonly": true,
+    "lockSize": true,
+    "bar": false,
     "icon": "fuel",
-    "arrange": "rows",
-    "perRow": 5
+    "highlightRows": true
+   },
+   "options": [
+    "More",
+    "The same",
+    "Fewer"
+   ],
+   "answer": 1,
+   "reveal": [
+    "The same! Still 15 cans.",
+    "Now it is 5 rows of 3."
+   ],
+   "revealProps": {
+    "flipped": true
    }
   },
   {
@@ -36,23 +59,26 @@
   },
   {
    "type": "guess",
-   "prompt": "Turn 3 rows of 5 a quarter turn. How many dots now?",
+   "prompt": "4 rows of 2. Flip it. How many rows now?",
    "options": [
-    "Fewer than 15",
-    "Still 15",
-    "More than 15"
+    "2 rows",
+    "4 rows",
+    "8 rows"
    ],
-   "answer": 1,
+   "answer": 0,
    "reveal": [
-    "Still 15!",
-    "Turning an array never changes the total."
+    "2 rows of 4 now.",
+    "Still 8 dots altogether!"
    ],
    "widget": "blaster",
    "props": {
-    "size": 5,
-    "rows": 3,
+    "size": 2,
+    "rows": 4,
     "readonly": true,
     "highlightRows": true
+   },
+   "revealProps": {
+    "flipped": true
    }
   },
   {
@@ -75,6 +101,13 @@
      },
      "then": [
       "{rows} rows of {size}. That is {total} dots."
+     ],
+     "hint": [
+      "Tap the dark grid 3 times.",
+      "Each tap adds a row of 5."
+     ],
+     "explain": [
+      "3 taps make 3 rows of 5."
      ]
     },
     {
@@ -90,6 +123,14 @@
      },
      "then": [
       "Now there are {rows} rows of {size}."
+     ],
+     "hint": [
+      "Find the blue Flip button.",
+      "It is at the top, on the right."
+     ],
+     "explain": [
+      "Flip turns the array a quarter turn.",
+      "The rows become the columns."
      ]
     },
     {
@@ -104,7 +145,24 @@
      "then": [
       "Still {total}!",
       "5 × 3 = 15 too."
-     ]
+     ],
+     "hint": [
+      "Count in 3s down the rows.",
+      "Or count every dot."
+     ],
+     "explain": [
+      "5 rows of 3: 3, 6, 9, 12, 15.",
+      "Still 15 dots."
+     ],
+     "hintProps": {
+      "rowLabels": [
+       "3",
+       "6",
+       "9",
+       "12",
+       "?"
+      ]
+     }
     },
     {
      "set": {
@@ -131,6 +189,14 @@
      },
      "then": [
       "6 × 2 = {total}."
+     ],
+     "hint": [
+      "Use the arrows to set the blaster to 2.",
+      "Then tap the grid 6 times."
+     ],
+     "explain": [
+      "Set the blaster to 2, then blast 6 times.",
+      "There are 6 rows of 2."
      ]
     },
     {
@@ -143,6 +209,12 @@
      "then": [
       "{rows} rows of {size}.",
       "2 × 6 = {total} too."
+     ],
+     "hint": [
+      "Tap the blue Flip button at the top."
+     ],
+     "explain": [
+      "Flip turns 6 rows of 2 into 2 rows of 6."
      ]
     }
    ]
@@ -168,6 +240,14 @@
      "then": [
       "Each robot gets {groupSize}.",
       "12 ÷ 3 = 4."
+     ],
+     "hint": [
+      "Tap Deal one each again and again.",
+      "Stop when the pile is empty."
+     ],
+     "explain": [
+      "Deal 1 each, then round again.",
+      "12 shared equally between 3 is 4 each."
      ]
     },
     {
@@ -185,6 +265,14 @@
      "then": [
       "There are not even enough for 1 each!",
       "Dividing does not work in any order."
+     ],
+     "hint": [
+      "12 robots, but only 3 crystals.",
+      "Can every robot get one?"
+     ],
+     "explain": [
+      "3 crystals can't go round 12 robots.",
+      "12 ÷ 3 is not the same as 3 ÷ 12."
      ]
     }
    ]

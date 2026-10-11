@@ -14,6 +14,13 @@
   "Thirds are hard to draw fairly. The hammer makes them exact.",
   "Counting in 3s helps: 1/3 of 12 is 4 because 4 × 3 = 12."
  ],
+ "warmup": {
+  "gen": "fractions.nameFraction",
+  "level": 1,
+  "items": 3,
+  "mission": "f2",
+  "say": "First, a quick warm-up: halves and quarters."
+ },
  "steps": [
   {
    "type": "look",
@@ -27,7 +34,22 @@
     "readonly": true,
     "shape": "rect",
     "parts": 3,
-    "labels": true
+    "colour": "blue",
+    "shaded": 3
+   },
+   "options": [
+    "A half",
+    "A third",
+    "A quarter"
+   ],
+   "answer": 1,
+   "reveal": [
+    "A third! There are 3 equal parts.",
+    "1 of 3 equal parts is 1/3."
+   ],
+   "revealProps": {
+    "labels": true,
+    "shaded": 1
    }
   },
   {
@@ -45,6 +67,7 @@
    "answer": 0,
    "reveal": [
     "1/2 is bigger.",
+    "Half the strip is more than a third.",
     "More parts means smaller parts."
    ],
    "widget": "fractions",
@@ -54,6 +77,10 @@
     "parts": 3,
     "shaded": 1,
     "labels": true
+   },
+   "revealProps": {
+    "parts": 2,
+    "shaded": 1
    }
   },
   {
@@ -80,6 +107,12 @@
      "then": [
       "3 equal parts.",
       "Each part is 1/3."
+     ],
+     "hint": [
+      "Tap the hammer with a 3 on it."
+     ],
+     "explain": [
+      "The 3 hammer cuts the circle into 3 equal parts."
      ]
     },
     {
@@ -90,6 +123,13 @@
       "shaded": 1
      },
      "then": [
+      "1 of 3 equal parts is 1/3."
+     ],
+     "hint": [
+      "Tap one of the 3 parts."
+     ],
+     "explain": [
+      "Tap one part.",
       "1 of 3 equal parts is 1/3."
      ]
     },
@@ -103,6 +143,13 @@
      "then": [
       "2 of 3 equal parts.",
       "Only 1/3 is left."
+     ],
+     "hint": [
+      "Tap one more white part."
+     ],
+     "explain": [
+      "Colour one more part.",
+      "2 of 3 equal parts is 2/3."
      ]
     },
     {
@@ -113,6 +160,13 @@
       "parts": 1
      },
      "then": [
+      "3 thirds make 1 whole."
+     ],
+     "hint": [
+      "Tap the Glue button."
+     ],
+     "explain": [
+      "Glue sticks the 3 thirds back together.",
       "3 thirds make 1 whole."
      ]
     }
@@ -128,7 +182,8 @@
     "tools": [
      "3"
     ],
-    "labels": true
+    "labels": true,
+    "icon": "asteroid"
    },
    "script": [
     {
@@ -142,6 +197,14 @@
      "then": [
       "4 in each group.",
       "1/3 of 12 is 4."
+     ],
+     "hint": [
+      "Tap the hammer with a 3 on it.",
+      "Count the moon rocks in each ring."
+     ],
+     "explain": [
+      "The 3 hammer makes 3 equal groups.",
+      "12 in 3 equal groups is 4 in each."
      ]
     },
     {
@@ -153,6 +216,13 @@
      },
      "then": [
       "1 group of 4 is coloured."
+     ],
+     "hint": [
+      "Tap one ring of moon rocks."
+     ],
+     "explain": [
+      "Colour one of the 3 rings.",
+      "1/3 of 12 is 4."
      ]
     }
    ]
@@ -179,6 +249,14 @@
      "then": [
       "3, 6, 9, 12.",
       "4 groups of 3 is 12."
+     ],
+     "hint": [
+      "Tap the dark grid 4 times.",
+      "Each tap adds a row of 3."
+     ],
+     "explain": [
+      "Blast 4 times.",
+      "3, 6, 9, 12: 4 groups of 3 is 12."
      ]
     },
     {
@@ -191,7 +269,24 @@
      "then": [
       "9 in 3 equal groups is 3 each.",
       "1/3 of 9 is 3."
-     ]
+     ],
+     "hint": [
+      "Tap the round reset button. Blast to 9 dots.",
+      "Each row is 1/3. Count one row."
+     ],
+     "explain": [
+      "9 in 3 equal rows is 3 in each row.",
+      "1/3 of 9 is 3."
+     ],
+     "hintProps": {
+      "size": 3,
+      "rows": 3,
+      "rowLabels": [
+       "3",
+       "6",
+       "9"
+      ]
+     }
     }
    ]
   },

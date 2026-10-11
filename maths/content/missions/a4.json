@@ -14,6 +14,19 @@
   "The 10 times table is place value: 7 × 10 is 7 tens.",
   "The 5s are the minutes on a clock: the 6 means 30 minutes."
  ],
+ "warmup": {
+  "gen": "muldiv.countInMultiples",
+  "level": 1,
+  "items": 3,
+  "params": {
+   "tables": [
+    10,
+    5
+   ]
+  },
+  "mission": "n2",
+  "say": "First, a quick warm-up: counting in 10s and 5s."
+ },
  "steps": [
   {
    "type": "look",
@@ -25,6 +38,7 @@
    "widget": "objects",
    "props": {
     "n": 40,
+    "icon": "crystal",
     "arrange": "groups",
     "groups": [
      10,
@@ -32,7 +46,30 @@
      10,
      10
     ],
-    "icon": "dot"
+    "groupLabels": [
+     "",
+     "",
+     "",
+     ""
+    ]
+   },
+   "options": [
+    "14",
+    "40",
+    "50"
+   ],
+   "answer": 1,
+   "reveal": [
+    "40 crystals. There are 4 groups of 10.",
+    "Count in 10s: 10, 20, 30, 40."
+   ],
+   "revealProps": {
+    "groupLabels": [
+     "10",
+     "20",
+     "30",
+     "40"
+    ]
    }
   },
   {
@@ -41,7 +78,7 @@
   },
   {
    "type": "guess",
-   "prompt": "Each hand has 5 fingers. How many fingers on 4 hands?",
+   "prompt": "How many fingers on 4 hands?",
    "options": [
     "About 10",
     "About 20",
@@ -49,9 +86,39 @@
    ],
    "answer": 1,
    "reveal": [
-    "20 fingers.",
-    "4 × 5 = 20."
-   ]
+    "20 fingers. 4 groups of 5.",
+    "5, 10, 15, 20. 4 × 5 = 20."
+   ],
+   "lines": [
+    "Hold up your hands. {engineer} too!",
+    "Each hand has 5 fingers."
+   ],
+   "widget": "objects",
+   "props": {
+    "n": 20,
+    "icon": "dot",
+    "arrange": "groups",
+    "groups": [
+     5,
+     5,
+     5,
+     5
+    ],
+    "groupLabels": [
+     "",
+     "",
+     "",
+     ""
+    ]
+   },
+   "revealProps": {
+    "groupLabels": [
+     "5",
+     "10",
+     "15",
+     "20"
+    ]
+   }
   },
   {
    "type": "try",
@@ -61,7 +128,8 @@
     "rows": 0,
     "lockSize": true,
     "highlightRows": true,
-    "maxRows": 10
+    "maxRows": 10,
+    "rowLabels": true
    },
    "script": [
     {
@@ -75,6 +143,13 @@
      "then": [
       "4 tens is {total}.",
       "4 × 10 = 40."
+     ],
+     "hint": [
+      "Tap the dark grid 4 times.",
+      "Each tap adds a row of 10."
+     ],
+     "explain": [
+      "4 packs of 10. Count in 10s: 10, 20, 30, 40."
      ]
     },
     {
@@ -87,6 +162,14 @@
      "then": [
       "7 × 10 = {total}.",
       "7 tens is 70."
+     ],
+     "hint": [
+      "Keep tapping the grid.",
+      "Stop when there are 7 rows."
+     ],
+     "explain": [
+      "7 rows of 10. Count in 10s to 70.",
+      "7 tens is 70."
      ]
     },
     {
@@ -98,6 +181,14 @@
      "answer": "9",
      "then": [
       "9 × 10 = 90."
+     ],
+     "hint": [
+      "Count in 10s: 10, 20, 30…",
+      "How many rows to reach 90?"
+     ],
+     "explain": [
+      "Count in 10s to 90: 10, 20, 30, 40, 50, 60, 70, 80, 90.",
+      "That is 9 tens."
      ]
     }
    ]
@@ -110,7 +201,8 @@
     "rows": 0,
     "lockSize": true,
     "highlightRows": true,
-    "maxRows": 10
+    "maxRows": 10,
+    "rowLabels": true
    },
    "script": [
     {
@@ -123,6 +215,13 @@
      },
      "then": [
       "Count in 5s: 5, 10, 15, 20."
+     ],
+     "hint": [
+      "Tap the dark grid 4 times.",
+      "Each tap adds a row of 5."
+     ],
+     "explain": [
+      "4 hands of 5. Count in 5s: 5, 10, 15, 20."
      ]
     },
     {
@@ -137,6 +236,14 @@
      "then": [
       "6 × 5 = {total}.",
       "On a clock, the 6 means 30 minutes."
+     ],
+     "hint": [
+      "Keep tapping the grid.",
+      "Stop when there are 6 rows."
+     ],
+     "explain": [
+      "6 rows of 5. Count in 5s to 30.",
+      "6 × 5 = 30."
      ]
     },
     {
@@ -147,6 +254,14 @@
      "input": "numpad",
      "answer": "40",
      "then": [
+      "8 × 5 = 40."
+     ],
+     "hint": [
+      "8 × 5 is 8 rows of 5.",
+      "Blast to 8 rows and read the last number."
+     ],
+     "explain": [
+      "8 rows of 5: 5, 10, 15, 20, 25, 30, 35, 40.",
       "8 × 5 = 40."
      ]
     }

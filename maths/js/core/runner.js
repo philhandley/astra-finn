@@ -132,6 +132,8 @@ function renderUnknown(el) {
 
 /* ---------------- Look ---------------- */
 async function renderLook(el, s, t) {
+  // A look with options is answered like a guess (tap, then Reveal).
+  if (Array.isArray(s.options) && s.options.length) return renderGuess(el, { ...s, prompt: s.question || s.prompt || '' }, t);
   const { tutor, con } = lessonLayout(el);
   cleanup.push(() => { tutor.destroy(); con.destroy(); });
   const scope = { ...crewScope(), ...(s.props || {}) };
@@ -141,7 +143,23 @@ async function renderLook(el, s, t) {
   else if (s.big) con.showBig(fill(s.big, scope));
   if (!alive(t)) return;
   await tutor.lines((s.lines || []).map(l => fill(l, scope)));
-  if (s.question && alive(t)) tutor.add([fill(s.question, scope)], { cls: 'q' });
+  if (!alive(t)) return;
+  if (s.question) tutor.add([fill(s.question, scope)], { cls: 'q' });
+  if (s.show) {
+    // A talk question with a "Show me" button that acts the answer out on the picture.
+    tutor.add([s.show.hint || `Talk about it, then tap ${s.show.label || 'Show me'}.`], { cls: 'soft', speak: false });
+    tutor.actions([tutor.button(s.show.label || 'Show me', async () => {
+      tutor.actions([]);
+      sfx('chime');
+      if (s.show.props && con.api) { try { con.api.update(s.show.props); } catch (e) { console.warn(e); } }
+      if (s.show.big) con.showBig(fill(s.show.big, scope));
+      if ('caption' in s.show) con.caption(fill(s.show.caption, scope), { glow: true });
+      await tutor.add([].concat(s.show.lines || []).map(l => fill(l, scope)), { cls: 'then' });
+      setReady(true);
+    }, { glow: true, iconName: 'sparkle' })]);
+    return;
+  }
+  if (s.question) tutor.add(['Talk about it together, then tap Next.'], { cls: 'soft', speak: false });
   setReady(true);
 }
 
@@ -157,9 +175,59 @@ function renderAsk(el, s, t) {
     const nextP = R.steps.findIndex((st, k) => k > R.idx && st.type === 'practise');
     if (nextP > 0) { toast("Let's see what you know!"); go(nextP); } else go(R.idx + 1);
   });
-  const no = con.button('Not yet', () => { if (alive(t)) go(R.idx + 1); }, 'ghost');
+  const no = con.button('Not yet', () => {
+    if (!alive(t)) return;
+    store.addLog(R.id, `${crew().commander} has not done "${R.mission.title}" at school yet.`);
+    if (R.mission.warmup && R.mission.warmup.gen) warmUp(tutor, con, R.mission.warmup, t);
+    else { toast("No problem. Let's learn it together."); go(R.idx + 1); }
+  }, 'ghost');
   void yes; void no;
   setReady(true);
+}
+
+// A gentle warm-up on the skill a mission builds on. If it wobbles, offer the earlier mission first.
+async function warmUp(tutor, con, w, t) {
+  let g;
+  try { g = await loadGen(w.gen); } catch (e) { console.warn(e); go(R.idx + 1); return; }
+  if (!alive(t)) return;
+  con.clearInputs();
+  await tutor.lines(["That's fine. We'll learn it together.", w.say || "First, a quick warm-up with something you know."], { cls: 'then' });
+  await sleep(1400);
+  if (!alive(t)) return;
+  const n = w.items || 3;
+  tutor.pips(n);
+  let first = 0;
+  const seen = new Set();
+  for (let i = 0; i < n; i++) {
+    if (!alive(t)) return;
+    tutor.pip(i, 'now');
+    const item = makeItem(g, Math.min(w.level || 1, g.levels || 1), w.params, seen);
+    if (!item) continue;
+    const res = await askItem({ tutor, con }, item, { t });
+    if (!alive(t)) return;
+    if (item.fact) recordFact(item.fact, res.firstTry);
+    if (res.firstTry) first++;
+    tutor.pip(i, res.firstTry ? 'ok' : 'help');
+  }
+  if (!alive(t)) return;
+  con.clearInputs();
+  con.clearWidget();
+  con.caption('');
+  const earlier = w.mission && R.env.missions[w.mission];
+  if (first >= n - 1 || !earlier || w.mission === R.id) {
+    con.showArt('star');
+    await tutor.lines(['Brilliant warm-up!', "You're ready. Let's learn the new bit."], { cls: 'good' });
+    if (alive(t)) tutor.actions([tutor.button("Let's go", () => go(R.idx + 1), { glow: true, iconName: 'next' })]);
+    return;
+  }
+  con.showArt('rocket');
+  store.addLog(R.id, `Warm-up wobbly (${first} of ${n}); suggested "${earlier.title}" first.`);
+  await tutor.lines(['This mission builds on ' + earlier.title + '.', 'Shall we do that one first?'], { cls: 'then' });
+  if (!alive(t)) return;
+  tutor.actions([
+    tutor.button('Do ' + earlier.title + ' first', () => { location.hash = `#/m/${w.mission}/1/0`; }, { glow: true, iconName: 'next' }),
+    tutor.button('Carry on here', () => go(R.idx + 1), { ghost: true }),
+  ]);
 }
 
 /* ---------------- Guess ---------------- */
@@ -172,7 +240,11 @@ async function renderGuess(el, s, t) {
   if (s.widget) await con.widget(s.widget, s.props || {}, { readonly: true });
   else if (s.art) con.showArt(s.art);
   if (!alive(t)) return;
-  tutor.lines([fill(s.prompt, scope)], { cls: 'q' });
+  if (s.lines && s.lines.length) {
+    tutor.lines(s.lines.map(l => fill(l, scope)), { speak: false });
+    tutor.add([fill(s.prompt, scope)], { cls: 'q', speak: false });
+    autoSay([...s.lines, s.prompt].map(l => fill(l, scope)).join(' '), tutor.spBtn);
+  } else tutor.lines([fill(s.prompt, scope)], { cls: 'q' });
   const opts = s.options || [];
   let cmd = null, eng = null, phase = 'cmd';
   const ch = con.choices(opts, (v, b) => {
@@ -228,15 +300,52 @@ async function renderTry(el, s, t) {
   state = con.state();
   const script = s.script || [];
   const waitTap = (label = 'Got it', glow = true) => new Promise(res => tutor.actions([tutor.button(label, () => { tutor.actions([]); res(); }, { glow, iconName: 'next' })]));
+  // Hint props change the picture for one sub-step only. `shown` tracks the props as set,
+  // so the hinted keys can be put back before the next sub-step (keys that are part of the goal are left alone).
+  let undoHint = null;
+  let shown = { ...props };
+  const hintUndo = (hp, goal) => Object.fromEntries(Object.keys(hp || {}).filter(k => !(goal && k in goal)).map(k => [k, shown[k]]));
   for (let j = 0; j < script.length; j++) {
     if (!alive(t)) return;
     const sub = script[j];
     con.clearInputs();
     tutor.actions([]);
-    if (sub.set && con.api) { try { con.api.update(sub.set); } catch (e) { console.warn(e); } state = con.state(); }
+    if (undoHint && con.api) { try { con.api.update(undoHint); } catch (e) { console.warn(e); } state = con.state(); }
+    undoHint = null;
+    if (sub.set && con.api) { try { con.api.update(sub.set); } catch (e) { console.warn(e); } state = con.state(); shown = { ...shown, ...sub.set }; }
     if ('caption' in sub) con.caption(fill(sub.caption, scope()), { glow: false });
     const lines = (sub.say || []).map(l => fill(l, scope()));
-    const help = sub.hint ? tutor.button('Help', () => tutor.add(sub.hint.map(l => fill(l, scope())), { cls: 'soft' }), { ghost: true, iconName: 'help' }) : null;
+    const helpLines = () => (sub.hint && sub.hint.length ? sub.hint.map(l => fill(l, scope())) : ['Here is what to do:', ...lines]);
+    // Help on a hands-on step: tap 1 = hint (and hintProps change the picture); tap 2 = "Show me" (explain, and the widget shows the answer).
+    let help = null;
+    if (sub.hint || sub.goal) {
+      let stage = 0;
+      help = tutor.button('Help', () => {
+        if (stage === 0) {
+          stage = 1;
+          tutor.add(helpLines(), { cls: 'then' });
+          if (sub.hintProps && con.api) { undoHint = hintUndo(sub.hintProps, sub.goal); try { con.api.update(sub.hintProps); } catch (e) { console.warn(e); } }
+          if (sub.goal && (sub.explain || (con.api && con.api.showAnswer))) help.innerHTML = `Show me ${icon('sparkle')}`;
+          else help.remove();
+        } else if (stage === 1) {
+          // "Show me": stop waiting for the goal, act it out on the widget, and let Finn read before moving on.
+          stage = 2;
+          help.remove();
+          const w = waiter;
+          if (w) { waiter = null; clearTimeout(w.timer); }
+          if (sub.explain) tutor.add(sub.explain.map(l => fill(l, scope())), { cls: 'then' });
+          if (sub.goal && con.api && con.api.showAnswer) { try { con.api.showAnswer(sub.goal); } catch (e) { console.warn(e); } }
+          state = con.state();
+          // Next: pick up the widget's final state (some act it out with an animation) before moving on.
+          if (w) tutor.actions([tutor.button('Next', () => {
+            tutor.actions([]);
+            state = con.state();
+            window.__astraShowMe = { goal: sub.goal, ok: !sub.goal || matches(sub.goal, state) }; // for automated tests
+            w.resolve(true);
+          }, { glow: true, iconName: 'next' })]);
+        }
+      }, { ghost: true, iconName: 'help' });
+    }
     let skipped = false;
     if (sub.goal) {
       tutor.lines(lines);
@@ -260,13 +369,13 @@ async function renderTry(el, s, t) {
       }
     } else if (sub.input) {
       tutor.lines(lines, { cls: 'q' });
-      const item = { lines: [], input: sub.input, answer: fillValue(sub.answer, scope()), options: sub.options, unit: sub.unit, prefix: sub.prefix, hint: sub.hint || ['Have another look.', 'Count carefully.'], explain: [] };
-      await askItem({ tutor, con }, item, { mount: false, sayLines: false, t });
+      const item = { lines: [], input: sub.input, answer: fillValue(sub.answer, scope()), options: sub.options, unit: sub.unit, prefix: sub.prefix, hint: sub.hint || ['Have another look.', 'Count carefully.'], hintProps: sub.hintProps, explain: (sub.explain || []).map(l => fill(l, scope())), widget: s.widget };
+      const res = await askItem({ tutor, con }, item, { mount: false, sayLines: false, t });
       if (!alive(t)) return;
+      if (res && res.hinted && sub.hintProps) undoHint = hintUndo(sub.hintProps);
     } else {
       tutor.lines(lines);
-      tutor.actions([help]);
-      await waitTap(j === script.length - 1 && !sub.then ? 'Got it' : 'Got it');
+      await new Promise(res => tutor.actions([...(help ? [help] : []), tutor.button('Got it', () => { tutor.actions([]); res(); }, { glow: true, iconName: 'next' })]));
       if (!alive(t)) return;
     }
     if (sub.then && sub.then.length && !skipped) {
@@ -293,6 +402,8 @@ export function askItem({ tutor, con }, item, { mount = true, sayLines = true, t
   const live = () => t === undefined || alive(t);
   return new Promise(async resolve => {
     let attempt = 0;
+    let helped = false;      // used the Help button or had a first "Not yet"
+    let hinted = false;      // the hint is showing
     let finished = false;
     let pad = null, ch = null, ord = null, goalTimer = null;
     const input = item.input || 'numpad';
@@ -314,12 +425,12 @@ export function askItem({ tutor, con }, item, { mount = true, sayLines = true, t
       else { con.caption(''); con.clearWidget(); }
     }
     if (!live()) return;
-    const finish = res => { if (goalTimer) clearTimeout(goalTimer); finished = true; resolve(res); };
     const answerText = () => {
       if (input === 'choice') { const o = (item.options || []).find(x => same(optVal(x), item.answer)); return String(optLabel(o) ?? item.answer); }
       if (input === 'order') return (item.answer || []).map(v => { const o = (item.options || []).find(x => same(optVal(x), v)); return optLabel(o) ?? v; }).join(', ');
       if (input === 'widget') return '';
-      return `${item.prefix || ''}${item.answer}${item.unit ? ' ' + item.unit : ''}`;
+      // "12p", "20°C", but "12 cm".
+      return `${item.prefix || ''}${item.answer}${item.unit ? (/^(p|°C?|%)$/.test(item.unit) ? '' : ' ') + item.unit : ''}`;
     };
     const showAnswered = () => {
       const capEl = con.capEl;
@@ -328,60 +439,82 @@ export function askItem({ tutor, con }, item, { mount = true, sayLines = true, t
         const b = con.wbox.querySelector('.bigcap');
         if (b.textContent.includes('?')) b.textContent = b.textContent.replace('?', answerText());
         else if (!/=/.test(b.textContent)) b.textContent = `${b.textContent} = ${answerText()}`;
-        b.style.color = 'var(--gold)';
+        b.style.color = 'var(--green)';
       } else con.glow(true);
     };
+    // Help, step 1: a hint, and the picture changes to help (more blocks, a number line, hands-on).
+    const showHint = async opener => {
+      hinted = true;
+      helped = true;
+      if (opener) tutor.lines([opener], { cls: 'notyet', speak: false });
+      else tutor.lines(['Here is a clue.'], { cls: 'then', speak: false });
+      const hint = (item.hint && item.hint.length ? item.hint : ['Have another look.']).map(l => fill(l, scope));
+      tutor.add(hint, { speak: false });
+      autoSay([opener || 'Here is a clue.', ...hint].join(' '), tutor.spBtn);
+      const unlock = item.hintProps && (item.hintProps.interactive === true || item.hintProps.readonly === false);
+      if (item.hintProps && item.widget && unlock && mount && input !== 'widget' && !(item.props && item.props.interactive === true)) {
+        // The hint makes a picture hands-on: remount it interactive with the hint props.
+        await con.widget(item.widget, { ...(item.props || {}), ...item.hintProps, readonly: false }, { readonly: false });
+      } else if (item.hintProps && con.api) { try { con.api.update(item.hintProps); } catch (e) { console.warn(e); } }
+      else if (item.hintWidget && !item.widget) {
+        if (item.caption) con.caption(item.caption);
+        await con.widget(item.hintWidget.widget, item.hintWidget.props || {}, { readonly: !(item.hintWidget.props && item.hintWidget.props.interactive) });
+      }
+      pad && pad.clear();
+      ord && setTimeout(() => ord.reset(), 400);
+      helpButton();
+    };
+    // Help, step 2 (or a second "Not yet"): Nova works it out and shows the answer; a smaller one follows.
+    const showExplain = opener => {
+      finished = true;
+      if (goalTimer) clearTimeout(goalTimer);
+      pad && pad.lock();
+      const first = opener || "Let's work it out together.";
+      tutor.lines([first], { cls: opener ? 'notyet' : 'then', speak: false });
+      const ex = (item.explain || []).map(l => fill(l, scope));
+      const at = answerText();
+      const lines = [...ex, ...(at && !ex.join(' ').includes(String(item.answer)) ? [`The answer is ${at}.`] : [])];
+      tutor.add(lines, { speak: false });
+      autoSay([first, ...lines].join(' '), tutor.spBtn);
+      if (pad && input === 'numpad') pad.set(item.answer);
+      if (ch) { const rb = ch.find(item.answer); rb && rb.classList.add('right'); }
+      if (input === 'widget' || input === 'none') con.clearInputs(); // the Check button has done its job
+      if (item.answerProps && con.api) { try { con.api.update(item.answerProps); } catch (e) { console.warn(e); } }
+      else if (con.api && con.api.showAnswer) { try { con.api.showAnswer(item.answer ?? item.goal); } catch (e) { console.warn(e); } }
+      showAnswered();
+      tutor.actions([tutor.button(item.reteach ? 'Now you try one' : 'Got it', () => { tutor.actions([]); resolve({ correct: false, firstTry: false, explained: true, hinted }); }, { glow: true, iconName: 'next' })]);
+    };
+    function helpButton() {
+      if (checkMode || finished) { tutor.actions([]); return; }
+      tutor.actions([hinted
+        ? tutor.button('Show me', () => { if (!finished) showExplain(); }, { ghost: true, iconName: 'sparkle' })
+        : tutor.button('Help', () => { if (!finished) showHint(); }, { ghost: true, iconName: 'help' })]);
+    }
     const judge = async (ok, btn) => {
       if (finished || !live()) return;
       if (ok) {
         finished = true;
         if (goalTimer) clearTimeout(goalTimer);
+        tutor.actions([]);
         pad && pad.lock();
         btn && btn.classList.add('right');
         sfx('chime');
         showAnswered();
         if (checkMode) { tutor.lines(['Thanks!'], { cls: 'good' }); await sleep(700); resolve({ correct: true, firstTry: true }); return; }
-        const p = tutor.lines([attempt === 0 ? praise() : 'There it is!'], { cls: 'good', append: false });
+        const first = attempt === 0 && !helped;
+        const p = tutor.lines([first ? praise() : 'There it is!'], { cls: 'good', append: false });
         await Promise.race([p, sleep(1600)]);
         await sleep(300);
-        resolve({ correct: true, firstTry: attempt === 0 });
+        resolve({ correct: true, firstTry: first, hinted });
         return;
       }
       attempt++;
       btn && btn.classList.add('tried');
       if (checkMode) { finished = true; pad && pad.lock(); tutor.lines(['Thanks!'], { cls: 'good' }); await sleep(700); resolve({ correct: false, firstTry: false }); return; }
       sfx('click');
-      if (attempt === 1) {
-        onFirstWrong && onFirstWrong();
-        tutor.lines(['Not yet.'], { cls: 'notyet', speak: false });
-        const hint = (item.hint && item.hint.length ? item.hint : ['Have another look.']).map(l => fill(l, scope));
-        tutor.add(hint, { speak: false });
-        autoSay(['Not yet.', ...hint].join(' '), tutor.spBtn);
-        const unlock = item.hintProps && (item.hintProps.interactive === true || item.hintProps.readonly === false);
-        if (item.hintProps && item.widget && unlock && mount && input !== 'widget' && !(item.props && item.props.interactive === true)) {
-          // The hint makes a picture hands-on: remount it interactive with the hint props.
-          await con.widget(item.widget, { ...(item.props || {}), ...item.hintProps, readonly: false }, { readonly: false });
-        } else if (item.hintProps && con.api) { try { con.api.update(item.hintProps); } catch (e) { console.warn(e); } }
-        else if (item.hintWidget && !item.widget) { await con.widget(item.hintWidget.widget, item.hintWidget.props || {}, { readonly: !(item.hintWidget.props && item.hintWidget.props.interactive) }); }
-        pad && pad.clear();
-        ord && setTimeout(() => ord.reset(), 400);
-        return;
-      }
-      // Second "Not yet": explain and show the answer.
-      finished = true;
-      if (goalTimer) clearTimeout(goalTimer);
-      pad && pad.lock();
-      tutor.lines(['Not yet.'], { cls: 'notyet', speak: false });
-      const ex = (item.explain || []).map(l => fill(l, scope));
-      const at = answerText();
-      const lines = [...ex, ...(at && !ex.join(' ').includes(String(item.answer)) ? [`The answer is ${at}.`] : [])];
-      tutor.add(lines, { speak: false });
-      autoSay(['Not yet.', ...lines].join(' '), tutor.spBtn);
-      if (pad && input === 'numpad') pad.set(item.answer);
-      if (ch) { const rb = ch.find(item.answer); rb && rb.classList.add('right'); }
-      if (con.api && con.api.showAnswer) { try { con.api.showAnswer(item.answer ?? item.goal); } catch (e) { console.warn(e); } }
-      showAnswered();
-      tutor.actions([tutor.button('Got it', () => { tutor.actions([]); resolve({ correct: false, firstTry: false, explained: true }); }, { glow: true, iconName: 'next' })]);
+      if (attempt === 1) onFirstWrong && onFirstWrong();
+      if (attempt === 1 && !hinted) { await showHint('Not yet.'); return; }
+      showExplain('Not yet.');
     };
     function onWidget(st) {
       if (finished || input !== 'widget' || !item.goal) return;
@@ -399,10 +532,10 @@ export function askItem({ tutor, con }, item, { mount = true, sayLines = true, t
       ord = con.order(item.options || [], arr => judge(arr.length === (item.answer || []).length && arr.every((x, i) => same(x, item.answer[i]))));
     } else if (input === 'widget') {
       con.button('Check', () => judge(matches(item.goal, con.state())), 'checkbtn');
-      if (matches(item.goal, con.state())) { /* already there: still ask them to press Check */ }
     } else {
       con.button('Next', () => judge(true));
     }
+    helpButton();
   });
 }
 
@@ -410,8 +543,9 @@ export function askItem({ tutor, con }, item, { mount = true, sayLines = true, t
 const genMods = {};
 export async function loadGen(spec) {
   const [strand, name] = String(spec).split('.');
-  if (!genMods[strand]) genMods[strand] = import(`../gen/${strand}.js`);
-  const mod = await genMods[strand];
+  if (!genMods[strand]) genMods[strand] = import(`../gen/${strand}.js`).catch(() => new Promise(r => setTimeout(r, 700)).then(() => import(`../gen/${strand}.js?retry=1`)));
+  let mod;
+  try { mod = await genMods[strand]; } catch (e) { delete genMods[strand]; throw e; }
   const g = mod[name];
   if (!g || typeof g.make !== 'function') throw new Error(`generator ${spec} not found`);
   return g;

@@ -15,21 +15,47 @@
     "Two ways to subtract across 10: through 10 (15 − 5 − 4) or from 10 (10 − 9, then add 5).",
     "Doubles of 6 to 9 should become instant: 6 + 6, 7 + 7, 8 + 8, 9 + 9."
   ],
+  "warmup": {
+    "gen": "addsub.bondsTo",
+    "level": 1,
+    "items": 3,
+    "params": {
+      "target": 10
+    },
+    "mission": "l4",
+    "say": "First, a quick warm-up: bonds to 10."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
-        "8 red and 5 yellow.",
-        "2 yellow counters filled the first frame."
+        "8 red counters.",
+        "Now we add 5 yellow ones."
       ],
-      "question": "How many altogether?",
+      "question": "How many will there be altogether?",
       "widget": "tensframe",
       "props": {
         "colours": [
           8,
-          5
+          0
         ],
         "frames": 2
+      },
+      "options": [
+        "12",
+        "13",
+        "14"
+      ],
+      "answer": 1,
+      "reveal": [
+        "2 yellow fill the frame to make 10.",
+        "10 and 3 more make 13."
+      ],
+      "revealProps": {
+        "colours": [
+          8,
+          5
+        ]
       }
     },
     {
@@ -63,6 +89,9 @@
           ],
           "then": [
             "8 + 2 = 10."
+          ],
+          "explain": [
+            "2 yellow counters fill the first frame."
           ]
         },
         {
@@ -77,6 +106,13 @@
           "then": [
             "10 + 3 = 13.",
             "So 8 + 5 = 13."
+          ],
+          "hint": [
+            "Keep the yellow brush.",
+            "Tap 3 empty spaces in the second frame."
+          ],
+          "explain": [
+            "3 more yellow go in the second frame."
           ]
         },
         {
@@ -99,6 +135,13 @@
           "then": [
             "7 + 3 = 10.",
             "3 more to go."
+          ],
+          "hint": [
+            "Tap the yellow brush.",
+            "Fill the first frame: 8, 9, 10."
+          ],
+          "explain": [
+            "3 yellow counters fill the first frame."
           ]
         },
         {
@@ -112,23 +155,36 @@
           "then": [
             "10 + 3 = 13.",
             "So 7 + 6 = 13."
+          ],
+          "hint": [
+            "You used 3 of the 6.",
+            "Add 3 more in the second frame."
+          ],
+          "explain": [
+            "The other 3 go in the second frame."
           ]
         },
         {
           "caption": "9 + 4 = ?",
           "say": [
-            "No counters this time.",
+            "Now picture it in your head.",
             "What is 9 + 4?"
           ],
           "input": "numpad",
           "answer": 13,
           "hint": [
-            "9 + 1 = 10.",
-            "Then 3 more."
+            "9 + 1 = 10. Then 3 more.",
+            "Build it in the frames if you like."
           ],
           "then": [
             "9 + 1 = 10. 10 + 3 = 13."
-          ]
+          ],
+          "set": {
+            "colours": [
+              0,
+              0
+            ]
+          }
         }
       ]
     },
@@ -145,7 +201,14 @@
         "Less than 10. It is 6.",
         "9 is nearly 10, so 15 − 9 is nearly 5."
       ],
-      "art": "comet"
+      "widget": "tensframe",
+      "props": {
+        "count": 15,
+        "frames": 2
+      },
+      "revealProps": {
+        "count": 6
+      }
     },
     {
       "type": "try",
@@ -170,6 +233,9 @@
           "then": [
             "15 − 5 = 10.",
             "We went through 10."
+          ],
+          "explain": [
+            "Tap the 5 counters in the second frame."
           ]
         },
         {
@@ -183,6 +249,12 @@
           "then": [
             "10 − 4 = 6.",
             "So 15 − 9 = 6."
+          ],
+          "hint": [
+            "Tap 4 counters in the first frame."
+          ],
+          "explain": [
+            "Tap 4 counters in the first frame."
           ]
         },
         {
@@ -199,6 +271,10 @@
           "then": [
             "Add the 5 ones that were left.",
             "15 − 9 = 6 again!"
+          ],
+          "hint": [
+            "1 is left from the 10.",
+            "Add the 5 in the second frame."
           ]
         }
       ]

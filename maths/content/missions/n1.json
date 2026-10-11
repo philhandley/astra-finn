@@ -4,21 +4,34 @@
   "title": "Tens and Ones",
   "tagline": "Build two-digit numbers from tens and ones",
   "covers": ["Y2-NPV-2", "2NPV–1"],
-  "patch": { "name": "Tens and Ones", "icon": "blocks" },
+  "patch": {"name": "Tens and Ones", "icon": "blocks"},
   "dadNotes": [
     "DfE sentence: 'This is the number 42. The 4 shows we have 4 groups of ten. The 2 shows we have 2 extra ones.'",
     "42 is 42 ones, or 4 tens and 2 ones. Swapping 10 ones for 1 ten changes the pieces, not the number.",
     "Ask: 'What is the 4 worth?' The answer is 40, not 4."
   ],
+  "warmup": {
+    "gen": "number.skipCount",
+    "level": 1,
+    "items": 3,
+    "params": {"steps": [10]},
+    "mission": "l3",
+    "say": "First, a quick warm-up: counting in 10s."
+  },
   "steps": [
     {
       "type": "look",
-      "lines": ["This is the number 42.", "The 4 shows we have 4 groups of ten.", "The 2 shows we have 2 extra ones."],
+      "lines": ["This is the number 42.", "Green rods are tens. Blue cubes are ones."],
+      "question": "How many tens in 42?",
+      "options": ["2", "4", "42"],
+      "answer": 1,
+      "reveal": ["The 4 shows we have 4 groups of ten.", "The 2 shows we have 2 extra ones."],
       "caption": "42",
       "widget": "placevalue",
-      "props": { "tens": 4, "ones": 2, "showDigits": true, "interactive": false }
+      "props": {"tens": 4, "ones": 2, "interactive": false},
+      "revealProps": {"showDigits": true, "showExpanded": true}
     },
-    { "type": "ask", "text": "Have you used tens and ones at school?" },
+    {"type": "ask", "text": "Have you used tens and ones at school?"},
     {
       "type": "guess",
       "prompt": "Each rod is 10 cubes. How many cubes in 6 rods?",
@@ -26,29 +39,80 @@
       "answer": 1,
       "reveal": ["60 cubes.", "6 tens is 60."],
       "widget": "placevalue",
-      "props": { "tens": 6, "ones": 0, "interactive": false },
-      "revealProps": { "showValue": true }
+      "props": {"tens": 6, "ones": 0, "interactive": false},
+      "revealProps": {"showValue": true}
     },
     {
       "type": "try",
       "widget": "placevalue",
-      "props": { "tens": 0, "ones": 0 },
+      "props": {"tens": 0, "ones": 0},
       "script": [
-        { "say": ["Let's build 34.", "Tap + under Tens 3 times."], "goal": { "tens": 3 }, "then": ["3 tens. That's 30."], "hint": ["The Tens are green.", "Use the + under them."] },
-        { "say": ["Now add 4 ones."], "goal": { "tens": 3, "ones": 4 }, "then": ["You put {tens} tens and {ones} ones.", "That's {value}."] },
-        { "say": ["Keep adding ones.", "Stop when you have 10 ones."], "goal": { "ones": 10 }, "then": ["10 ones! That's the same as 1 ten."], "hint": ["Count the cubes.", "Use − if you go past 10."] },
-        { "say": ["Tap the blue button.", "Swap 10 ones for 1 ten."], "goal": { "tens": 4, "ones": 0 }, "then": ["{tens} tens and {ones} ones.", "Still {value}!"] },
-        { "say": ["How many is that altogether?"], "input": "numpad", "answer": "{value}", "then": ["4 tens is 40."] }
+        {
+          "say": ["Let's build 34.", "Tap + under Tens 3 times."],
+          "goal": {"tens": 3},
+          "then": ["3 tens. That's 30."],
+          "hint": ["The tens are the green rods.", "Tap + under them. Watch the number go up."],
+          "caption": "34",
+          "hintProps": {"showDigits": true}
+        },
+        {
+          "say": ["Now add 4 ones."],
+          "goal": {"tens": 3, "ones": 4},
+          "then": ["You made {tens} tens and {ones} ones.", "That's {value}."],
+          "hint": ["The ones are the blue cubes.", "Tap + under Ones 4 times."],
+          "hintProps": {"showDigits": true}
+        },
+        {
+          "say": ["Keep adding ones.", "Stop when you have 10 ones."],
+          "goal": {"ones": 10},
+          "then": ["10 ones! That's the same as 1 ten."],
+          "hint": ["Count the cubes.", "Use − if you go past 10."],
+          "caption": ""
+        },
+        {
+          "say": ["Tap the blue button.", "Swap 10 ones for 1 ten."],
+          "goal": {"tens": 4, "ones": 0},
+          "then": ["{tens} tens and {ones} ones.", "Same number, fewer pieces!"],
+          "hint": ["The blue button is at the top.", "It swaps 10 cubes for 1 rod."],
+          "explain": ["10 ones make 1 ten.", "The blue button turns 10 cubes into 1 rod."]
+        },
+        {
+          "say": ["How many is that altogether?"],
+          "input": "numpad",
+          "answer": "{value}",
+          "then": ["4 tens is 40."],
+          "hint": ["Count the green rods in tens.", "10, 20, 30..."]
+        }
       ]
     },
     {
       "type": "try",
       "widget": "placevalue",
-      "props": { "tens": 0, "ones": 0, "showDigits": true },
+      "props": {"tens": 0, "ones": 0, "showDigits": true},
       "script": [
-        { "say": ["Make 57."], "caption": "57", "goal": { "value": 57, "tens": 5, "ones": 7 }, "then": ["The 5 shows 5 groups of ten.", "The 7 shows 7 extra ones."], "hint": ["57 has 5 tens.", "How many ones?"] },
-        { "say": ["What is the 5 worth?"], "input": "choice", "options": [5, 50, 57], "answer": 50, "then": ["5 tens is 50."] },
-        { "set": { "tens": 0, "ones": 42 }, "caption": "", "say": ["Here are 42 ones.", "Swap them into tens."], "goal": { "tens": 4, "ones": 2 }, "then": ["42 ones is 4 tens and 2 ones.", "Same number, fewer pieces!"], "hint": ["Tap the swap button.", "Keep going while you have 10 ones."] }
+        {
+          "say": ["Make 57."],
+          "caption": "57",
+          "goal": {"value": 57, "tens": 5, "ones": 7},
+          "then": ["The 5 shows 5 groups of ten.", "The 7 shows 7 extra ones."],
+          "hint": ["The 5 means 5 green rods.", "The 7 means 7 blue cubes."]
+        },
+        {
+          "say": ["What is the 5 worth?"],
+          "input": "choice",
+          "options": [5, 50, 57],
+          "answer": 50,
+          "then": ["5 tens is 50."],
+          "hint": ["The 5 is in the tens place.", "Count the green rods in tens."]
+        },
+        {
+          "set": {"tens": 0, "ones": 42},
+          "caption": "",
+          "say": ["Here are 42 ones.", "Swap them into tens."],
+          "goal": {"tens": 4, "ones": 2},
+          "then": ["42 ones is 4 tens and 2 ones.", "Same number, fewer pieces!"],
+          "hint": ["Tap the swap button.", "Keep going while you have 10 ones."]
+        }
       ]
     },
     {
@@ -72,10 +136,14 @@
       "title": "Would you rather?",
       "prompt": "Would you rather count 34 like this or like this?",
       "options": [
-        { "label": "34 ones", "widget": "placevalue", "props": { "tens": 0, "ones": 34, "interactive": false } },
-        { "label": "3 tens and 4 ones", "widget": "placevalue", "props": { "tens": 3, "ones": 4, "interactive": false } }
+        {"label": "34 ones", "widget": "placevalue", "props": {"tens": 0, "ones": 34, "interactive": false}},
+        {"label": "3 tens and 4 ones", "widget": "placevalue", "props": {"tens": 3, "ones": 4, "interactive": false}}
       ],
-      "reveal": ["Both are 34.", "Tens are quicker to count: 10, 20, 30, 31, 32, 33, 34.", "34 ones lets you see every single one."],
+      "reveal": [
+        "Both are 34.",
+        "Tens are quicker to count: 10, 20, 30, 31, 32, 33, 34.",
+        "34 ones lets you see every single one."
+      ],
       "followUp": "What would change your mind?"
     },
     {
@@ -85,9 +153,6 @@
       "steps": ["Make bundles of 10.", "Count the bundles: 10, 20, 30.", "Count the loose ones on."],
       "why": "A bundle of 10 is one ten. That is place value."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "Why is 42 the same as 4 tens and 2 ones?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "Why is 42 the same as 4 tens and 2 ones?"]}
   ]
 }

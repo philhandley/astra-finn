@@ -19,14 +19,45 @@
   {
    "type": "look",
    "lines": [
-    "Look at the yellow face of this cylinder.",
-    "It is flat."
+    "We paint the yellow face of this box.",
+    "Then we press it on paper."
    ],
-   "question": "What 2-D shape is it?",
+   "question": "What shape will it print?",
+   "options": [
+    {
+     "label": "Circle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "circle"
+     }
+    },
+    {
+     "label": "Triangle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "triangle"
+     }
+    },
+    {
+     "label": "Rectangle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "rectangle"
+     }
+    }
+   ],
+   "answer": 2,
+   "reveal": [
+    "A rectangle: 2 long sides, 2 short sides.",
+    "A face prints its own 2-D shape."
+   ],
    "widget": "shapes3d",
    "props": {
-    "shape": "cylinder",
-    "highlight": "top"
+    "shape": "cuboid",
+    "highlight": "side"
+   },
+   "revealProps": {
+    "print": true
    }
   },
   {
@@ -84,6 +115,10 @@
      "answer": "circle",
      "then": [
       "A circle! A cylinder has 2 circle faces."
+     ],
+     "hint": [
+      "Trace round the yellow face with your finger.",
+      "Is it round, or does it have corners?"
      ]
     },
     {
@@ -128,6 +163,10 @@
      "answer": "triangle",
      "then": [
       "A triangle on a pyramid."
+     ],
+     "hint": [
+      "Trace round the yellow face.",
+      "Count its sides."
      ]
     },
     {
@@ -173,6 +212,10 @@
      "then": [
       "The base is a square.",
       "So it is a square-based pyramid."
+     ],
+     "hint": [
+      "Spin it to see underneath.",
+      "Count the sides of the yellow face."
      ]
     },
     {
@@ -216,6 +259,10 @@
      "answer": "triangle",
      "then": [
       "Triangles on both ends."
+     ],
+     "hint": [
+      "Look at the yellow face on the end.",
+      "Count its sides."
      ]
     }
    ]
@@ -261,6 +308,10 @@
      "answer": "An orange",
      "then": [
       "An orange. It is round all over."
+     ],
+     "hint": [
+      "A sphere is round all over, like a ball.",
+      "Which one could roll any way?"
      ]
     },
     {
@@ -288,6 +339,10 @@
      "answer": "A dice",
      "then": [
       "A dice. Every face is a square."
+     ],
+     "hint": [
+      "A cube has 6 square faces.",
+      "Which one do you roll in a board game?"
      ]
     }
    ]
@@ -405,5 +460,12 @@
     "Which 3-D shapes have a circle on them?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "geometry.name3d",
+  "level": 1,
+  "items": 3,
+  "mission": "s2",
+  "say": "First, a quick warm-up: name some 3-D shapes."
+ }
 }

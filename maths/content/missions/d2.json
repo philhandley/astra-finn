@@ -23,6 +23,16 @@
     "Each rocket picture is 1 launch."
    ],
    "question": "Which day had the most launches?",
+   "options": [
+    "Mon",
+    "Tue",
+    "Thu"
+   ],
+   "answer": 1,
+   "reveal": [
+    "Tuesday: 5 rockets, so 5 launches.",
+    "The longest row has the most."
+   ],
    "widget": "charts",
    "props": {
     "kind": "pictogram",
@@ -51,6 +61,9 @@
       "value": 4
      }
     ]
+   },
+   "revealProps": {
+    "highlight": 1
    }
   },
   {
@@ -62,10 +75,10 @@
    "prompt": "Each rocket now stands for 2. How many launches on Wednesday?",
    "options": [
     "4",
-    "8",
-    "6"
+    "6",
+    "8"
    ],
-   "answer": 1,
+   "answer": 2,
    "reveal": [
     "8 launches.",
     "4 rockets, and each one stands for 2."
@@ -98,6 +111,9 @@
       "value": 2
      }
     ]
+   },
+   "revealProps": {
+    "highlight": 2
    }
   },
   {
@@ -162,6 +178,10 @@
      "answer": 20,
      "then": [
       "6 + 4 + 10 = 20."
+     ],
+     "hint": [
+      "Monday 6, Tuesday 4, Wednesday 10.",
+      "Add 6 and 4 first."
      ]
     },
     {
@@ -172,6 +192,10 @@
      "answer": 6,
      "then": [
       "10 take away 4 is 6."
+     ],
+     "hint": [
+      "Wednesday has 10. Tuesday has 4.",
+      "Count on from 4 to 10."
      ]
     },
     {
@@ -179,7 +203,7 @@
       "key": 10,
       "interactive": false,
       "given": null,
-      "title": "Launches this month",
+      "title": "Launches at the big space port",
       "cats": [
        {
         "label": "Mon",
@@ -206,6 +230,10 @@
      "answer": 30,
      "then": [
       "3 rockets of 10 is 30."
+     ],
+     "hint": [
+      "Look at the Monday row.",
+      "Count in 10s: each rocket is 10."
      ]
     },
     {
@@ -218,6 +246,10 @@
      "then": [
       "Half of 10 is 5.",
       "So Wednesday had 25."
+     ],
+     "hint": [
+      "A whole rocket is 10.",
+      "What is half of 10?"
      ]
     }
    ]
@@ -353,5 +385,12 @@
     "Why might one picture stand for 10?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "stats.readTally",
+  "level": 1,
+  "items": 3,
+  "mission": "d1",
+  "say": "First, a quick warm-up: read a tally chart."
+ }
 }

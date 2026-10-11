@@ -7,10 +7,13 @@
 //        fold (true: dashed vertical line through the middle and a Fold button; the left half folds over the right),
 //        folded (start folded), marks ('right': small squares on right-angle corners),
 //        showAll ('sides' | 'vertices': light and number them all, e.g. for a reveal),
-//        shapes (array of { shape | poly, rotate, scale, x, y, colour, label } to draw several shapes at once:
+//        showLeft ('sides' | 'vertices' | true for the tap mode: a hint; sides not tapped yet get a dotted blue line,
+//            vertices not tapped yet a blue ring, so Finn can see which ones still need counting),
+//        shapes (array of { shape | poly, rotate, scale, x, y, colour, label, dim, badge } to draw several shapes at once:
 //            without x/y they sit in a neat grid, each fitted to its cell; with x/y (viewBox units, 800 by 500) the shape's
 //            own origin goes at (x, y) and one unit is `unit` (default 60) times scale pixels, so pieces can be composed exactly;
-//            `poly` is an array of [x, y] points in those units),
+//            `poly` is an array of [x, y] points in those units; `dim: true` fades a shape; `badge` puts a blue numbered
+//            tag in its middle (both for reveals, e.g. "count the triangles"); `showAll` works on every shape in the group),
 //        readonly.
 // State: { sides, vertices, folded, symmetric, shape }  (sides/vertices = how many tapped so far;
 //         symmetric = the true vertical-symmetry property of the shape as rotated now)
@@ -270,6 +273,7 @@ export function mount(el, props = {}, ctx = {}) {
   const rot = () => +p.rotate || 0;
   const symmetric = () => isSymmetric(shapeName(), rot());
   const tapMode = () => (p.tap === 'sides' || p.tap === 'vertices' ? p.tap : null);
+  const multi = () => Array.isArray(p.shapes) && p.shapes.length > 0;
 
   function layoutSingle() {
     const r = rotated(shapeName(), rot());
@@ -351,6 +355,14 @@ export function mount(el, props = {}, ctx = {}) {
         const sd = L.sides[i];
         if (!sd) return;
         root.appendChild(S('path', { class: 'deco lit-side', 'data-i': i, d: linePath(sd), fill: 'none', stroke: PAL.blue, 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+      });
+      // Hint: dotted blue on the sides (or rings on the vertices) still to be tapped.
+      const left = p.showLeft === true ? tapMode() : p.showLeft === 'sides' || p.showLeft === 'vertices' ? p.showLeft : null;
+      if (left === 'sides') L.sides.forEach((sd, i) => {
+        if (!lit.includes(i)) root.appendChild(S('path', { class: 'deco', d: linePath(sd), fill: 'none', stroke: PAL.blue, 'stroke-width': 16, 'stroke-dasharray': '0.5 32', 'stroke-linecap': 'round' }));
+      });
+      if (left === 'vertices') L.verts.forEach((v, i) => {
+        if (!litV.includes(i)) root.appendChild(S('circle', { class: 'deco', cx: fmt(v[0]), cy: fmt(v[1]), r: 17, fill: COL.surface, stroke: PAL.blue, 'stroke-width': 5 }));
       });
       // Hit areas (generous).
       const mode = tapMode();
@@ -441,14 +453,17 @@ export function mount(el, props = {}, ctx = {}) {
     const rowsN = Math.ceil(n / cols);
     const cw = W / cols, ch = H / rowsN;
     const anyLabel = items.some(it => it && it.label);
+    const all = p.showAll === 'sides' || p.showAll === 'vertices' ? p.showAll : null;
+    const tags = []; // badges drawn last, on top of every shape
     items.forEach((it, i) => {
       if (!it) return;
       const r = it.poly ? null : rotated(it.shape, +it.rotate || 0);
-      let sides;
+      let sides, verts;
       if (it.poly && Array.isArray(it.poly) && it.poly.length >= 3) {
         const pts = rotPts(it.poly, +it.rotate || 0);
         sides = pts.map((q, j) => [q, pts[(j + 1) % pts.length]]);
-      } else sides = (r || rotated('square', 0)).sides;
+        verts = pts;
+      } else ({ sides, verts } = r || rotated('square', 0));
       let T;
       if (placed) {
         const u = (+p.unit || 60) * (it.scale ?? 1);
@@ -461,14 +476,30 @@ export function mount(el, props = {}, ctx = {}) {
         T = ([x, y]) => [cx + (x - b.cx) * k, cy + (y - b.cy) * k];
       }
       const ts = sides.map(sd => sd.map(T));
+      const tv = verts.map(T);
       const c = colourOf(it.colour, FRAC[i % FRAC.length]);
-      root.appendChild(S('path', { d: pathOf(ts), fill: c, ...OUTLINE }));
+      root.appendChild(S('path', { d: pathOf(ts), fill: c, ...OUTLINE, ...(it.dim ? { 'fill-opacity': 0.22, 'stroke-opacity': 0.3 } : {}) }));
+      const b1 = bbox(ts);
+      const mid = tv.length ? [tv.reduce((s, q) => s + q[0], 0) / tv.length, tv.reduce((s, q) => s + q[1], 0) / tv.length] : [b1.cx, b1.cy];
+      // showAll in a group: light and number every side (or vertex) of every shape, e.g. for a reveal.
+      if (all === 'sides' && !it.dim) {
+        ts.forEach((sd, k) => {
+          root.appendChild(S('path', { class: 'deco', d: linePath(sd), fill: 'none', stroke: PAL.blue, 'stroke-width': 10, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+          const closed = sd.length > 2 && Math.hypot(sd[0][0] - sd[sd.length - 1][0], sd[0][1] - sd[sd.length - 1][1]) < 1;
+          const m = sd.length === 2 ? [(sd[0][0] + sd[1][0]) / 2, (sd[0][1] + sd[1][1]) / 2] : sd[Math.round((sd.length - 1) * (closed ? 0.875 : 0.5))];
+          const [bx, by] = outward(m[0], m[1], mid[0], mid[1], 25);
+          tags.push([clamp(bx, 19, W - 19), clamp(by, 19, H - 19), k + 1, 18]);
+        });
+      } else if (all === 'vertices' && !it.dim) tv.forEach((v, k) => tags.push([v[0], v[1], k + 1, 16]));
+      // A numbered blue tag in the middle of one shape (e.g. to count the triangles in a picture).
+      if (it.badge !== undefined && it.badge !== null && it.badge !== '') tags.push([mid[0], mid[1], it.badge, 21]);
       if (it.label) {
         const b2 = bbox(ts);
         const ly = placed ? Math.min(H - 8, b2.y1 + 36) : Math.min(H - 10, (Math.floor(i / cols) + 1) * ch - 14);
         root.appendChild(S('text', { x: fmt(b2.cx), y: fmt(ly), 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 700, 'font-size': 30, fill: COL.ink }, [String(it.label)]));
       }
     });
+    tags.forEach(([x, y, n, r]) => root.appendChild(badge(x, y, n, r)));
   }
 
   function lightAll(kind) {
@@ -491,7 +522,7 @@ export function mount(el, props = {}, ctx = {}) {
       clearTimeout(safety); safety = 0;
       clearTimers();
       if (reset) { lit = []; litV = []; }
-      if (np.showAll) lightAll(np.showAll);
+      if (np.showAll && !multi()) lightAll(np.showAll);
       if ('folded' in np) { folded = !!np.folded; foldT = folded ? 1 : 0; }
       else if (reset || ('fold' in np && !np.fold)) { folded = false; foldT = 0; }
       draw();
@@ -519,7 +550,7 @@ export function mount(el, props = {}, ctx = {}) {
       el.replaceChildren();
     },
   };
-  if (p.showAll) lightAll(p.showAll);
+  if (p.showAll && !multi()) lightAll(p.showAll);
   draw();
   return api;
 }

@@ -183,12 +183,17 @@ export function mount(el, props = {}, ctx = {}) {
       draw();
     },
     showAnswer(answer) {
-      const list = numList(answer);
+      // A number, a list, or a goal object such as { selected: 23 } or { taps: [37, 38, 39] }.
+      const g = answer && typeof answer === 'object' && !Array.isArray(answer) ? answer : null;
+      const list = g ? numList(Array.isArray(g.taps) ? g.taps : g.selected ?? g.value) : numList(answer);
+      // A "?" cell that is the answer shows its number now.
+      if (Array.isArray(p.hide)) p = { ...p, hide: numList(p.hide).filter(nm => !list.includes(nm)) };
       list.forEach(nm => { if (!gold.has(nm)) { gold.add(nm); taps.push(nm); } });
       popN = list[0] ?? null;
       draw();
       // Make the answer cells glow briefly.
       list.forEach(nm => { const c = root.querySelector(`.hc[data-n="${nm}"]`); if (c) c.classList.add('glow'); });
+      ctx.onChange && ctx.onChange(api.getState());
     },
     destroy() {
       unbinds.splice(0).forEach(u => u());

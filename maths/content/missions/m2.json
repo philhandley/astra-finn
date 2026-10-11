@@ -16,14 +16,24 @@
     "On any scale, first work out what each small mark is worth, then read.",
     "On a balance, the heavier side always goes down."
   ],
+  "warmup": {
+    "gen": "measure.compareY1",
+    "level": 1,
+    "items": 3,
+    "params": {
+      "kind": "mass"
+    },
+    "mission": "l11",
+    "say": "First, a quick warm-up: heavier and lighter."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
         "These are kitchen scales.",
-        "The needle shows how heavy things are."
+        "The red needle shows how heavy things are."
       ],
-      "question": "Can you find 0 on the dial?",
+      "question": "How heavy is the moon rock?",
       "widget": "measure",
       "props": {
         "tool": "scales",
@@ -32,7 +42,20 @@
         "labels": 100,
         "marks": 100,
         "value": 300,
-        "object": "apple"
+        "object": "asteroid"
+      },
+      "options": [
+        "200 g",
+        "300 g",
+        "400 g"
+      ],
+      "answer": 1,
+      "reveal": [
+        "The red needle points to 300.",
+        "So the moon rock weighs 300 g."
+      ],
+      "revealProps": {
+        "readout": true
       }
     },
     {
@@ -76,10 +99,18 @@
             "value": 6
           },
           "hint": [
-            "Drag round the dial, or tap +."
+            "Drag the red needle round to 6.",
+            "Or tap + until it points to 6."
           ],
           "then": [
             "6 kg. kg means kilograms."
+          ],
+          "hintProps": {
+            "target": 6
+          },
+          "explain": [
+            "The needle points to 6.",
+            "The robot weighs 6 kg."
           ]
         },
         {
@@ -89,7 +120,8 @@
             "labels": 100,
             "marks": 100,
             "value": 0,
-            "object": "apple"
+            "object": "apple",
+            "target": null
           },
           "say": [
             "Light things are weighed in grams.",
@@ -100,28 +132,41 @@
           },
           "then": [
             "200 g. g means grams."
+          ],
+          "hint": [
+            "Drag the red needle round to 200.",
+            "Or tap + 2 times."
+          ],
+          "hintProps": {
+            "target": 200
+          },
+          "explain": [
+            "The needle points to 200.",
+            "That is 200 g."
           ]
         },
         {
           "set": {
             "marks": 50,
             "value": 350,
-            "object": "cookie",
-            "interactive": false
+            "object": "boot",
+            "interactive": false,
+            "target": null
           },
           "say": [
             "The small marks are halfway.",
-            "How heavy are the cookies?"
+            "How heavy is the boot?"
           ],
           "input": "numpad",
           "answer": 350,
           "unit": "g",
           "hint": [
-            "The needle is between 300 and 400."
+            "The needle is between 300 and 400.",
+            "It is on the small mark half way."
           ],
           "then": [
-            "Halfway from 300 to 400 is 350.",
-            "The cookies weigh 350 g."
+            "Half way from 300 to 400 is 350.",
+            "The boot weighs 350 g."
           ]
         },
         {
@@ -138,6 +183,17 @@
           },
           "then": [
             "750 g. Halfway between 700 and 800."
+          ],
+          "hint": [
+            "Find 700. The small mark after it is 750.",
+            "Drag the needle there, or tap +."
+          ],
+          "hintProps": {
+            "target": 700
+          },
+          "explain": [
+            "Find 700. Each small mark is 50 more.",
+            "700, then 750. That is 750 g."
           ]
         }
       ]
@@ -195,6 +251,17 @@
           "then": [
             "30, then 35.",
             "35 kg of moon rock!"
+          ],
+          "hint": [
+            "Find 30. Each small mark is 5 more.",
+            "The small mark after 30 is 35."
+          ],
+          "hintProps": {
+            "target": 30
+          },
+          "explain": [
+            "Find 30. Each small mark is 5 more.",
+            "30, then 35. That is 35 kg."
           ]
         }
       ]
@@ -203,10 +270,10 @@
       "type": "look",
       "lines": [
         "The moon rock side went down.",
-        "The moon rock is heavier than the apple."
+        "The moon rock is heavier than the fuel can."
       ],
-      "question": "How could we write that with a sign?",
-      "caption": "8 kg > 3 kg",
+      "question": "Which sign goes in the gap?",
+      "caption": "8 kg ? 3 kg",
       "widget": "measure",
       "props": {
         "tool": "compare",
@@ -215,8 +282,25 @@
         "b": 3,
         "icons": [
           "asteroid",
-          "apple"
+          "fuel"
+        ],
+        "tags": [
+          "8 kg",
+          "3 kg"
         ]
+      },
+      "options": [
+        ">",
+        "<",
+        "="
+      ],
+      "answer": 0,
+      "reveal": [
+        "8 kg > 3 kg.",
+        "The open side faces the heavier side."
+      ],
+      "revealProps": {
+        "sign": ">"
       }
     },
     {

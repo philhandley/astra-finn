@@ -20,9 +20,28 @@
    "type": "look",
    "lines": [
     "The landing lights flash in a pattern.",
-    "Rocket, star, rocket, star..."
+    "Say each picture out loud."
    ],
    "question": "What comes next?",
+   "options": [
+    {
+     "label": "Star",
+     "art": "star"
+    },
+    {
+     "label": "Rocket",
+     "art": "rocket"
+    },
+    {
+     "label": "Moon",
+     "art": "moon"
+    }
+   ],
+   "answer": 1,
+   "reveal": [
+    "A rocket! Rocket, star, then again.",
+    "The pattern repeats every 2."
+   ],
    "widget": "pattern",
    "props": {
     "items": [
@@ -46,6 +65,14 @@
      }
     ],
     "gap": "end"
+   },
+   "revealProps": {
+    "filled": [
+     {
+      "art": "rocket"
+     }
+    ],
+    "unit": 2
    }
   },
   {
@@ -56,9 +83,30 @@
    "type": "guess",
    "prompt": "What will the 8th shape be?",
    "options": [
-    "A circle",
-    "A triangle",
-    "A square"
+    {
+     "label": "Circle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "circle",
+      "colour": "yellow"
+     }
+    },
+    {
+     "label": "Triangle",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "triangle",
+      "colour": "blue"
+     }
+    },
+    {
+     "label": "Square",
+     "widget": "shapes2d",
+     "props": {
+      "shape": "square",
+      "colour": "green"
+     }
+    }
    ],
    "answer": 1,
    "reveal": [
@@ -91,17 +139,17 @@
      {
       "shape": "triangle",
       "colour": "blue"
-     }
-    ],
-    "gap": "end",
-    "slots": 2
-   },
-   "revealProps": {
-    "filled": [
+     },
      {
       "shape": "circle",
       "colour": "yellow"
-     },
+     }
+    ],
+    "gap": "end",
+    "slots": 1
+   },
+   "revealProps": {
+    "filled": [
      {
       "shape": "triangle",
       "colour": "blue"
@@ -165,6 +213,10 @@
      },
      "then": [
       "Yes! The pattern repeats every 2."
+     ],
+     "hint": [
+      "Say it out loud with {engineer}.",
+      "Yellow circle, blue square, yellow circle... what did you say next?"
      ]
     },
     {
@@ -300,6 +352,10 @@
      },
      "then": [
       "Each arrow makes a quarter turn clockwise."
+     ],
+     "hint": [
+      "Each arrow turns a quarter turn clockwise.",
+      "Turn the last arrow one more quarter turn."
      ]
     },
     {
@@ -356,6 +412,10 @@
      },
      "then": [
       "Triangle, circle, hexagon, again and again."
+     ],
+     "hint": [
+      "Say the pattern out loud from the start.",
+      "Triangle, circle, hexagon..."
      ]
     }
    ]
@@ -415,6 +475,10 @@
      },
      "then": [
       "Ask {engineer} what comes next!"
+     ],
+     "hint": [
+      "Pick 2 shapes. Tap them in turn, again and again.",
+      "Like star, circle, star, circle..."
      ]
     }
    ]
@@ -498,6 +562,10 @@
      },
      "then": [
       "Each one is a quarter turn anticlockwise."
+     ],
+     "hint": [
+      "Each arrow turns a quarter turn anticlockwise.",
+      "That is the opposite way to clock hands."
      ]
     }
    ]
@@ -670,5 +738,12 @@
     "How do you know what comes next in a pattern?"
    ]
   }
- ]
+ ],
+ "warmup": {
+  "gen": "geometry.patternNext",
+  "level": 1,
+  "items": 3,
+  "mission": "l9",
+  "say": "First, a quick warm-up: what comes next?"
+ }
 }

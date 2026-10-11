@@ -4,39 +4,106 @@
   "title": "Numbers in Words to 100",
   "tagline": "Read and write numbers to 100",
   "covers": ["Y2-NPV-5"],
-  "patch": { "name": "Number Words", "icon": "words" },
+  "patch": {"name": "Number Words", "icon": "words"},
   "dadNotes": [
     "Teen means 1 ten and some ones (fourteen is 14). 'Ty' means tens (forty is 40).",
     "A hyphen joins the tens and the ones: sixty-four is sixty and four.",
     "Spelling to watch: forty (no u), eight, eighteen, eighty."
   ],
+  "warmup": {
+    "gen": "number.numberWords",
+    "level": 1,
+    "items": 3,
+    "params": {"min": 11},
+    "mission": "l2",
+    "say": "First, a quick warm-up: number words to 20."
+  },
   "steps": [
     {
       "type": "look",
-      "lines": ["Sixty-four is 64.", "It is made of sixty and four.", "The little line is a hyphen."],
-      "caption": "64",
-      "big": "sixty-four"
+      "lines": ["This number is in words.", "The little line is a hyphen."],
+      "question": "Which number is sixty-four?",
+      "options": ["46", "64", "604"],
+      "answer": 1,
+      "reveal": ["Sixty is 6 tens. Four is 4 ones.", "Sixty and four make 64."],
+      "caption": "sixty-four",
+      "widget": "placevalue",
+      "props": {"tens": 6, "ones": 4, "interactive": false},
+      "revealProps": {"showDigits": true, "showExpanded": true, "showValue": true}
     },
-    { "type": "ask", "text": "Have you written numbers in words at school?" },
+    {"type": "ask", "text": "Have you written numbers in words at school?"},
     {
       "type": "guess",
       "prompt": "Which word has more letters: sixty or sixteen?",
       "options": ["sixty", "sixteen", "The same"],
       "answer": 1,
-      "reveal": ["Sixteen has 7 letters. Sixty has 5.", "But sixty is the bigger number!"],
-      "art": "rocket"
+      "reveal": [
+        "Sixteen has 7 letters. Sixty has 5.",
+        "But sixty is much further along the line.",
+        "Sixty is the bigger number!"
+      ],
+      "widget": "numberline",
+      "props": {
+        "min": 0,
+        "max": 70,
+        "step": 10,
+        "minor": 0,
+        "labels": "tens",
+        "marks": [{"at": 16, "label": "sixteen", "colour": "purple"}, {"at": 60, "label": "sixty", "colour": "orange"}]
+      }
     },
     {
       "type": "try",
       "widget": "placevalue",
-      "props": { "tens": 0, "ones": 0, "showDigits": true },
+      "props": {"tens": 0, "ones": 0, "showDigits": true},
       "script": [
-        { "caption": "sixty-four", "say": ["Build sixty-four.", "Sixty is how many tens?"], "goal": { "tens": 6 }, "then": ["Sixty is 6 tens."], "hint": ["Count in tens: ten, twenty, thirty..."] },
-        { "say": ["Now add four."], "goal": { "tens": 6, "ones": 4 }, "then": ["Sixty and four make sixty-four.", "We write {value}."] },
-        { "set": { "tens": 0, "ones": 0 }, "caption": "forty", "say": ["Build forty."], "goal": { "value": 40, "tens": 4, "ones": 0 }, "then": ["Forty is 4 tens.", "No extra ones."] },
-        { "set": { "tens": 0, "ones": 0 }, "caption": "fourteen", "say": ["Now build fourteen."], "goal": { "value": 14, "tens": 1, "ones": 4 }, "then": ["Fourteen is 1 ten and 4 ones.", "Forty and fourteen sound alike!"], "hint": ["Teen means 1 ten and some more."] },
-        { "set": { "tens": 0, "ones": 0 }, "caption": "seventy-three", "say": ["Build seventy-three."], "goal": { "value": 73, "tens": 7, "ones": 3 }, "then": ["Seventy-three is {value}."] },
-        { "caption": "", "say": ["Which words say 37?"], "input": "choice", "options": ["seventy-three", "thirty-seven", "seventeen"], "answer": "thirty-seven", "then": ["Thirty-seven: 3 tens and 7 ones."] }
+        {
+          "caption": "sixty-four",
+          "say": ["Build sixty-four.", "First make sixty with the tens."],
+          "goal": {"tens": 6},
+          "then": ["Sixty is 6 tens."],
+          "hint": ["Tap + under Tens and count:", "ten, twenty, thirty... sixty."]
+        },
+        {
+          "say": ["Now add four."],
+          "goal": {"tens": 6, "ones": 4},
+          "then": ["Sixty and four make sixty-four.", "We write {value}."],
+          "hint": ["Four is 4 ones.", "Tap + under Ones 4 times."]
+        },
+        {
+          "set": {"tens": 0, "ones": 0},
+          "caption": "forty",
+          "say": ["Build forty."],
+          "goal": {"value": 40, "tens": 4, "ones": 0},
+          "then": ["Forty is 4 tens.", "No extra ones."],
+          "hint": ["Forty sounds like four: 4 tens.", "Count: ten, twenty, thirty, forty."]
+        },
+        {
+          "set": {"tens": 0, "ones": 0},
+          "caption": "fourteen",
+          "say": ["Now build fourteen."],
+          "goal": {"value": 14, "tens": 1, "ones": 4},
+          "then": ["Fourteen is 1 ten and 4 ones.", "Forty and fourteen sound alike!"],
+          "hint": ["Teen means 1 ten and some more.", "1 ten, then 4 ones."]
+        },
+        {
+          "set": {"tens": 0, "ones": 0},
+          "caption": "seventy-three",
+          "say": ["Build seventy-three."],
+          "goal": {"value": 73, "tens": 7, "ones": 3},
+          "then": ["Seventy-three is {value}."],
+          "hint": ["Seventy is 7 tens.", "Three is 3 ones."]
+        },
+        {
+          "caption": "37",
+          "say": ["Which words say 37?"],
+          "input": "choice",
+          "options": ["seventy-three", "thirty-seven", "seventeen"],
+          "answer": "thirty-seven",
+          "then": ["Thirty-seven: 3 tens and 7 ones."],
+          "set": {"tens": 3, "ones": 7},
+          "hint": ["The blocks show 3 tens and 7 ones.", "3 tens is thirty."]
+        }
       ]
     },
     {
@@ -50,7 +117,7 @@
       "type": "practise",
       "tiers": [2, 3],
       "gen": "number.numberWords",
-      "params": { "dir": "toDigits" },
+      "params": {"dir": "toDigits"},
       "levels": [3, 3, 3],
       "items": [3, 3, 4],
       "intro": ["Type the words in digits."]
@@ -69,9 +136,6 @@
       "steps": ["Find a number written as a word.", "Write it in digits.", "Find the biggest one."],
       "why": "Reading number words in real life makes them stick."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "How are fourteen and forty different?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "How are fourteen and forty different?"]}
   ]
 }

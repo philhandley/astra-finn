@@ -4,22 +4,27 @@
   "title": "Numbers in Words",
   "tagline": "Read and write numbers to 20 in digits and words",
   "covers": ["Y1-NPV-4", "Y1-NPV-5", "1NPV–2"],
-  "patch": { "name": "Numbers in Words", "icon": "words" },
+  "patch": {"name": "Numbers in Words", "icon": "words"},
   "dadNotes": [
     "Teen numbers trip children up: fourteen is 14, forty is 40. Say 'teen means ten and some more'.",
     "Use the words more than, fewer than, equal to, most and least when you compare things at home.",
     "On a number line: 'b is 12 because it is 2 more than 10.'"
   ],
+  "warmup": {"gen": "number.countObjects", "level": 1, "items": 3, "mission": "l1", "say": "First, a quick warm-up: counting."},
   "steps": [
     {
       "type": "look",
-      "lines": ["Here are 14 counters.", "We write 14.", "We say fourteen."],
+      "lines": ["Here are 14 counters.", "We write 14. We say fourteen."],
       "question": "How many full frames?",
+      "options": ["1", "2", "4"],
+      "answer": 0,
+      "reveal": ["1 full frame. That's 10 red.", "10 and 4 yellow make fourteen."],
       "caption": "14",
       "widget": "tensframe",
-      "props": { "count": 14, "frames": 2, "interactive": false }
+      "props": {"count": 14, "frames": 2, "interactive": false},
+      "revealProps": {"colours": [10, 4]}
     },
-    { "type": "ask", "text": "Have you written numbers in words at school?" },
+    {"type": "ask", "text": "Have you written numbers in words at school?"},
     {
       "type": "guess",
       "prompt": "Red or yellow: which has more?",
@@ -27,28 +32,81 @@
       "answer": 1,
       "reveal": ["Yellow has 11. Red has 9.", "11 is more than 9.", "9 is fewer than 11."],
       "widget": "objects",
-      "props": { "n": 20, "icon": "dot", "arrange": "groups", "groups": [9, 11], "colours": [9, 11] }
+      "props": {"n": 20, "icon": "dot", "arrange": "groups", "groups": [9, 11], "colours": [9, 11]},
+      "revealProps": {"groupLabels": ["9", "11"]}
     },
     {
       "type": "try",
       "widget": "tensframe",
-      "props": { "count": 0, "frames": 2, "interactive": true },
+      "props": {"count": 0, "frames": 2, "interactive": true},
       "script": [
-        { "say": ["Make 13 on the tens frames.", "Tap a frame to add a counter."], "goal": { "count": 13 }, "then": ["13 is ten and 3 more."], "hint": ["Fill the first frame. That's 10.", "Then 3 more."] },
-        { "say": ["Which word says 13?"], "input": "choice", "options": ["thirty", "thirteen", "three"], "answer": "thirteen", "then": ["Thirteen. Teen means ten and some more."] },
-        { "say": ["Now make twenty."], "goal": { "count": 20 }, "then": ["Twenty is 2 full tens frames."] },
-        { "say": ["Take 1 away.", "Tap a counter."], "goal": { "count": 19 }, "then": ["19 is 1 less than 20.", "We say nineteen."] },
-        { "say": ["Which number is nineteen?"], "input": "choice", "options": [9, 19, 90], "answer": 19 }
+        {
+          "say": ["Make 13 on the tens frames.", "Tap a frame to add a counter."],
+          "goal": {"count": 13},
+          "then": ["13 is ten and 3 more."],
+          "hint": ["Fill the first frame. That's 10.", "Then 3 more."],
+          "caption": "13"
+        },
+        {
+          "say": ["Which word says 13?"],
+          "input": "choice",
+          "options": ["thirty", "thirteen", "three"],
+          "answer": "thirteen",
+          "then": ["Thirteen. Teen means ten and some more."],
+          "hint": ["13 is 1 full frame and 3 more.", "Teen means ten and some more."]
+        },
+        {
+          "say": ["Now make twenty."],
+          "goal": {"count": 20},
+          "then": ["Twenty is 2 full tens frames."],
+          "caption": "twenty",
+          "hint": ["Fill both frames.", "2 full frames make twenty."]
+        },
+        {
+          "say": ["Take 1 away.", "Tap a counter."],
+          "goal": {"count": 19},
+          "then": ["19 is 1 less than 20.", "We say nineteen."],
+          "caption": "",
+          "hint": ["Tap any counter to take it away."]
+        },
+        {
+          "say": ["Which number is nineteen?"],
+          "input": "choice",
+          "options": [9, 19, 90],
+          "answer": 19,
+          "caption": "nineteen",
+          "hint": ["Nineteen is a teen number.", "Teen means ten and some more."]
+        }
       ]
     },
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 0, "max": 20, "mode": "place", "labels": [0, 10, 20] },
+      "props": {"min": 0, "max": 20, "mode": "place", "labels": [0, 10, 20]},
       "script": [
-        { "say": ["Land the rocket on 12.", "Drag it, or tap the line."], "goal": { "value": 12 }, "then": ["12 is 2 more than 10."], "hint": ["Find 10 first.", "Then count on 2 marks."] },
-        { "set": { "value": null }, "say": ["Now land on 19."], "goal": { "value": 19 }, "then": ["19 is 1 less than 20."], "hint": ["Start at 20 and go back 1."] },
-        { "set": { "value": null }, "say": ["Now land on 5."], "goal": { "value": 5 }, "then": ["5 is halfway between 0 and 10."] }
+        {
+          "say": ["Land the rocket on 12.", "Drag it, or tap the line."],
+          "goal": {"value": 12},
+          "then": ["12 is 2 more than 10."],
+          "hint": ["Find 10, the green dot.", "Then count on 2 marks."],
+          "hintProps": {"marks": [{"at": 10, "colour": "green"}]}
+        },
+        {
+          "set": {"value": null, "marks": []},
+          "say": ["Now land on 19."],
+          "goal": {"value": 19},
+          "then": ["19 is 1 less than 20."],
+          "hint": ["Find 20, the green dot.", "Go back 1 mark."],
+          "hintProps": {"marks": [{"at": 20, "colour": "green"}]}
+        },
+        {
+          "set": {"value": null, "marks": []},
+          "say": ["Now land on 5."],
+          "goal": {"value": 5},
+          "then": ["5 is halfway between 0 and 10."],
+          "hint": ["Find 0 and 10, the green dots.", "5 is in the middle of them."],
+          "hintProps": {"marks": [{"at": 0, "colour": "green"}, {"at": 10, "colour": "green"}]}
+        }
       ]
     },
     {
@@ -72,12 +130,17 @@
       "title": "Which one doesn't belong?",
       "prompt": "Pick one. Then say why.",
       "options": [
-        { "label": "5", "widget": "tensframe", "props": { "count": 5, "frames": 1, "interactive": false } },
-        { "label": "9", "widget": "tensframe", "props": { "count": 9, "frames": 1, "interactive": false } },
-        { "label": "10", "widget": "tensframe", "props": { "count": 10, "frames": 1, "interactive": false } },
-        { "label": "15", "widget": "tensframe", "props": { "count": 15, "frames": 2, "interactive": false } }
+        {"label": "5", "widget": "tensframe", "props": {"count": 5, "frames": 1, "interactive": false}},
+        {"label": "9", "widget": "tensframe", "props": {"count": 9, "frames": 1, "interactive": false}},
+        {"label": "10", "widget": "tensframe", "props": {"count": 10, "frames": 1, "interactive": false}},
+        {"label": "15", "widget": "tensframe", "props": {"count": 15, "frames": 2, "interactive": false}}
       ],
-      "reveal": ["Every one can be the odd one out!", "9 is the only one you skip counting in 5s.", "10 is the only even number. 15 needs two frames.", "5 fills just one row."],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "9 is the only one not in the 5s.",
+        "10 is the only even number. 15 needs two frames.",
+        "5 fills just one row."
+      ],
       "followUp": "Can you find a reason for every single one?"
     },
     {
@@ -87,9 +150,6 @@
       "steps": ["Find 3 numbers around the house.", "Say each one in words.", "Which is the most? Which is the least?"],
       "why": "Numbers are everywhere. Reading them out loud builds the words."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "How do you write fourteen in digits?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "How do you write fourteen in digits?"]}
   ]
 }

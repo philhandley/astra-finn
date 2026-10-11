@@ -137,11 +137,14 @@ export function mount(el, props = {}, ctx = {}) {
     root.appendChild(S('circle', { cx: PX, cy: PY, r: 18, fill: PAL.yellow, stroke: COL.ink, 'stroke-width': 4 }));
     if (initialLevel && v.angle !== 0) {
       // Start level, then tip, so the eye sees the scales move.
+      // Keep this drawing's own beam and pans: a later redraw must not be tipped by this one's timer.
+      const b = beam, ps = pans;
       timer = setTimeout(() => {
         requestAnimationFrame(() => {
-          beam.style.transform = `rotate(${v.angle}deg)`;
-          pans[0].style.transform = panAt(-1, v.angle);
-          pans[1].style.transform = panAt(1, v.angle);
+          if (b !== beam) return;
+          b.style.transform = `rotate(${v.angle}deg)`;
+          ps[0].style.transform = panAt(-1, v.angle);
+          ps[1].style.transform = panAt(1, v.angle);
         });
       }, 250);
     }

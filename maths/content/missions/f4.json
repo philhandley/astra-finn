@@ -14,19 +14,43 @@
   "Finding 1/4 of 12 is the same as sharing 12 into 4 equal groups.",
   "Write it the school way: 1/2 of 6 = 3."
  ],
+ "warmup": {
+  "gen": "fractions.fractionOfSet",
+  "level": 1,
+  "items": 3,
+  "mission": "f1",
+  "say": "First, a quick warm-up: half of a set."
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
     "6 apples for the space station.",
-    "Half go to the kitchen."
+    "Half of them go to the kitchen."
    ],
-   "question": "How many apples is that?",
+   "question": "How many apples go to the kitchen?",
    "widget": "objects",
    "props": {
     "n": 6,
     "icon": "apple",
     "arrange": "row"
+   },
+   "options": [
+    "2",
+    "3",
+    "4"
+   ],
+   "answer": 1,
+   "reveal": [
+    "3 apples. Half of 6 is 3.",
+    "6 in 2 equal groups is 3 each."
+   ],
+   "revealProps": {
+    "arrange": "groups",
+    "groups": [
+     3,
+     3
+    ]
    }
   },
   {
@@ -35,7 +59,7 @@
   },
   {
    "type": "guess",
-   "prompt": "What is 1/4 of 12?",
+   "prompt": "12 stars. What is 1/4 of them?",
    "options": [
     "About 2",
     "About 3",
@@ -45,7 +69,23 @@
    "reveal": [
     "3.",
     "12 shared into 4 equal groups is 3 each."
-   ]
+   ],
+   "widget": "groups",
+   "props": {
+    "total": 12,
+    "mode": "share",
+    "bowls": 4,
+    "icon": "star",
+    "readonly": true
+   },
+   "revealProps": {
+    "filled": [
+     3,
+     3,
+     3,
+     3
+    ]
+   }
   },
   {
    "type": "try",
@@ -67,6 +107,14 @@
      "then": [
       "{groupSize} in each group.",
       "Half of 6 is {groupSize}."
+     ],
+     "hint": [
+      "Tap Deal one each.",
+      "Stop when the pile is empty."
+     ],
+     "explain": [
+      "Deal one each until the pile is empty.",
+      "6 shared into 2 equal groups is 3 each."
      ]
     },
     {
@@ -93,6 +141,14 @@
      "then": [
       "{groupSize} in each group.",
       "1/4 of 12 = 3."
+     ],
+     "hint": [
+      "Tap Deal one each until the pile is empty.",
+      "Count one group."
+     ],
+     "explain": [
+      "Deal one each into the 4 groups.",
+      "12 shared into 4 equal groups is 3 each."
      ]
     }
    ]
@@ -121,6 +177,13 @@
      },
      "then": [
       "1/4 of 8 is {groupSize}."
+     ],
+     "hint": [
+      "Tap Deal one each until the pile is empty."
+     ],
+     "explain": [
+      "Deal one each into the 4 groups.",
+      "8 shared into 4 equal groups is 2 each."
      ]
     },
     {
@@ -134,6 +197,14 @@
      "then": [
       "3 groups of 2 is 6.",
       "3/4 of 8 = 6."
+     ],
+     "hint": [
+      "1/4 is one group.",
+      "Count the cans in 3 groups."
+     ],
+     "explain": [
+      "Each group has 2.",
+      "3 groups of 2 is 6, so 3/4 of 8 = 6."
      ]
     }
    ]
@@ -172,7 +243,9 @@
       "readonly": true,
       "shape": "circle",
       "parts": 2,
-      "shaded": 1
+      "shaded": 1,
+      "colour": "orange",
+      "scale": 0.55
      }
     },
     {
@@ -182,7 +255,8 @@
       "readonly": true,
       "shape": "circle",
       "parts": 4,
-      "shaded": 1
+      "shaded": 1,
+      "colour": "orange"
      }
     }
    ],

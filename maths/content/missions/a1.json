@@ -16,19 +16,120 @@
   "Say 'groups of' before 'times'. Three groups of five is fifteen.",
   "Ask: what does the 3 stand for? What does the 5 stand for?"
  ],
+ "warmup": {
+  "gen": "muldiv.countInMultiples",
+  "level": 1,
+  "items": 3,
+  "params": {
+   "tables": [
+    2,
+    5,
+    10
+   ]
+  },
+  "mission": "l3",
+  "say": "First, a quick warm-up: counting in 2s, 5s and 10s."
+ },
  "steps": [
   {
    "type": "look",
+   "tiers": [
+    1
+   ],
    "lines": [
-    "Five astronauts in a row.",
+    "5 astronauts take off their moon boots.",
     "Every astronaut has 2 boots."
    ],
    "question": "How many boots?",
    "widget": "objects",
    "props": {
-    "n": 5,
-    "icon": "astronaut",
-    "arrange": "row"
+    "n": 10,
+    "icon": "boot",
+    "arrange": "groups",
+    "groups": [
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "mirror": "alternate",
+    "groupLabels": [
+     "",
+     "",
+     "",
+     "",
+     ""
+    ]
+   },
+   "options": [
+    "8",
+    "10",
+    "12"
+   ],
+   "answer": 1,
+   "reveal": [
+    "10 boots. There are 5 groups of 2.",
+    "Count in 2s: 2, 4, 6, 8, 10."
+   ],
+   "revealProps": {
+    "groupLabels": [
+     "2",
+     "4",
+     "6",
+     "8",
+     "10"
+    ]
+   }
+  },
+  {
+   "type": "look",
+   "tiers": [
+    2,
+    3
+   ],
+   "lines": [
+    "7 astronauts kick off their moon boots.",
+    "The boots land all over the floor!"
+   ],
+   "question": "How many boots?",
+   "widget": "objects",
+   "props": {
+    "n": 14,
+    "icon": "boot",
+    "arrange": "scatter",
+    "mirror": "alternate"
+   },
+   "options": [
+    "12",
+    "14",
+    "16"
+   ],
+   "answer": 1,
+   "reveal": [
+    "14 boots. Sort them into pairs: 7 groups of 2.",
+    "Count in 2s: 2, 4, 6, 8, 10, 12, 14."
+   ],
+   "revealProps": {
+    "arrange": "groups",
+    "groups": [
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ],
+    "groupLabels": [
+     "2",
+     "4",
+     "6",
+     "8",
+     "10",
+     "12",
+     "14"
+    ]
    }
   },
   {
@@ -46,13 +147,18 @@
    "answer": 1,
    "reveal": [
     "15.",
-    "3 rows of 5."
+    "3 rows of 5: 5, 10, 15."
    ],
    "widget": "blaster",
    "props": {
     "size": 5,
     "rows": 0,
     "readonly": true
+   },
+   "revealProps": {
+    "rows": 3,
+    "highlightRows": true,
+    "rowLabels": true
    }
   },
   {
@@ -74,6 +180,14 @@
      },
      "then": [
       "Pew! One blast made 1 dot."
+     ],
+     "hint": [
+      "Tap anywhere on the dark grid.",
+      "Each tap is one blast."
+     ],
+     "explain": [
+      "Tap the dark grid once.",
+      "The blaster fires a row of dots."
      ]
     },
     {
@@ -86,6 +200,14 @@
      },
      "then": [
       "Now each blast makes a row of 5."
+     ],
+     "hint": [
+      "Tap the right arrow at the top.",
+      "Stop when the blaster shows 5."
+     ],
+     "explain": [
+      "The right arrow makes each blast bigger.",
+      "1, 2, 3, 4, 5."
      ]
     },
     {
@@ -100,6 +222,14 @@
      },
      "then": [
       "{rows} rows of {size}."
+     ],
+     "hint": [
+      "Tap the grid once for each row.",
+      "Stop at 3 rows."
+     ],
+     "explain": [
+      "3 taps make 3 rows.",
+      "There are 3 groups of 5."
      ]
     },
     {
@@ -111,7 +241,21 @@
      "then": [
       "You made {total} dots by blasting {rows} times.",
       "Each blast made a new row of {size}."
-     ]
+     ],
+     "hint": [
+      "Count in 5s, one row at a time."
+     ],
+     "explain": [
+      "3 rows of 5. Count in 5s: 5, 10, 15.",
+      "There are 15 dots."
+     ],
+     "hintProps": {
+      "rowLabels": [
+       "5",
+       "10",
+       "?"
+      ]
+     }
     },
     {
      "set": {
@@ -126,9 +270,12 @@
     {
      "caption": "5 + 5 + 5 = 15",
      "say": [
-      "Add the rows.",
+      "Add the rows: 5, 10, 15.",
       "5 + 5 + 5 = 15."
-     ]
+     ],
+     "set": {
+      "rowLabels": true
+     }
     },
     {
      "set": {
@@ -165,6 +312,13 @@
      },
      "then": [
       "4 rows of 2 is {total}."
+     ],
+     "hint": [
+      "Tap the grid 4 times.",
+      "Each tap adds a row of 2."
+     ],
+     "explain": [
+      "4 taps make 4 rows of 2."
      ]
     },
     {
@@ -178,7 +332,18 @@
      "then": [
       "5 groups of 2 is 10.",
       "5 × 2 = 10."
-     ]
+     ],
+     "hint": [
+      "You have {total} dots now.",
+      "Blast more rows of 2 and count on in 2s."
+     ],
+     "explain": [
+      "Count in 2s: 2, 4, 6, 8, 10.",
+      "5 rows of 2 make 10."
+     ],
+     "hintProps": {
+      "rowLabels": true
+     }
     }
    ]
   },
@@ -207,6 +372,14 @@
      },
      "then": [
       "4 groups of 5 is {total}."
+     ],
+     "hint": [
+      "Tap the right arrow until the blaster shows 5.",
+      "Then tap the grid 4 times."
+     ],
+     "explain": [
+      "Set the blaster to 5, then blast 4 times.",
+      "There are 4 groups of 5."
      ]
     },
     {
@@ -219,6 +392,13 @@
      "answer": "4",
      "then": [
       "5 + 5 + 5 + 5 = 4 × 5."
+     ],
+     "hint": [
+      "Count the 5s in the sum."
+     ],
+     "explain": [
+      "5 + 5 + 5 + 5 is 4 fives.",
+      "So it is 4 × 5."
      ]
     },
     {
@@ -236,7 +416,18 @@
      "then": [
       "{rows} groups of 10 is 30.",
       "{rows} × 10 = 30."
-     ]
+     ],
+     "hint": [
+      "Each ring is 10.",
+      "Count in 10s as you blast: 10, 20, 30."
+     ],
+     "explain": [
+      "Count in 10s: 10, 20, 30.",
+      "3 groups of 10 make 30."
+     ],
+     "hintProps": {
+      "rowLabels": true
+     }
     }
    ]
   },

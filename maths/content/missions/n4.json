@@ -4,38 +4,108 @@
   "title": "Compare and Order",
   "tagline": "Greater than, less than and equal to",
   "covers": ["Y2-NPV-4", "Y1-NPV-4"],
-  "patch": { "name": "Compare and Order", "icon": "star" },
+  "patch": {"name": "Compare and Order", "icon": "star"},
   "dadNotes": [
     "Compare the tens first, then the ones. 61 > 59 because 6 tens is more than 5 tens.",
     "Read the signs aloud: '43 is greater than 34', '34 is less than 43', '30 + 4 is equal to 34'.",
     "The crocodile's mouth opens towards the bigger number."
   ],
+  "warmup": {
+    "gen": "number.order",
+    "level": 1,
+    "items": 3,
+    "mission": "l2",
+    "say": "First, a quick warm-up: put numbers to 20 in order."
+  },
   "steps": [
     {
       "type": "look",
-      "lines": ["This sign means greater than.", "The crocodile mouth eats the bigger number.", "43 is greater than 34."],
-      "big": "43 > 34"
+      "lines": ["This is the greater than sign.", "The crocodile's mouth eats the bigger number."],
+      "question": "Which number does the crocodile eat?",
+      "options": ["34", "43", "Both"],
+      "answer": 1,
+      "reveal": ["It eats 43. 43 is greater than 34.", "43 is further along the line."],
+      "caption": "43 > 34",
+      "widget": "numberline",
+      "props": {
+        "min": 30,
+        "max": 50,
+        "step": 10,
+        "minor": 1,
+        "labels": "tens",
+        "marks": [{"at": 34, "label": "34", "colour": "purple"}, {"at": 43, "label": "43", "colour": "orange"}]
+      },
+      "revealProps": {"hops": [{"from": 34, "to": 43, "label": "", "colour": "orange"}]}
     },
-    { "type": "ask", "text": "Have you used < and > at school?" },
+    {"type": "ask", "text": "Have you used < and > at school?"},
     {
       "type": "guess",
       "prompt": "Which is more: 5 tens or 48 ones?",
       "options": ["5 tens", "48 ones", "The same"],
       "answer": 0,
-      "reveal": ["5 tens is 50.", "50 is greater than 48."],
+      "reveal": ["5 tens is 50. 48 ones is 48.", "50 is greater than 48.", "So 5 tens is more."],
       "widget": "placevalue",
-      "props": { "tens": 5, "ones": 0, "interactive": false },
-      "revealProps": { "showValue": true }
+      "props": {"tens": 5, "ones": 48, "interactive": false},
+      "revealProps": {"showDigits": true}
     },
     {
       "type": "try",
       "widget": "numberline",
-      "props": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 43, "label": "43", "colour": "orange" }, { "at": 34, "label": "34", "colour": "purple" }] },
+      "props": {
+        "min": 0,
+        "max": 100,
+        "labels": "tens",
+        "marks": [{"at": 52, "label": "52", "colour": "orange"}, {"at": 25, "label": "25", "colour": "purple"}]
+      },
       "script": [
-        { "say": ["Look at 43 and 34.", "Which one is further along?"], "input": "choice", "options": [43, 34], "answer": 43, "then": ["43 is greater than 34.", "4 tens is more than 3 tens."] },
-        { "caption": "43 ? 34", "say": ["Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": ">", "then": ["43 > 34.", "The open mouth faces 43."] },
-        { "set": { "min": 60, "max": 70, "labels": "all", "marks": [{ "at": 67, "label": "67", "colour": "orange" }, { "at": 61, "label": "61", "colour": "purple" }] }, "caption": "61 ? 67", "say": ["Same tens!", "Look at the ones."], "input": "choice", "options": ["<", ">", "="], "answer": "<", "then": ["61 < 67.", "61 is less than 67."] },
-        { "set": { "min": 0, "max": 100, "labels": "tens", "marks": [{ "at": 34, "label": "34", "colour": "orange" }] }, "caption": "30 + 4 ? 34", "say": ["What is 30 + 4?", "Which sign goes in the gap?"], "input": "choice", "options": ["<", ">", "="], "answer": "=", "then": ["30 + 4 = 34.", "Both sides are equal."] }
+        {
+          "say": ["Look at 52 and 25.", "Which one is further along?"],
+          "input": "choice",
+          "options": [52, 25],
+          "answer": 52,
+          "hint": ["Further along means nearer to 100.", "Which dot is further right?"],
+          "then": ["52 is greater than 25.", "5 tens is more than 2 tens."]
+        },
+        {
+          "caption": "52 ? 25",
+          "say": ["Which sign goes in the gap?"],
+          "input": "choice",
+          "options": ["<", ">", "="],
+          "answer": ">",
+          "hint": ["52 is the bigger number.", "The open mouth faces the bigger number."],
+          "then": ["52 > 25.", "The open mouth faces 52."]
+        },
+        {
+          "set": {
+            "min": 60,
+            "max": 70,
+            "labels": "all",
+            "marks": [{"at": 67, "label": "67", "colour": "orange"}, {"at": 61, "label": "61", "colour": "purple"}]
+          },
+          "caption": "61 ? 67",
+          "say": ["Same tens!", "Look at the ones."],
+          "input": "choice",
+          "options": ["<", ">", "="],
+          "answer": "<",
+          "then": ["61 < 67.", "61 is less than 67."],
+          "hint": ["Both have 6 tens.", "Which has more ones: 61 or 67?"]
+        },
+        {
+          "set": {
+            "min": 30,
+            "max": 40,
+            "labels": "all",
+            "marks": [{"at": 34, "colour": "orange"}],
+            "hops": [{"from": 30, "to": 34, "label": "+4", "colour": "purple"}]
+          },
+          "caption": "30 + 4 ? 34",
+          "say": ["What is 30 + 4?", "Which sign goes in the gap?"],
+          "input": "choice",
+          "options": ["<", ">", "="],
+          "answer": "=",
+          "then": ["30 + 4 = 34.", "Both sides are equal."],
+          "hint": ["The purple hop starts at 30 and hops on 4.", "It lands on the orange dot. = means the same."]
+        }
       ]
     },
     {
@@ -57,20 +127,26 @@
       "format": "wodb",
       "title": "Which one doesn't belong?",
       "prompt": "Pick one. Then say why.",
-      "options": [{ "label": "34" }, { "label": "43" }, { "label": "30 + 4" }, { "label": "4 tens" }],
-      "reveal": ["Every one can be the odd one out!", "43 is the only one over 40. 4 tens has no ones.", "30 + 4 is the only sum.", "34 is the only plain number under 40."],
+      "options": [{"label": "34"}, {"label": "43"}, {"label": "30 + 4"}, {"label": "4 tens"}],
+      "reveal": [
+        "Every one can be the odd one out!",
+        "43 is the only one over 40. 4 tens has no ones.",
+        "30 + 4 is the only sum.",
+        "34 is the only plain number under 40."
+      ],
       "followUp": "Which two are equal?"
     },
     {
       "type": "athome",
       "title": "Card battle",
       "need": ["Playing cards 1 to 9, or number cards"],
-      "steps": ["Each turn over 2 cards. Make a 2-digit number.", "The greater number wins the cards.", "Say it: '63 is greater than 36'."],
+      "steps": [
+        "Each turn over 2 cards. Make a 2-digit number.",
+        "The greater number wins the cards.",
+        "Say it: '63 is greater than 36'."
+      ],
       "why": "Making and comparing numbers builds place value."
     },
-    {
-      "type": "finish",
-      "debrief": ["What was your favourite part?", "How do you know 61 is greater than 59?"]
-    }
+    {"type": "finish", "debrief": ["What was your favourite part?", "How do you know 61 is greater than 59?"]}
   ]
 }

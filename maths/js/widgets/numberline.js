@@ -6,7 +6,8 @@
 //   labels                     'all' (every step tick, default), 'ends', 'tens', 'fives', 'none',
 //                              or an array of numbers and/or { at, text } objects (e.g. [{ at: 0.5, text: '½' }]).
 //   hide                       numbers whose label shows as a blue "?" box.
-//   marks                      numbers (a plain dot) or { at, label, colour } (a dot with a label above it).
+//   marks                      numbers (a plain dot) or { at, label, colour, below } (a dot with a label above it,
+//                              or under the line with below: true, so close labels can take turns).
 //                              colour: a palette name (orange, purple, pink, teal, red, yellow, blue, green),
 //                              'tens' / 'ones', or any CSS colour. Default orange. Old names: gold = orange, cyan = blue.
 //   hops                       arcs drawn above the line: { from, to, label?, colour? }; label defaults to "+n" / "−n".
@@ -27,6 +28,8 @@
 // State: { value, hops, pos, placed }
 //   hop mode: value = pos = where the rocket is, hops = hops made, placed = hops > 0.
 //   place mode: value = pos = marker value (null while it is still in the dock), placed = true once moved.
+// Sizing: in a tall, narrow box (for example beside the number pad) the viewBox narrows to as little as 640 wide,
+// so labels and the rocket stay big enough to read; it redraws when the box changes size.
 // Debug: dev/harness.html?widget=numberline&props={"mode":"hop","hopSize":2}
 import { S, svgRoot, svgPoint, onTap, drag, injectCSS, clamp, reducedMotion } from '../core/dom.js';
 import { artInner } from '../core/art.js';
@@ -39,7 +42,7 @@ export const meta = {
   state: ['value', 'hops', 'pos', 'placed'],
 };
 
-const W = 1000, XL = 60, XR = 940;
+const WMAX = 1000, WMIN = 640, XL = 60;
 const EPS = 1e-6;
 
 const num = (v, d) => { const n = Number(v); return v !== null && v !== '' && Number.isFinite(n) ? n : d; };
@@ -116,6 +119,8 @@ export function mount(el, props = {}, ctx = {}) {
 
   let p = { ...props };
   let L = norm(p);
+  let W = WMAX, XR = WMAX - XL;  // viewBox width and right end of the line for this draw (see Sizing above)
+  let drawnWH = '';
   const root = svgRoot(W, 440, 'w-numberline');
   el.appendChild(root);
   const unbinds = [];
@@ -151,6 +156,12 @@ export function mount(el, props = {}, ctx = {}) {
 
   // Vertical layout depends on the mode.
   function geom() {
+    const g = geomBase();
+    // Mark labels under the line sit below the number labels, so make room for them.
+    if (Array.isArray(p.marks) && p.marks.some(m => m && typeof m === 'object' && m.below && m.label)) g.H += 50;
+    return g;
+  }
+  function geomBase() {
     const hasHops = (Array.isArray(p.hops) && p.hops.length) || L.mode === 'hop';
     if (L.mode === 'hop') return { H: 450, LY: 250 };
     if (L.mode === 'place') return { H: 380, LY: 250 };
@@ -198,7 +209,7 @@ export function mount(el, props = {}, ctx = {}) {
 
   function fontFor(list) {
     if (!list.length) return 40;
-    const xs = list.map(l => X(l.at)).sort((a, b) => a - b);
+    const xs = [...new Set(list.map(l => Math.round(X(l.at) * 100) / 100))].sort((a, b) => a - b);
     let gap = Infinity;
     for (let i = 1; i < xs.length; i++) gap = Math.min(gap, xs[i] - xs[i - 1]);
     const chars = Math.max(...list.map(l => [...l.text].length), 1);
@@ -210,7 +221,7 @@ export function mount(el, props = {}, ctx = {}) {
     const mx = (x1 + x2) / 2;
     return `M${x1} ${y} Q${mx} ${y - 2 * hgt} ${x2} ${y}`;
   }
-  const arcH = dx => clamp(Math.abs(dx) * 0.42, 34, 150);
+  const arcH = dx => clamp(Math.abs(dx) * 0.5, 50, 150);
 
   function arrowHead(x1, x2, y, hgt, colour) {
     // Tangent of the quadratic at the end point is (x2 - mx, y - (y - 2h)) direction = (x2 - mx, 2h).
@@ -259,7 +270,7 @@ export function mount(el, props = {}, ctx = {}) {
   function dropButtons() { if (btnCache) { btnCache.unb.forEach(u => u()); btnCache = null; } }
   function hopButtons(by) {
     const hs = L.hopSize;
-    const sig = `${Math.round(by)}|${hs}`;
+    const sig = `${Math.round(by)}|${hs}|${W}`;
     if (!btnCache || btnCache.sig !== sig) {
       dropButtons();
       const hop = button(W / 2 + 80, by, 260, 86, 'Hop', (hs > 0 ? '+' : '−') + fmtF(Math.abs(hs)), null, { primary: true });
@@ -284,6 +295,11 @@ export function mount(el, props = {}, ctx = {}) {
     root.classList.toggle('ro', ro());
     G = geom();
     const { H, LY } = G;
+    // Narrow the viewBox only for a box much taller than the picture's shape; wide boxes keep the full 1000.
+    const bw = el.clientWidth, bh = el.clientHeight;
+    drawnWH = `${Math.round(bw)}x${Math.round(bh)}`;
+    W = bw > 0 && bh > 0 && bw / bh < 1.25 ? clamp(Math.round((H * bw * 1.2) / bh), WMIN, WMAX) : WMAX;
+    XR = W - XL;
     root.setAttribute('viewBox', `0 0 ${W} ${H}`);
     const { min, max } = L;
 
@@ -314,12 +330,12 @@ export function mount(el, props = {}, ctx = {}) {
 
     // Labels and "?" boxes.
     const fs = fontFor([...labels, ...hide.map(at => ({ at, text: '??' }))]);
-    const here = L.mode === 'hop' ? pos : L.mode === 'place' && placeVal !== null ? placeVal : null;
+    const here = L.mode === 'hop' ? pos : L.mode === 'place' ? placeVal : num(p.value, null);
     const lg = S('g', { 'pointer-events': 'none' });
     const ly = LY + 30 + fs * 0.78;
     for (const l of labels) {
       if (hide.some(hv => near(hv, l.at))) continue;
-      const on = here !== null && near(here, l.at) && (L.mode === 'hop' || placed || L.mode === 'place');
+      const on = here !== null && near(here, l.at);
       const t = S('text', { x: X(l.at), y: ly, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': on ? 800 : 700, 'font-size': on ? fs * 1.12 : fs, fill: on ? COL.focus : COL.ink }, [l.text]);
       if (on) {
         // Where the rocket is: the label in blue on a soft blue chip.
@@ -383,7 +399,11 @@ export function mount(el, props = {}, ctx = {}) {
         const bw = 56, bh = 58;
         mg.appendChild(S('rect', { x: X(at) - bw / 2, y: LY - 34 - bh, width: bw, height: bh, rx: 12, fill: COL.focusSoft, stroke: COL.focus, 'stroke-width': 3.5 }));
         mg.appendChild(S('text', { x: X(at), y: LY - 34 - bh * 0.25, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 44, fill: COL.focus }, ['?']));
-      } else if (lab) mg.appendChild(S('text', { x: X(at), y: LY - 38, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 44, fill: dark }, [lab]));
+      } else if (lab) {
+        // A white halo keeps the label readable where a hop arc starts or ends under it.
+        const below = !!(m && typeof m === 'object' && m.below);
+        mg.appendChild(S('text', { x: X(at), y: below ? ly + 54 : LY - 38, 'text-anchor': 'middle', 'font-family': FONT.display, 'font-weight': 800, 'font-size': 44, fill: dark, stroke: COL.surface, 'stroke-width': 10, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }, [lab]));
+      }
     }
     root.appendChild(mg);
 
@@ -503,7 +523,8 @@ export function mount(el, props = {}, ctx = {}) {
       lastPop = to;
       draw();
       changed();
-      if (queued > 0) { queued--; later(doHop, 40); } else silent = false;
+      if (queued > 0) { queued--; later(doHop, 40); }
+      else if (silent) { silent = false; changed(); } // a replayed answer reports its final state once
     };
     if (reducedMotion() || !markerG) { finish(); return; }
     const x1 = X(from), x2 = X(to), LY = G.LY, hh = arcH(x2 - x1);
@@ -581,6 +602,16 @@ export function mount(el, props = {}, ctx = {}) {
     silent = false;
   }
 
+  // Redraw when the box changes shape (the number pad can appear beside it after mount), but never mid-drag or mid-hop.
+  let rq = 0, ro_ = null;
+  const recheck = () => {
+    if (`${Math.round(el.clientWidth)}x${Math.round(el.clientHeight)}` === drawnWH) return;
+    clearTimeout(rq);
+    rq = setTimeout(() => { if (dragging || anim) recheck(); else draw(); }, 60);
+  };
+  if (typeof ResizeObserver !== 'undefined') { ro_ = new ResizeObserver(recheck); ro_.observe(el); }
+  const t1 = setTimeout(recheck, 80), t2 = setTimeout(recheck, 500);
+
   const api = {
     getState: state,
     update(np = {}) {
@@ -606,14 +637,27 @@ export function mount(el, props = {}, ctx = {}) {
       }
       a = num(a, null);
       if (a === null) return;
+      // An answer that is not on this line (e.g. a money total) is left alone, not squeezed onto an end.
+      if (a < L.min - EPS || a > L.max + EPS) return;
       a = clamp(a, L.min, L.max);
+      // Show the answer: its number in a bubble over the marker, and a "?" at the answer turns into the number.
+      p = { ...p, showValue: true, hide: (Array.isArray(p.hide) ? p.hide : []).filter(v => !near(num(v, NaN), a)) };
       if (L.mode === 'place') {
         placeVal = clamp(snapV(a), L.min, L.max);
         placed = true;
         lastPop = placeVal;
         draw();
+        changed();
       } else if (L.mode === 'hop') {
-        // Replay hops from the start until the rocket reaches the answer (if it is on the hop path).
+        // If the rocket is already part-way there (Finn has hopped some of the way), carry on from where it is.
+        const onPath = near(pos, L.start + hopList.length * L.hopSize);
+        const more = Math.round((a - pos) / L.hopSize);
+        if (onPath && more >= 0 && near(pos + more * L.hopSize, a)) {
+          draw();
+          if (more > 0) { silent = true; queued = more - 1; doHop(); } else changed();
+          return;
+        }
+        // Otherwise replay hops from the start until the rocket reaches the answer (if it is on the hop path).
         pos = L.start; hopList = [];
         draw();
         const n = Math.round((a - L.start) / L.hopSize);
@@ -622,7 +666,7 @@ export function mount(el, props = {}, ctx = {}) {
           silent = true;
           queued = n - 1;
           doHop();
-        } else { pos = a; draw(); }
+        } else { pos = a; draw(); changed(); }
       } else {
         p = { ...p, value: a };
         draw();
@@ -631,6 +675,8 @@ export function mount(el, props = {}, ctx = {}) {
     destroy() {
       stopAnim();
       dropButtons();
+      clearTimeout(rq); clearTimeout(t1); clearTimeout(t2);
+      if (ro_) ro_.disconnect();
       timers.forEach(t => clearTimeout(t));
       timers.clear();
       unbinds.splice(0).forEach(u => u());

@@ -15,23 +15,46 @@
     "'How many more?' is a subtraction or a missing addend: 4 + ? = 7.",
     "Keep the units the same: cm with cm, pounds with pounds."
   ],
+  "warmup": {
+    "gen": "addsub.factsWithin20",
+    "level": 1,
+    "items": 3,
+    "params": {
+      "op": "-"
+    },
+    "mission": "l6",
+    "say": "First, a quick warm-up: subtracting within 20."
+  },
   "steps": [
     {
       "type": "look",
       "lines": [
-        "7 red rockets.",
-        "4 yellow rockets."
+        "8 red rockets.",
+        "6 yellow rockets."
       ],
       "question": "How many more red rockets?",
       "widget": "bar",
       "props": {
         "kind": "compare",
-        "a": 7,
-        "b": 4,
+        "a": 8,
+        "b": 6,
         "labelA": "Red",
         "labelB": "Yellow",
         "icons": "rocket",
         "unknown": "difference"
+      },
+      "options": [
+        "2",
+        "6",
+        "14"
+      ],
+      "answer": 0,
+      "reveal": [
+        "Count the empty boxes: 2.",
+        "The difference between 8 and 6 is 2."
+      ],
+      "revealProps": {
+        "unknown": null
       }
     },
     {
@@ -75,6 +98,9 @@
           "then": [
             "3 fewer. The difference is still 3.",
             "More and fewer are the same gap."
+          ],
+          "hint": [
+            "Count the empty boxes again."
           ]
         },
         {
@@ -83,7 +109,7 @@
             "b": 5,
             "labelA": "Crew A",
             "labelB": "Crew B",
-            "icons": null
+            "icons": "crystal"
           },
           "say": [
             "Crew A found 12 crystals.",
@@ -93,7 +119,7 @@
           "input": "numpad",
           "answer": 7,
           "hint": [
-            "5 + ? = 12",
+            "Count the empty boxes.",
             "Or work out 12 − 5."
           ],
           "then": [
@@ -106,7 +132,8 @@
             "a": 25,
             "b": 19,
             "labelA": "Cost",
-            "labelB": "You have"
+            "labelB": "You have",
+            "icons": null
           },
           "say": [
             "A rocket kit costs £25.",
@@ -117,7 +144,8 @@
           "answer": 6,
           "prefix": "£",
           "hint": [
-            "Count on from 19 to 25."
+            "Count on from 19 to 25.",
+            "19 + 1 = 20. Then 5 more."
           ],
           "then": [
             "19 + 6 = 25.",
@@ -139,7 +167,18 @@
         "26 cm taller.",
         "64 − 38 = 26."
       ],
-      "art": "rocket"
+      "widget": "bar",
+      "props": {
+        "kind": "compare",
+        "a": 64,
+        "b": 38,
+        "labelA": "Rocket A",
+        "labelB": "Rocket B",
+        "unknown": "difference"
+      },
+      "revealProps": {
+        "unknown": null
+      }
     },
     {
       "type": "try",
@@ -186,7 +225,7 @@
           "input": "numpad",
           "answer": 26,
           "hint": [
-            "2 + 20 + 4"
+            "Add up the hops: 2 + 20 + 4."
           ],
           "then": [
             "2 + 20 + 4 = 26.",

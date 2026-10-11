@@ -15,19 +15,42 @@
   "Sharing: we know how many groups. Grouping: we know how many in each group.",
   "School words: '15 divided into groups of 5 is equal to 3.'"
  ],
+ "warmup": {
+  "gen": "muldiv.equalGroups",
+  "level": 1,
+  "items": 3,
+  "mission": "a1",
+  "say": "First, a quick warm-up: equal groups."
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
-    "12 space biscuits for 3 robots.",
+    "12 space biscuits. A plate for each of 3 robots.",
     "Each robot wants a fair share."
    ],
    "question": "How could they share them?",
-   "widget": "objects",
+   "widget": "groups",
    "props": {
-    "n": 12,
+    "total": 12,
+    "mode": "share",
+    "bowls": 3,
     "icon": "cookie",
-    "arrange": "scatter"
+    "readonly": true
+   },
+   "show": {
+    "label": "Deal one each",
+    "props": {
+     "filled": [
+      1,
+      1,
+      1
+     ]
+    },
+    "lines": [
+     "One on each plate, then round again.",
+     "Keep going until none are left."
+    ]
    }
   },
   {
@@ -45,8 +68,23 @@
    "answer": 1,
    "reveal": [
     "4 each.",
-    "12 shared between 3 is 4."
-   ]
+    "12 shared equally between 3 is 4 each."
+   ],
+   "widget": "groups",
+   "props": {
+    "total": 12,
+    "mode": "share",
+    "bowls": 3,
+    "icon": "cookie",
+    "readonly": true
+   },
+   "revealProps": {
+    "filled": [
+     4,
+     4,
+     4
+    ]
+   }
   },
   {
    "type": "try",
@@ -72,6 +110,12 @@
      },
      "then": [
       "One each. Keep going!"
+     ],
+     "hint": [
+      "Tap the blue Deal one each button once."
+     ],
+     "explain": [
+      "One biscuit goes on each plate: 1, 1, 1."
      ]
     },
     {
@@ -84,6 +128,14 @@
      "then": [
       "Each robot gets {groupSize}.",
       "That is sharing."
+     ],
+     "hint": [
+      "Keep tapping Deal one each.",
+      "Stop when the pile is empty."
+     ],
+     "explain": [
+      "Deal one each again and again.",
+      "12 shared equally between 3 is 4 each."
      ]
     },
     {
@@ -116,6 +168,14 @@
      "then": [
       "You made {groups} bags of 4.",
       "That is grouping."
+     ],
+     "hint": [
+      "Tap Make a group of 4 again and again.",
+      "Stop when every biscuit is in a bag."
+     ],
+     "explain": [
+      "Each tap packs a bag of 4.",
+      "12 divided into groups of 4 is equal to 3."
      ]
     },
     {
@@ -138,6 +198,14 @@
      "input": "numpad",
      "answer": "3",
      "then": [
+      "15 divided into groups of 5 is equal to 3."
+     ],
+     "hint": [
+      "Tap Make a group of 5.",
+      "Count the bags you make."
+     ],
+     "explain": [
+      "Count in 5s: 5, 10, 15. That is 3 bags.",
       "15 divided into groups of 5 is equal to 3."
      ]
     }
@@ -164,6 +232,14 @@
      "then": [
       "Each gets {groupSize}.",
       "There is {left} left over."
+     ],
+     "hint": [
+      "Tap Deal one each.",
+      "Stop when there are not enough to go round."
+     ],
+     "explain": [
+      "Deal one each until you can't go round again.",
+      "3 each, and 1 left over."
      ]
     }
    ]

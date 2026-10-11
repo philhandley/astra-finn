@@ -5,6 +5,8 @@
 //   kind        'partwhole' (default) | 'compare'
 //   partwhole:  whole, parts (array of 2 or 3), labels (array of part labels), wholeLabel,
 //               unknown ('whole' | part index | null)
+//               colours (optional array of palette names, one per part, e.g. ['yellow', 'red'], so a part keeps
+//               its colour when the parts swap places; default red, yellow, green, orange in turn)
 //   compare:    a, b, labelA, labelB, unknown ('difference' | 'a' | 'b' | null), diffLabel (text for a known difference)
 //               Two left-aligned bars; a dashed box and a bracket mark the difference.
 //   generic:    top ([{ v, label }]), bottom ([{ v, label }]), unknown (a label whose bar shows "?")
@@ -120,7 +122,8 @@ export function mount(el, props = {}, ctx = {}) {
       row.forEach((o, i) => {
         const gl = i > 0 ? GAP : 0, gr = i < row.length - 1 ? GAP : 0;
         // The whole is blue; parts take red, yellow, green, orange in turn (a lone generic top bar is a whole too).
-        const colour = isTop && (!generic || row.length === 1) ? WHOLE_COL : SEG_COL[i % SEG_COL.length];
+        const named = !isTop && Array.isArray(p.colours) && Object.hasOwn(PAL, String(p.colours[i])) ? PAL[p.colours[i]] : null;
+        const colour = isTop && (!generic || row.length === 1) ? WHOLE_COL : named || SEG_COL[i % SEG_COL.length];
         seg(g, x + gl, y, ws[i] - gl - gr, bh, o.v, {
           colour, unknown: o.unknown, icons: hasIcons ? p.icons : null,
           numberAt: { x: x + ws[i] / 2, y: isTop ? y - 30 : y + bh + 30 },

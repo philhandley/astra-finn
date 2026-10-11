@@ -16,18 +16,42 @@
   "Even means every dot has a partner. Odd means one is left over.",
   "For big numbers only the last digit matters: 47 is odd because 7 is odd."
  ],
+ "warmup": {
+  "gen": "muldiv.countInMultiples",
+  "level": 1,
+  "items": 3,
+  "params": {
+   "tables": [
+    2
+   ]
+  },
+  "mission": "a3",
+  "say": "First, a quick warm-up: counting in 2s."
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
     "7 astronauts want a buddy each.",
-    "They pair up."
+    "Buddies go in pairs."
    ],
    "question": "Does everyone get a buddy?",
    "widget": "objects",
    "props": {
     "n": 7,
     "icon": "astronaut",
+    "arrange": "row"
+   },
+   "options": [
+    "Yes",
+    "No"
+   ],
+   "answer": 1,
+   "reveal": [
+    "No. 3 pairs, and 1 is left over.",
+    "7 is an odd number."
+   ],
+   "revealProps": {
     "arrange": "groups",
     "groups": [
      2,
@@ -51,12 +75,15 @@
    "answer": 0,
    "reveal": [
     "15 is odd.",
-    "One dot has no partner."
+    "7 pairs, and 1 dot has no partner."
    ],
    "widget": "objects",
    "props": {
     "n": 15,
     "icon": "dot",
+    "arrange": "scatter"
+   },
+   "revealProps": {
     "arrange": "groups",
     "groups": [
      2,
@@ -92,6 +119,14 @@
      "then": [
       "{total} dots in pairs.",
       "No dot is left over, so {total} is even."
+     ],
+     "hint": [
+      "Tap the dark grid 4 times.",
+      "Each tap adds a pair."
+     ],
+     "explain": [
+      "4 pairs make 8.",
+      "Every dot has a partner, so 8 is even."
      ]
     },
     {
@@ -103,6 +138,14 @@
      },
      "then": [
       "{total} is even too."
+     ],
+     "hint": [
+      "Tap the grid 3 more times.",
+      "Stop at 7 rows."
+     ],
+     "explain": [
+      "7 pairs make 14.",
+      "Every dot has a partner, so 14 is even."
      ]
     },
     {
@@ -119,12 +162,12 @@
     "total": 9,
     "mode": "group",
     "groupSize": 2,
-    "icon": "dot"
+    "icon": "astronaut"
    },
    "script": [
     {
      "say": [
-      "Pair up 9 dots.",
+      "9 astronauts need buddies.",
       "Tap Make a group of 2."
      ],
      "goal": {
@@ -133,6 +176,14 @@
      "then": [
       "{groups} pairs and {left} left over.",
       "9 is odd."
+     ],
+     "hint": [
+      "Keep tapping Make a group of 2.",
+      "Stop when no more pairs fit."
+     ],
+     "explain": [
+      "9 makes 4 pairs and 1 left over.",
+      "9 is odd."
      ]
     },
     {
@@ -140,13 +191,20 @@
       "total": 12
      },
      "say": [
-      "Now pair up 12 dots."
+      "Now 12 astronauts need buddies."
      ],
      "goal": {
       "done": true
      },
      "then": [
-      "{groups} pairs. Every dot has a partner.",
+      "{groups} pairs. Everyone has a buddy.",
+      "12 is even."
+     ],
+     "hint": [
+      "Tap Make a group of 2 again and again."
+     ],
+     "explain": [
+      "12 makes 6 pairs and none left over.",
       "12 is even."
      ]
     },
@@ -164,6 +222,14 @@
      "then": [
       "31 ends in 1.",
       "Numbers ending in 1, 3, 5, 7 or 9 are odd."
+     ],
+     "hint": [
+      "Look at the 1 in 31.",
+      "Is 1 odd or even?"
+     ],
+     "explain": [
+      "31 ends in 1.",
+      "1 is odd, so 31 is odd."
      ]
     }
    ]

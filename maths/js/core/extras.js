@@ -166,6 +166,8 @@ export function renderFacts(app, env) {
 
 /* ---------------- Arcade ---------------- */
 export const ARCADE = [
+  { id: 'crush', title: 'Crystal Crush', about: 'Join crystals that make the number. Add or take away.', art: 'crystal', after: null },
+  { id: 'drop', title: 'Bond Drop', about: 'Drop number blocks so touching pairs make the target.', art: 'star', after: null },
   { id: 'asteroids', title: 'Asteroid Sort', about: 'Blast the asteroids that fit the rule.', art: 'asteroid', after: 'l4' },
   { id: 'tiledock', title: 'Tile Dock', about: 'Make every row and column add up.', art: 'crystal', after: 'l7' },
   { id: 'landing', title: 'Rocket Landing', about: 'Land on the number line.', art: 'rocket', after: 'n3' },
@@ -231,10 +233,18 @@ export async function renderPlaygroundList(app) {
     let meta = null;
     try { meta = (await loadWidget(w)).meta; } catch (e) { continue; }
     if (!meta || !meta.playground) continue;
-    const sec = { tensframe: 'bonds', partwhole: 'bonds', bar: 'bonds', balance: 'bonds', blocks: 'number', numberline: 'number', hundred: 'number', placevalue: 'number', blaster: 'blaster', groups: 'blaster', fractions: 'fractions', clock: 'measure', coins: 'measure', measure: 'measure', shapes2d: 'shape', shapes3d: 'shape', rover: 'shape', pattern: 'shape', charts: 'data', objects: 'launchpad' }[w] || 'launchpad';
-    const el = h(`<div class="game"><div class="gcover">${cover(sec)}</div><div class="gbody"><h3>${esc(meta.title || w)}</h3><p>Free play</p></div></div>`);
-    el.addEventListener('click', () => { location.hash = `#/play/${w}`; });
+    // A live, read-only preview of the tool itself.
+    const el = h(`<div class="game"><div class="gprev ${meta.surface === 'dark' ? 'dark' : ''}"><div></div></div><div class="gbody"><h3>${esc(meta.title || w)}</h3><p>Free play</p></div></div>`);
     list.appendChild(el);
+    const PREVIEW = {
+      tensframe: { colours: [7, 3], frames: 1 }, partwhole: { whole: 7, parts: [4, 3], mode: 'display' }, blaster: { size: 3, rows: 3 },
+      fractions: { shape: 'circle', parts: 4, shaded: 3 }, coins: { purse: ['50p', '20p', '10p', '2p'], tray: [], showTotal: true },
+      groups: { total: 12, mode: 'share', bowls: 3, filled: [4, 4, 4] }, objects: { n: 10, icon: 'rocket', arrange: 'groups', groups: [5, 5] },
+      numberline: { min: 0, max: 20, hops: [{ from: 0, to: 5 }, { from: 5, to: 10 }] },
+      charts: { kind: 'block', max: 8, cats: [{ label: 'Red', value: 4 }, { label: 'Blue', value: 7 }, { label: 'Green', value: 3 }, { label: 'Yellow', value: 5 }] },
+    };
+    try { (await loadWidget(w)).mount(el.querySelector('.gprev > div'), { ...(meta.playground || {}), ...(PREVIEW[w] || {}), readonly: true }, { readonly: true, onChange() {} }); } catch (err) { console.warn(err); }
+    el.addEventListener('click', () => { location.hash = `#/play/${w}`; });
   }
 }
 

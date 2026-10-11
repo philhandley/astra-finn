@@ -3,12 +3,22 @@
 // Props: size (1-10, default 1), rows (start rows, default 0), maxRows (default 10), maxSize (default 10),
 //        lockSize (hide the arrows), highlightRows (yellow boxes round each row), groupsView (each blast is a circled group),
 //        caption (bubble above the array, e.g. "3 × 5 = 15"), flipButton (or flip: show a Flip button), flipped,
-//        bar (false hides the top bar, for small readonly pictures), interactive (default true), readonly.
+//        bar (false hides the top bar, for small readonly pictures), icon (an art name such as 'fuel': draw that
+//        picture instead of a blue dot), mirror ('alternate': every second picture in a row faces the other way, so a
+//        row of 2 boots is a left and a right boot), rowLabels (true: the running total at the end of each row, 5, 10, 15;
+//        or an array of strings, e.g. ["5", "10", "?"] for a hint; in groupsView the label sits under each ring),
+//        interactive (default true), readonly.
+// update({ flipped }) on its own (no size or rows) turns the array a quarter turn with the flip animation, even when
+// readonly, so a look step's "Turn the crate" button can act it out. With size or rows it only sets the flag.
 // State: { size, rows, total, flipped }
 // Debug: dev/harness.html?widget=blaster&props={"size":5,"rows":3,"highlightRows":true,"caption":"3 × 5 = 15"}
 //        dev/harness.html?widget=blaster&props={"size":4,"rows":3,"groupsView":true}
 //        dev/harness.html?widget=blaster&props={"size":5,"rows":3,"flipButton":true}
+//        dev/harness.html?widget=blaster&props={"size":5,"rows":3,"icon":"fuel","bar":false,"readonly":true}
+//        dev/harness.html?widget=blaster&props={"size":5,"rows":3,"highlightRows":true,"rowLabels":["5","10","?"]}
+//        dev/harness.html?widget=blaster&props={"size":2,"rows":4,"icon":"boot","mirror":"alternate","rowLabels":true}
 import { injectCSS, onTap, clamp, reducedMotion } from '../core/dom.js';
+import { artInner } from '../core/art.js';
 import { FONT, PAL, COL } from '../core/theme.js';
 import { sfx } from '../core/sfx.js';
 
@@ -91,6 +101,7 @@ export function mount(el, props = {}, ctx = {}) {
   let L = null;        // current layout targets
   let cur = null;      // smoothed { s }
   let bg = null, sprite = null, spriteR = 0;
+  let iconName = '', iconImg = null; // optional art drawn instead of the blue dot
   const unbinds = [];
 
   const wrap = document.createElement('div');
@@ -118,6 +129,8 @@ export function mount(el, props = {}, ctx = {}) {
   const barH = () => (showBar() ? (H < 380 ? 66 : 76) : 0);
   const motion = () => !reducedMotion();
   const state = () => ({ size, rows, total: size * rows, flipped });
+  const hasLabels = () => p.rowLabels === true || (Array.isArray(p.rowLabels) && p.rowLabels.length > 0);
+  const labelFor = r => (p.rowLabels === true ? String((r + 1) * size) : Array.isArray(p.rowLabels) && p.rowLabels[r] != null ? String(p.rowLabels[r]) : '');
   const changed = () => { ctx.onChange && ctx.onChange(state()); };
 
   // ---------- layout ----------
@@ -128,11 +141,12 @@ export function mount(el, props = {}, ctx = {}) {
     const availH = Math.max(60, H - top - capH - 16);
     const maxS = clamp(Math.min(W, H) * 0.16, 30, 78);
     const lay = { top, capH, cap: { x: W / 2, y: top + capH / 2 } };
+    const labelled = hasLabels();
     if (p.groupsView) {
       const gc = size <= 3 ? size : size === 4 ? 2 : size <= 6 ? 3 : size <= 8 ? 4 : 5;
       const gr = Math.ceil(size / gc);
       const slots = Math.max(rows, ro() ? rows : Math.min(Math.max(rows + 1, 3), maxRows()), 1);
-      const bw = gc + 0.9, bh = gr + 0.9, gap = 0.55;
+      const bw = gc + 0.9, bh = gr + 0.9 + (labelled ? 0.95 : 0), gap = 0.55;
       let best = null;
       for (let k = 1; k <= slots; k++) {
         const ln = Math.ceil(slots / k);
@@ -150,7 +164,7 @@ export function mount(el, props = {}, ctx = {}) {
       for (let k = 0; k < Math.max(rows, 0); k++) {
         const li = Math.floor(k / gpl), ci = k % gpl;
         const bx = gx0 + ci * (bw + gap) * s, by = gy0 + li * (bh + gap) * s;
-        lay.groups.push({ x: bx, y: by, w: bw * s, h: bh * s, cols, gr });
+        lay.groups.push({ x: bx, y: by, w: bw * s, h: (bh - (labelled ? 0.95 : 0)) * s, cols, gr });
       }
       lay.slot = (r, c) => {
         const gk = lay.groups[r] || { x: W / 2, y: gy0, w: bw * s, h: bh * s };
@@ -167,11 +181,12 @@ export function mount(el, props = {}, ctx = {}) {
       };
       return lay;
     }
-    const fitCols = Math.max(size, 3);
+    const extra = labelled ? 1.7 : 0;  // room for the running totals at the end of each row
+    const fitCols = Math.max(size, 3) + extra;
     const fitRows = Math.max(rows, ro() ? rows : Math.min(Math.max(rows + 1, 3), maxRows()), 1);
     const s = Math.min(availW / (fitCols + 0.4), availH / (fitRows + 0.25), maxS);
     lay.s = s;
-    const x0 = W / 2 - ((size - 1) * s) / 2;
+    const x0 = W / 2 - ((size - 1) * s) / 2 - (extra * s) / 2;
     const y0 = ro() ? top + capH + Math.max(0, (availH - rows * s) / 2) + s / 2 : top + capH + s * 0.6;
     lay.x0 = x0; lay.y0 = y0;
     lay.slot = (r, c) => ({ x: x0 + c * s, y: y0 + r * s });
@@ -251,6 +266,15 @@ export function mount(el, props = {}, ctx = {}) {
     sprite.width = sz; sprite.height = sz;
     const s = sprite.getContext('2d');
     const c = sz / 2;
+    if (iconImg) {
+      // A picture (fuel can, crystal...) on a faint halo so it still reads on the dark scene.
+      const halo = s.createRadialGradient(c, c, R * 0.6, c, c, R * 1.6);
+      halo.addColorStop(0, 'rgba(150, 200, 255, .22)'); halo.addColorStop(1, 'rgba(150, 200, 255, 0)');
+      s.fillStyle = halo; s.beginPath(); s.arc(c, c, R * 1.6, 0, Math.PI * 2); s.fill();
+      const d = R * 2.25;
+      s.drawImage(iconImg, c - d / 2, c - d / 2, d, d);
+      return;
+    }
     // A soft halo so the dots read on the dark scene, then a flat blue dot with a darker rim and a small shine.
     const glow = s.createRadialGradient(c, c, R * 0.85, c, c, R * 1.55);
     glow.addColorStop(0, 'rgba(90, 162, 255, .32)'); glow.addColorStop(1, 'rgba(90, 162, 255, 0)');
@@ -260,13 +284,57 @@ export function mount(el, props = {}, ctx = {}) {
     s.fillStyle = 'rgba(255, 255, 255, .3)'; s.beginPath(); s.ellipse(c - R * 0.32, c - R * 0.36, R * 0.3, R * 0.2, -0.6, 0, Math.PI * 2); s.fill();
   }
 
+  // The optional icon is an art SVG turned into an image; the sprite is rebuilt once it has loaded.
+  function loadIcon() {
+    const name = p.icon && p.icon !== 'dot' ? String(p.icon) : '';
+    if (name === iconName) return;
+    iconName = name; iconImg = null;
+    if (sprite) buildSprite();
+    if (!name) return;
+    const img = new Image();
+    img.onload = () => {
+      if (!alive || iconName !== name) return;
+      iconImg = img;
+      buildSprite();
+      if (W) { render(performance.now()); kick(); }
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="160" height="160">${artInner(name)}</svg>`);
+  }
+
   // ---------- drawing ----------
-  function drawDot(x, y, rad, alpha = 1) {
+  function drawDot(x, y, rad, alpha = 1, mirror = false) {
     if (rad <= 0.3) return;
     const d = (rad / spriteR) * (sprite.width / dpr);
     if (alpha < 1) g.globalAlpha = alpha;
-    g.drawImage(sprite, x - d / 2, y - d / 2, d, d);
+    if (mirror) { g.save(); g.translate(x, y); g.scale(-1, 1); g.drawImage(sprite, -d / 2, -d / 2, d, d); g.restore(); }
+    else g.drawImage(sprite, x - d / 2, y - d / 2, d, d);
     if (alpha < 1) g.globalAlpha = 1;
+  }
+
+  // Running totals (or hint labels such as "?") at the end of each row, or under each ring in groupsView.
+  function drawRowLabels(now, s) {
+    const fs = clamp(Math.round(s * 0.6), 22, 40);
+    g.font = `800 ${fs}px ${FONT.display}`;
+    g.textBaseline = 'middle';
+    for (let r = 0; r < rows; r++) {
+      const txt = labelFor(r);
+      if (!txt) continue;
+      const a = clamp((now - rowBorn(r) - 200) / 250, 0, 1);
+      if (a <= 0) continue;
+      g.globalAlpha = a;
+      g.fillStyle = txt === '?' ? '#ffffff' : YEL;
+      if (p.groupsView && L.groups && L.groups[r]) {
+        const gb = L.groups[r];
+        g.textAlign = 'center';
+        g.fillText(txt, gb.x + gb.w / 2, gb.y + gb.h + s * 0.5);
+      } else {
+        const q = L.slot(r, size - 1);
+        g.textAlign = 'left';
+        g.fillText(txt, q.x + s * 0.72, q.y + 1);
+      }
+      g.globalAlpha = 1;
+    }
+    g.textAlign = 'left';
   }
 
   function roundRect(x, y, w, h, r) {
@@ -364,13 +432,14 @@ export function mount(el, props = {}, ctx = {}) {
       if (now < d.born) continue;
       const fl = clamp((now - d.born) / 220, 0, 1);
       const sc = d.pop ? 0.3 + 0.7 * ease(fl * 1.4) : 0.35 + 0.65 * ease(fl);
-      drawDot(d.x, d.y, rad * sc);
+      drawDot(d.x, d.y, rad * sc, 1, !!iconImg && p.mirror === 'alternate' && d.c % 2 === 1);
       if (d.arrived && now - d.arrived < 300) {
         const t = (now - d.arrived) / 300;
         g.strokeStyle = `rgba(160, 210, 255, ${0.7 * (1 - t)})`; g.lineWidth = 2;
         g.beginPath(); g.arc(d.x, d.y, rad * (1 + t * 0.9), 0, Math.PI * 2); g.stroke();
       }
     }
+    if (!flipping && rows > 0 && hasLabels()) drawRowLabels(now, s);
     g.restore();
     // Beams.
     for (const bm of beams) {
@@ -543,7 +612,7 @@ export function mount(el, props = {}, ctx = {}) {
     changed();
   }
 
-  function doFlip() {
+  function doFlip(quiet = false) {
     if (rows <= 0 || flip) { if (!flip) { wob = performance.now(); kick(); } return; }
     const R = rows, C = size;
     const from = { s: cur.s, cx: 0, cy: 0 };
@@ -561,7 +630,7 @@ export function mount(el, props = {}, ctx = {}) {
     sfx('whoosh');
     syncBar();
     kick();
-    changed();
+    if (!quiet) changed();
   }
 
   // ---------- bar ----------
@@ -636,6 +705,7 @@ export function mount(el, props = {}, ctx = {}) {
 
   function applyProps(np, first) {
     p = { ...p, ...np };
+    if ('icon' in np) loadIcon();
     if (first) {
       size = clamp(Math.round(p.size ?? 1) || 1, 1, maxSize());
       flipped = !!p.flipped;
@@ -658,23 +728,34 @@ export function mount(el, props = {}, ctx = {}) {
       setRows(np.rows, 'pop');
     }
     if ('maxSize' in np && size > maxSize()) setSize(maxSize());
-    if ('flipped' in np) flipped = !!np.flipped;
+    // A lone flipped change turns the array (animated); with size or rows it is a fresh set-up and only sets the flag.
+    let turn = false;
+    if ('flipped' in np) {
+      if (!('size' in np) && !('rows' in np) && !!np.flipped !== flipped && rows > 0) turn = true;
+      else flipped = !!np.flipped;
+    }
     relayout();
     if ('bar' in np && W) buildBackground();
+    return turn;
   }
 
   const api = {
     getState: state,
     update(np = {}) {
       flip = null;
-      applyProps(np, false);
+      const turn = applyProps(np, false);
+      if (turn) { snapAll(); doFlip(true); }
       syncBar();
       if (W) { render(performance.now()); kick(); }
     },
     showAnswer(answer) {
       if (answer && typeof answer === 'object') {
-        if (answer.size) setSize(answer.size);
-        if (answer.rows !== undefined) setRows(answer.rows);
+        // A try goal such as { size: 5, rows: 3 }, { total: 30, size: 10 } or { flipped: true }.
+        flip = null;
+        if (typeof answer.size === 'number') setSize(answer.size);
+        if (typeof answer.rows === 'number') setRows(answer.rows);
+        else if (typeof answer.total === 'number' && size > 0 && answer.total % size === 0 && answer.total / size <= maxRows()) setRows(answer.total / size);
+        if (typeof answer.flipped === 'boolean' && answer.flipped !== flipped && rows > 0) { snapAll(); doFlip(true); }
       } else if (typeof answer === 'number' && rows === 0 && size > 0 && answer % size === 0 && answer / size <= 12) {
         // Only build the answer on an empty array; otherwise the picture already shows it (the number may be a factor).
         setRows(answer / size);

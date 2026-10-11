@@ -2,6 +2,8 @@
 // Props: total (0-50), mode ('share' | 'group'), bowls (share mode: 1-10 pads), groupSize (group mode: 1-10),
 //        icon (art name or 'dot'), filled (share mode: counts already in each pad), made (group mode: groups already made),
 //        interactive (default true), readonly.
+// update({ filled }) or update({ made }) on its own glides the items into place one after another (a dealt-out
+// reveal for a readonly picture); any other update redraws instantly.
 // Share: tap the pile or "Deal one each" to deal round-robin. Done when nothing is left, or when fewer are left than pads.
 // Group: tap "Make a group" or tap an item to pull it and its neighbours into a ring. Done when fewer than a group are left.
 // State (keys always present): { bowls, groups, left, done, groupSize }
@@ -137,7 +139,7 @@ export function mount(el, props = {}, ctx = {}) {
     const cols = total <= 12 ? Math.max(total, 1) : Math.ceil(total / Math.ceil(total / 12));
     const prow = Math.max(1, Math.ceil(total / cols));
     const trayMax = gRows > 2 ? 120 : twoRows ? 150 : 178;
-    const psp = Math.min(740 / cols, (trayMax - 24) / prow, 58);
+    const psp = Math.min(740 / cols, (trayMax - 24) / prow, 72);
     const pw = cols * psp, ph = prow * psp;
     const px0 = (VW - pw) / 2 + psp / 2, py0 = 12 + 12 + psp / 2;
     lay.pile = i => ({ x: px0 + (i % cols) * psp, y: py0 + Math.floor(i / cols) * psp, r: psp * 0.43 });
@@ -445,17 +447,38 @@ export function mount(el, props = {}, ctx = {}) {
     getState: state,
     update(np = {}) {
       timers.forEach(t => clearTimeout(t)); timers.clear();
+      const keys = Object.keys(np);
+      const glide = keys.length > 0 && keys.every(k => k === 'filled' || k === 'made') && items.length && !reducedMotion();
       p = { ...p, ...np };
       setup(false);
+      if (glide && iconKey === `${total}|${p.icon || 'dot'}`) {
+        // Deal the newly placed items in one after another; everything else settles straight away.
+        drawBack();
+        const moved = [];
+        for (let i = 0; i < total; i++) {
+          const at = where[i] >= 0 ? `${where[i]}:${slotIn[i]}` : '';
+          if (where[i] >= 0 && items[i].dataset.at !== at) moved.push(i); else place(i);
+          items[i].dataset.at = at;
+        }
+        const share = mode === 'share';
+        moved.sort((a, b) => (share ? (slotIn[a] - slotIn[b]) || (where[a] - where[b]) : (where[a] - where[b]) || (slotIn[a] - slotIn[b])));
+        const gap = share ? 110 : 45;
+        moved.forEach((i, k) => later(() => { place(i); if (share || slotIn[i] === 0) sfx('pop'); }, k * gap));
+        later(() => { drawBack(); for (let i = 0; i < total; i++) if (where[i] < 0) place(i); }, moved.length * gap + 50);
+        syncCtl();
+        return;
+      }
       redraw(true);
       for (const g of items) g.dataset.at = '';
       for (let i = 0; i < total; i++) if (where[i] >= 0 && items[i]) items[i].dataset.at = `${where[i]}:${slotIn[i]}`;
     },
-    showAnswer() {
+    showAnswer(answer) {
       timers.forEach(t => clearTimeout(t)); timers.clear();
+      // A try goal such as { bowls: [1, 1, 1] } deals only that far; anything else finishes the sharing or grouping.
+      const want = answer && typeof answer === 'object' && Array.isArray(answer.bowls) ? answer.bowls.reduce((a, b) => a + (+b || 0), 0) : Infinity;
       if (mode === 'share') {
         let n = 0;
-        while (dealOne()) n++;
+        while (counts.reduce((a, b) => a + b, 0) < want && dealOne()) n++;
         if (n) animateDeal(n);
       } else {
         while (!isDone()) {

@@ -15,12 +15,19 @@
   "Equal matters more than shape: halves of a square can be rectangles or triangles.",
   "Ask 'how do you know they are equal?' more than 'what is it called?'"
  ],
+ "warmup": {
+  "gen": "fractions.isEqualParts",
+  "level": 1,
+  "items": 3,
+  "mission": "l8",
+  "say": "First, a quick warm-up: spot the halves."
+ },
  "steps": [
   {
    "type": "look",
    "lines": [
-    "Two pilots share a fuel bar.",
-    "One piece is much bigger."
+    "Two pilots share a space snack bar.",
+    "Here is how they cut it."
    ],
    "question": "Is that fair?",
    "widget": "fractions",
@@ -28,7 +35,20 @@
     "readonly": true,
     "shape": "bar",
     "parts": 2,
-    "unequal": true
+    "unequal": true,
+    "shaded": 2,
+    "colour": "yellow"
+   },
+   "show": {
+    "label": "Cut it fairly",
+    "props": {
+     "unequal": false,
+     "labels": true
+    },
+    "lines": [
+     "Now the 2 parts are the same size.",
+     "One half each. That is fair!"
+    ]
    }
   },
   {
@@ -63,7 +83,6 @@
     "parts": 1,
     "tools": [
      "2",
-     "4",
      "glue"
     ],
     "labels": true
@@ -79,6 +98,12 @@
      "then": [
       "2 equal parts.",
       "Each one is 1/2."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 on it."
+     ],
+     "explain": [
+      "The 2 hammer cuts it into 2 equal parts."
      ]
     },
     {
@@ -89,6 +114,14 @@
       "shaded": 1
      },
      "then": [
+      "1 of 2 equal parts is 1/2."
+     ],
+     "hint": [
+      "Tap one of the 2 parts.",
+      "It turns purple."
+     ],
+     "explain": [
+      "Tap one part.",
       "1 of 2 equal parts is 1/2."
      ]
     },
@@ -102,6 +135,14 @@
      "then": [
       "Now each part is 1/4.",
       "Your half became {shaded} quarters."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 again.",
+      "Each half splits in 2."
+     ],
+     "explain": [
+      "Each half splits in 2.",
+      "Now there are 4 equal parts."
      ]
     },
     {
@@ -113,6 +154,12 @@
      },
      "then": [
       "{fraction} is coloured again."
+     ],
+     "hint": [
+      "Tap the Glue button."
+     ],
+     "explain": [
+      "Glue sticks 2 quarters into 1 half."
      ]
     }
    ]
@@ -140,6 +187,14 @@
      "then": [
       "Each half is 5 cm.",
       "Half of 10 cm is 5 cm."
+     ],
+     "caption": "10 cm",
+     "hint": [
+      "Tap the hammer with a 2 on it."
+     ],
+     "explain": [
+      "The 2 hammer cuts the strip into 2 equal halves.",
+      "Half of 10 cm is 5 cm."
      ]
     }
    ]
@@ -154,7 +209,8 @@
     "tools": [
      "2"
     ],
-    "labels": true
+    "labels": true,
+    "icon": "crystal"
    },
    "script": [
     {
@@ -168,6 +224,14 @@
      "then": [
       "3 in each group.",
       "Half of 6 is 3."
+     ],
+     "hint": [
+      "Tap the hammer with a 2 on it.",
+      "Count the crystals in each ring."
+     ],
+     "explain": [
+      "The 2 hammer makes 2 equal groups.",
+      "There are 3 crystals in each group."
      ]
     },
     {
